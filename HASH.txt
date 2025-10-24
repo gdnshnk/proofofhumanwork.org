@@ -1,0 +1,13 @@
+# Proof of Human Work – Integrity Snapshot
+# Registry: proofofhumanwork.org
+# Type: Public Registry and Documentation Layer
+# Version: v1.0.0-registry
+# Generated: 2025-10-24T00:00:00Z
+# Purpose: Cryptographic proof of registry integrity at release.
+
+<first-hash>  index.html
+<second-hash>  .well-known/public.txt
+<third-hash>  paper/position.html
+
+# Node-Reference: https://gdn.sh
+# End-of-Record
