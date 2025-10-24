@@ -19,8 +19,32 @@ registry key  : <a href="/.well-known/public.txt">/.well-known/public.txt</a>
 verify node   : <a href="https://gdn.sh">https://gdn.sh</a>  
 
 objective     : preservation of origin  
-horizon       : 100-year authorship standard   
+horizon       : 100-year authorship standard  
+
+-------------------------------------------------
+verification-node : gdn.sh  
+signature-status  : <span id="sig-status">loading...</span>  
+latest-hash       : <span id="sig-hash">loading...</span>  
+verified-on       : <span id="sig-date">loading...</span>  
+-------------------------------------------------
 </pre>
 </main>
+
+<script>
+async function loadVerification() {
+  try {
+    const res = await fetch("https://gdn.sh/pohw/verify/index.json");
+    const data = await res.json();
+
+    document.getElementById("sig-status").textContent = data.status || "unknown";
+    document.getElementById("sig-hash").textContent = data.hash || "n/a";
+    document.getElementById("sig-date").textContent = data.created || "n/a";
+  } catch (err) {
+    document.getElementById("sig-status").textContent = "unreachable";
+    console.error("Verification fetch failed:", err);
+  }
+}
+loadVerification();
+</script>
 </body>
 </html>
