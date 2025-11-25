@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoHW Attestor Framework</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<pre>
+PROOF OF HUMAN WORK — ATTESTOR FRAMEWORK
+─────────────────────────────────────────
+
+OVERVIEW
+────────
+
+Attestors are entities that issue human credentials and verify
+human presence. They play a crucial role in ensuring the "human"
+aspect of Proof of Human Work.
+
+FORMAL RULES FOR ATTESTORS
+──────────────────────────
+
+Who Can Issue Human Credentials:
+1. Accredited institutions (universities, organizations)
+2. Trusted verification providers
+3. Community-validated attestors
+4. Self-attestors (with reputation thresholds)
+
+Attestation Types:
+- Identity verification (KYC/AML compliant)
+- Credential verification (degrees, certificates)
+- Reputation-based (community validation)
+- Hardware-based (biometric, hardware keys)
+
+ATTESTOR AUDIT PROCESS
+──────────────────────
+
+Attestors must:
+
+1. Register with PoHW Foundation
+   - Submit public key
+   - Provide identity information
+   - Agree to audit terms
+
+2. Maintain Public Key
+   - Publish at /.well-known/public.txt
+   - Rotate keys securely
+   - Revoke compromised keys
+
+3. Submit Audit Logs
+   - All credential issuances
+   - Revocations
+   - Key rotations
+   - Anomaly reports
+
+4. Undergo Periodic Audits
+   - Annual review
+   - Random spot checks
+   - Incident response audits
+
+AUDIT CRITERIA
+──────────────
+
+Attestors are evaluated on:
+
+- Accuracy of credentials issued
+- Rate of false positives/negatives
+- Response to revocation requests
+- Key management practices
+- Transparency of processes
+- Compliance with privacy standards
+
+Attestors failing audits may be:
+- Suspended from issuing credentials
+- Required to improve processes
+- Removed from attestor registry
+
+REVOCATION REGISTRY
+───────────────────
+
+Attestors maintain revocation lists:
+
+- Revoked credential hashes
+- Revocation reasons (optional)
+- Revocation timestamps
+- Public access via API
+
+Revocation Format:
+{
+  "credential_hash": "0x...",
+  "revoked_at": "2025-11-25T00:00:00Z",
+  "reason": "compromised|expired|fraud",
+  "attestor_signature": "..."
+}
+
+DID CREDENTIALS BINDING
+───────────────────────
+
+Attestors issue DID-based credentials:
+
+Credential Format (W3C Verifiable Credentials):
+{
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
+  "type": ["VerifiableCredential", "HumanCredential"],
+  "issuer": "did:pohw:attestor:example",
+  "issuanceDate": "2025-11-25T00:00:00Z",
+  "credentialSubject": {
+    "id": "did:pohw:user:example",
+    "humanVerified": true,
+    "verificationMethod": "in-person|remote|automated"
+  },
+  "proof": {
+    "type": "Ed25519Signature2020",
+    "created": "2025-11-25T00:00:00Z",
+    "verificationMethod": "did:pohw:attestor:example#key-1",
+    "proofPurpose": "assertionMethod",
+    "proofValue": "..."
+  }
+}
+
+BINDING TO PROOF EVENTS
+────────────────────────
+
+Human credentials bind to PoHW attestations:
+
+1. User holds human credential from attestor
+2. User creates content and generates PoHW attestation
+3. Attestation includes credential reference:
+   {
+     "hash": "0x...",
+     "signature": "...",
+     "did": "did:pohw:user:example",
+     "human_credential": "did:pohw:attestor:example:credential:123",
+     "timestamp": "2025-11-25T00:00:00Z"
+   }
+4. Verifier checks credential validity
+5. Verifier verifies credential binds to attestation
+
+ATTESTOR TYPES
+──────────────
+
+Institutional Attestors:
+- Universities
+- Certification bodies
+- Government agencies
+- Professional organizations
+
+Commercial Attestors:
+- Identity verification services
+- KYC providers
+- Authentication platforms
+
+Community Attestors:
+- Peer validation networks
+- Reputation systems
+- Social proof mechanisms
+
+Self-Attestors:
+- Individual verification
+- Hardware-based proofs
+- Reputation thresholds required
+
+ATTESTOR API
+────────────
+
+Standard Endpoints:
+
+POST /attest/credential
+  Issue human credential
+  Auth: Attestor signature
+  Response: {credential, credential_hash}
+
+GET /verify/credential/{hash}
+  Verify credential validity
+  Response: {valid, issuer, issued_at, revoked}
+
+GET /revoke/credential/{hash}
+  Revoke credential
+  Auth: Attestor signature
+  Response: {revoked, timestamp}
+
+GET /attest/audit
+  Attestor audit logs
+  Response: [{timestamp, action, credential_hash}, ...]
+
+TRANSPARENCY REQUIREMENTS
+─────────────────────────
+
+Attestors must publish:
+
+- Public key (/.well-known/public.txt)
+- Audit logs (publicly accessible)
+- Revocation registry (queryable)
+- Attestation statistics (anonymized)
+- Policies and procedures
+
+PRIVACY CONSIDERATIONS
+──────────────────────
+
+Attestors must:
+
+- Minimize data collection
+- Use zero-knowledge proofs where possible
+- Allow credential pseudonymity
+- Enable selective disclosure
+- Respect user privacy rights
+
+ATTESTOR REGISTRY
+─────────────────
+
+PoHW Foundation maintains public attestor registry:
+
+Registry Format:
+{
+  "attestor_id": "did:pohw:attestor:example",
+  "name": "Example Attestor",
+  "public_key": "https://attestor.example/.well-known/public.txt",
+  "type": "institutional|commercial|community|self",
+  "status": "active|suspended|revoked",
+  "registered_at": "2025-01-01T00:00:00Z",
+  "last_audit": "2025-11-01T00:00:00Z"
+}
+
+Registry Location: https://proofofhumanwork.org/attestors/registry.json
+
+<a href="../">← Back to Home</a> | <a href="../governance">Governance →</a>
+</pre>
+</main>
+</body>
+</html>
+
