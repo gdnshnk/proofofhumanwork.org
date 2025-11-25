@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoHW SDKs & Libraries</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<pre>
+PROOF OF HUMAN WORK — SDKs & LIBRARIES
+──────────────────────────────────────
+
+AVAILABLE SDKs
+──────────────
+
+CLI Tool
+────────
+Installation:
+  $ npm install -g @pohw/cli
+  # or
+  $ cargo install pohw-cli
+
+Usage:
+  $ pohw attest file.txt --key ~/.pohw/key.pem
+  $ pohw verify file.txt
+  $ pohw status --node gdn.sh
+
+GitHub: https://github.com/pohw/cli
+Documentation: https://docs.pohw.org/cli
+
+JavaScript/TypeScript SDK
+─────────────────────────
+Installation:
+  $ npm install @pohw/sdk
+
+Usage:
+  import { PoHW } from '@pohw/sdk';
+  
+  const pohw = new PoHW({
+    registry: 'https://proofofhumanwork.org'
+  });
+  
+  // Attest content
+  const receipt = await pohw.attest(
+    content,
+    privateKey,
+    { did: 'did:pohw:my-did' }
+  );
+  
+  // Verify content
+  const verification = await pohw.verify(content);
+
+GitHub: https://github.com/pohw/js-sdk
+Documentation: https://docs.pohw.org/js
+
+Python SDK
+──────────
+Installation:
+  $ pip install pohw-sdk
+
+Usage:
+  from pohw import PoHW
+  
+  pohw = PoHW(registry='https://proofofhumanwork.org')
+  
+  # Attest content
+  receipt = pohw.attest(content, private_key, did='did:pohw:my-did')
+  
+  # Verify content
+  verification = pohw.verify(content)
+
+GitHub: https://github.com/pohw/py-sdk
+Documentation: https://docs.pohw.org/python
+
+Go SDK
+──────
+Installation:
+  $ go get github.com/pohw/go-sdk
+
+Usage:
+  import "github.com/pohw/go-sdk"
+  
+  client := pohw.NewClient("https://proofofhumanwork.org")
+  
+  receipt, err := client.Attest(content, privateKey, pohw.AttestOptions{
+    DID: "did:pohw:my-did",
+  })
+  
+  verification, err := client.Verify(content)
+
+GitHub: https://github.com/pohw/go-sdk
+Documentation: https://docs.pohw.org/go
+
+Rust SDK
+────────
+Cargo.toml:
+  [dependencies]
+  pohw-sdk = "1.0"
+
+Usage:
+  use pohw_sdk::PoHW;
+  
+  let client = PoHW::new("https://proofofhumanwork.org");
+  let receipt = client.attest(content, private_key, did)?;
+  let verification = client.verify(content)?;
+
+GitHub: https://github.com/pohw/rust-sdk
+Documentation: https://docs.pohw.org/rust
+
+iOS SDK (Swift)
+───────────────
+Installation:
+  Swift Package Manager
+  Repository: https://github.com/pohw/ios-sdk
+
+Usage:
+  import PoHWSDK
+  
+  let client = PoHWClient(registry: "https://proofofhumanwork.org")
+  let receipt = try await client.attest(content, privateKey: key, did: did)
+  let verification = try await client.verify(content)
+
+Android SDK (Kotlin)
+────────────────────
+Installation:
+  repositories {
+    maven { url "https://maven.pohw.org" }
+  }
+  
+  dependencies {
+    implementation "org.pohw:sdk:1.0.0"
+  }
+
+Usage:
+  import org.pohw.sdk.PoHW
+  
+  val client = PoHW(registry = "https://proofofhumanwork.org")
+  val receipt = client.attest(content, privateKey, did = did)
+  val verification = client.verify(content)
+
+EXAMPLE LIBRARIES
+─────────────────
+
+Web Integration (React):
+  npm install @pohw/react
+  
+  import { usePoHW } from '@pohw/react';
+  
+  function MyComponent() {
+    const { attest, verify } = usePoHW();
+    // ...
+  }
+
+WordPress Plugin:
+  GitHub: https://github.com/pohw/wordpress-plugin
+  Installation: WordPress admin → Plugins → Add New
+
+Browser Extension:
+  GitHub: https://github.com/pohw/browser-extension
+  Chrome/ Firefox/ Safari support
+
+CONTRIBUTING
+────────────
+
+All SDKs are open source.
+Contributions welcome:
+- Bug reports
+- Feature requests
+- Pull requests
+- Documentation improvements
+
+See each SDK's GitHub repository for contribution guidelines.
+
+<a href="../">← Back to Home</a> | <a href="../registry">Registry →</a>
+</pre>
+</main>
+</body>
+</html>
+
