@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoHW Architecture</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<pre>
+PROOF OF HUMAN WORK — ARCHITECTURE
+───────────────────────────────────
+
+REFERENCE ARCHITECTURE DIAGRAMS
+────────────────────────────────
+
+1. FOUR-LAYER PROTOCOL STACK
+─────────────────────────────
+
+┌─────────────────────────────────────────────┐
+│  LAYER 4: RETRIEVAL                        │
+│  Verification endpoints, query interfaces  │
+└─────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────┐
+│  LAYER 3: REGISTRY                         │
+│  Merkle trees, multi-chain anchoring       │
+└─────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────┐
+│  LAYER 2: VERIFICATION                     │
+│  DID-based signatures, key management      │
+└─────────────────────────────────────────────┘
+                    ↓
+┌─────────────────────────────────────────────┐
+│  LAYER 1: CLAIM                            │
+│  Content canonicalization, hashing         │
+└─────────────────────────────────────────────┘
+
+2. DATA FLOW SEQUENCE
+─────────────────────
+
+Human Creates Content
+         ↓
+Canonicalize (normalize format)
+         ↓
+Hash (SHA-256 / BLAKE3)
+         ↓
+Sign with Private Key (Ed25519)
+         ↓
+Submit to Registry Node
+         ↓
+Merkle Tree Batching
+         ↓
+Multi-Chain Anchoring
+         ↓
+Verification Endpoint Available
+
+3. PROTOCOL OBJECTS (PAV EXTENSIONS)
+────────────────────────────────────
+
+ATTESTATION OBJECT:
+{
+  "hash": "0x...",
+  "signature": "...",
+  "did": "did:pohw:...",
+  "timestamp": "2025-11-25T00:00:00Z",
+  "registry": "proofofhumanwork.org",
+  "merkle_root": "0x...",
+  "merkle_proof": [...]
+}
+
+VERIFICATION REQUEST:
+{
+  "content": "<file_hash>",
+  "signature": "<signature>",
+  "did": "did:pohw:..."
+}
+
+VERIFICATION RESPONSE:
+{
+  "valid": true|false,
+  "signer": "did:pohw:...",
+  "timestamp": "2025-11-25T00:00:00Z",
+  "registry": "proofofhumanwork.org",
+  "merkle_root": "0x...",
+  "merkle_proof": [...]
+}
+
+4. MERKLE ANCHORING
+───────────────────
+
+[Attestation 1] [Attestation 2] [Attestation 3] [Attestation 4]
+      │              │              │              │
+      └──────────────┴──────────────┴──────────────┘
+                     │
+              [Merkle Root]
+                     │
+      ┌──────────────┼──────────────┐
+      │              │              │
+  [Chain A]     [Chain B]     [Archive C]
+   (Bitcoin)    (Ethereum)    (IPFS/Arweave)
+
+5. DID-BASED IDENTITY FLOW
+──────────────────────────
+
+User Generates Keypair
+         ↓
+Create DID: did:pohw:gdn.sh
+         ↓
+Register DID on Registry
+         ↓
+Sign Content with Private Key
+         ↓
+Verify with Public Key (DID resolution)
+         ↓
+Reputation through Continuity
+
+6. LIVENESS/SESSION ATTESTATIONS
+─────────────────────────────────
+
+Hardware Signing Event
+         ↓
+Local Rate Limiting
+         ↓
+Session Token Generation
+         ↓
+Attestation with Liveness Proof
+         ↓
+Registry Verification
+
+7. PROOF RECEIPTS
+─────────────────
+
+After verification, user receives:
+
+{
+  "verified": true,
+  "receipt_hash": "0x...",
+  "verification_timestamp": "2025-11-25T00:00:00Z",
+  "verifier": "gdn.sh",
+  "content_hash": "0x...",
+  "signer_did": "did:pohw:...",
+  "merkle_proof": [...],
+  "anchors": [
+    {"chain": "bitcoin", "tx": "0x..."},
+    {"chain": "ethereum", "tx": "0x..."}
+  ]
+}
+
+SYSTEM COMPONENTS
+─────────────────
+
+REGISTRY NODES:
+- Accept verification requests
+- Maintain Merkle tree state
+- Anchor roots to chains
+- Sync with other nodes
+- Provide audit logs
+
+VERIFICATION CLIENTS:
+- Submit content + signature
+- Query verification status
+- Verify Merkle proofs
+- Check chain anchors
+
+WALLETS:
+- Generate and store keys
+- Sign content
+- Submit attestations
+- Verify third-party proofs
+
+INTEGRATION POINTS
+──────────────────
+
+- REST API endpoints
+- GraphQL queries
+- WebSocket subscriptions
+- CLI tools
+- SDK libraries (JS, Python, Go)
+
+<a href="../">← Back to Home</a> | <a href="../docs">Developer Docs →</a>
+</pre>
+</main>
+</body>
+</html>
+
