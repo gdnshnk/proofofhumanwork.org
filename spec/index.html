@@ -1,403 +1,350 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proof of Human Work — Full Standard</title>
-<link rel="stylesheet" href="../style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proof of Human Work — Full Standard</title>
+    <link rel="stylesheet" href="../shared-styles.css">
 </head>
 <body>
-<main>
-<pre>
-PROOF OF HUMAN WORK — FULL STANDARD
-────────────────────────────────────
-version : 1.0.0 (public draft)
-author  : gdn.sh : node[00]
-date    : 2025-11-25
-
-───────────────────────────────────────────────
-0. ABSTRACT
-───────────────────────────────────────────────
-
-In the synthetic era, authorship no longer implies origin.
-The instruments of creation have detached from the human hand,
-and the provenance of thought—once implicit in expression—
-now demands proof.
-
-Proof of Human Work (PoHW) is a minimal, durable protocol
-for cryptographically attesting to human authorship.
-It operates without reliance on institutional authority,
-substituting centralised trust with verifiable continuity.
-
-The system defines authorship as an event of integrity:
-a moment where human intention, content, and computation intersect.
-Each proof represents not identity, but authorship—
-a claim that a work originated from human process,
-anchored by cryptographic evidence yet shielded by privacy.
-
-PoHW establishes a public trust infrastructure
-for a post-synthetic world:
-a distributed standard to preserve epistemic reliability
-across text, image, and code for the next century.
-It reintroduces accountability without exposure,
-authorship without surveillance,
-and origin without ownership.
-
-> objective : preservation of origin
-> horizon   : 100-year verification standard
-> scope     : human authorship in the synthetic media era
-
-───────────────────────────────────────────────
-1. BACKGROUND & MOTIVATION
-───────────────────────────────────────────────
-
-The erosion of authorship is not a technical failure—it is an epistemic one.
-When machines generate with fluency equal to human language,
-the boundary between synthesis and origin collapses.
-In such a landscape, truth becomes a style, not a source.
-
-Existing verification models depend on institutional memory—
-publishers, universities, and certification bodies—
-each vulnerable to decay, bias, and discontinuity.
-These systems cannot persist for a century,
-nor can they scale across the decentralised fabric of digital creation.
-
-A cryptographic alternative is therefore required:
-one that preserves proof independent of institutions,
-that encodes authorship as data rather than decree,
-and that can survive the obsolescence of platforms, companies, and states.
-
-PoHW emerges from this necessity.
-It is not a marketplace for authenticity,
-but a protocol for epistemic survival—
-an open, verifiable layer ensuring that the human signal
-remains detectable within the noise of automation.
-
-The protocol assumes no moral purity in human work;
-it assumes only that human origin carries informational weight—
-that meaning, when authored, bears consequence.
-To preserve that consequence, authorship must be verifiable,
-not as identity, but as evidence of human agency.
-
-> premise   : provenance is infrastructure
-> failure   : institutional trust is non-durable
-> solution  : verifiable human continuity
-> outcome   : authorship persists beyond its medium
-
-───────────────────────────────────────────────
-2. PHILOSOPHICAL FOUNDATIONS
-───────────────────────────────────────────────
-
-PoHW is designed around constraint, not expansion.
-It is engineered to verify the minimum necessary truth:
-that a human created, signed, and registered a work
-without revealing who that human is.
-
-The protocol follows four governing principles—
-each an invariant across architecture, governance, and ethics.
-
-2.1 INTEGRITY
-   A proof must remain reproducible and immutable.
-   Verification must yield the same outcome regardless of who verifies it,
-   where it is stored, or when it is replayed.
-   Cryptographic primitives replace institutional testimony.
-
-2.2 PRIVACY
-   Human verification must never depend on exposure.
-   Proofs confirm authorship without identity disclosure.
-   Keys represent continuity, not personhood.
-   The system treats anonymity as a civic right, not an evasion.
-
-2.3 DURABILITY
-   Every proof must survive beyond its creator.
-   Registries are federated and mirrored across time,
-   anchored on multiple chains and archival substrates.
-   The architecture assumes institutional death
-   and designs for informational persistence.
-
-2.4 ETHICAL GOVERNANCE
-   No entity owns verification.
-   The Foundation maintains stewardship;
-   the Labs execute development;
-   neither can unilaterally alter protocol truth.
-   The design encodes restraint—
-   the refusal to monetise human verification as product.
-
-PoHW aligns cryptography with ethics,
-treating authorship not as possession, but as responsibility.
-It defines proof as a public good:
-lightweight, verifiable, and free of coercion.
-
-> trust basis : computation over institution
-> guarantee   : verifiable authorship without identity
-> horizon     : one protocol, one proof standard, one human origin
-
-───────────────────────────────────────────────
-3. DESIGN PRINCIPLES
-───────────────────────────────────────────────
-
-3.1 Minimal → Durable → Ethical
-   The protocol minimizes surface area to maximize longevity.
-   Every feature must justify its existence against a 100-year horizon.
-
-3.2 Cryptographic Primitives Over Institutions
-   Trust derives from mathematics, not authority.
-   Verification is reproducible by anyone, anywhere, anytime.
-
-3.3 Privacy by Design
-   Authorship verification without identity revelation.
-   The system proves "a human authored this" not "this human authored this."
-
-3.4 Fail Visible, Not Silent
-   Corruption, obsolescence, and compromise must be detectable.
-   The system cannot lie quietly.
-
-───────────────────────────────────────────────
-4. THREAT LANDSCAPE
-───────────────────────────────────────────────
-
-PoHW assumes that every layer can be corrupted or abandoned.
-It is designed to fail visibly, not silently.
-
-Threats include:
-- Synthetic authorship (AI-generated content)
-- Identity substitution (impersonation)
-- Mass automation (bot farms)
-- Registry corruption (compromised nodes)
-- Technological obsolescence (protocol deprecation)
-
-Defence rests on continuity, transparency, and redundancy.
-
-Security is defined as auditable integrity—
-a system that cannot lie quietly.
-
-> adversary   : synthesis, impersonation, entropy
-> defence     : continuity, transparency, redundancy
-> posture     : fail visible, persist human
-
-───────────────────────────────────────────────
-5. REFERENCE ARCHITECTURE
-───────────────────────────────────────────────
-
-PoHW operates as a layered verification stack.
-Each layer performs a discrete function—
-from the initial act of authorship
-to the public replay of its proof.
-
-LAYER 1 : CLAIM
-   The creation event.
-   Human work is canonicalised—normalised into a consistent digital form—
-   then hashed using deterministic cryptographic functions.
-
-LAYER 2 : VERIFICATION
-   The human layer.
-   A decentralised identifier (DID) and private key sign the hash.
-   The signature represents authorship without identity exposure.
-
-LAYER 3 : REGISTRY
-   The persistence layer.
-   Signed claims are batched into Merkle trees
-   and anchored across multiple public ledgers and archives.
-
-LAYER 4 : RETRIEVAL
-   The verification endpoint.
-   Anyone can submit a file to re-hash and confirm its inclusion
-   within a Merkle root and timestamp.
-
-DATA FLOW
-──────────
-human creates → canonicalise → hash → sign → anchor → verify
-
-Each proof links the act of creation to a verifiable, time-anchored event.
-No personal data, no institutional trust, no proprietary dependency.
-
-> origin event : human work
-> proof object : hash + signature + timestamp
-> verification : public, open, reproducible
-> objective    : integrity across time and medium
-
-───────────────────────────────────────────────
-6. IDENTITY & HUMAN VERIFICATION MODEL
-───────────────────────────────────────────────
-
-Authorship must be verifiable without confession.
-The human is treated not as biometric subject but as cryptographic presence—
-provable, continuous, privately held.
-
-Verification confirms key control, not identity.
-Reputation derives from persistence:
-the continuity of a signing key across time.
-Automation decays; lineage persists.
-
-Presence is ensured through local hardware signing events;
-rate-limiting enforces human cadence.
-Verification reveals no data beyond proof validity.
-
-> subject     : human keyholder
-> proof type  : signature + continuity
-> verifier    : any public node
-> trust basis : persistence, not persona
-
-───────────────────────────────────────────────
-7. REGISTRIES & DURABILITY
-───────────────────────────────────────────────
-
-Registries are federated and mirrored across time.
-They batch signed claims into Merkle trees
-and anchor roots across multiple public ledgers and archival substrates.
-
-Every registry node must:
-- Accept verification requests
-- Maintain Merkle tree state
-- Anchor roots periodically
-- Sync with other registry nodes
-- Provide public audit logs
-
-Durability is achieved through:
-- Multiple registry nodes (federation)
-- Multiple anchoring chains (redundancy)
-- Multiple archival substrates (persistence)
-- Open verification (transparency)
-
-───────────────────────────────────────────────
-8. WALLETS
-───────────────────────────────────────────────
-
-PoHW wallets manage private keys and sign attestations.
-They must:
-- Generate and store keys securely
-- Sign canonicalised content
-- Submit to registry nodes
-- Verify third-party attestations
-
-Wallet implementations should prioritize:
-- Local key storage (no cloud sync)
-- Hardware security modules (HSM) support
-- Rate limiting (prevent automation)
-- Privacy preservation (no identity leakage)
-
-───────────────────────────────────────────────
-9. GOVERNANCE
-───────────────────────────────────────────────
-
-Governance is divided between stewardship and execution.
-The Foundation preserves ethics and standards.
-The Labs implement infrastructure and code.
-No unilateral control, no ownership.
-
-All governance actions are recorded as verifiable claims
-within the PoHW ledger itself.
-Governance becomes an act of proof.
-
-> foundation : ethical permanence
-> labs       : technical execution
-> model      : dual-entity, consensus-based
-> doctrine   : stewardship without possession
-
-───────────────────────────────────────────────
-10. COMPLIANCE
-───────────────────────────────────────────────
-
-PoHW operates as a public good protocol.
-It does not:
-- Require identity disclosure
-- Collect personal data
-- Monetize verification
-- Create gatekeeping barriers
-
-Compliance is achieved through:
-- Open source implementations
-- Public audit logs
-- Transparent governance
-- Verifiable claims
-
-───────────────────────────────────────────────
-11. SOCIAL DIMENSIONS
-───────────────────────────────────────────────
-
-PoHW treats verification as a civic right.
-It enables:
-- Authorship verification without surveillance
-- Reputation through persistence, not persona
-- Accountability without exposure
-- Origin preservation for future generations
-
-The protocol assumes no moral purity in human work;
-it assumes only that human origin carries informational weight.
-
-───────────────────────────────────────────────
-12. ROADMAP
-───────────────────────────────────────────────
-
-12.1 Phase 1: Core Protocol (Current)
-   - Minimal verification endpoints
-   - Registry node implementation
-   - Basic wallet support
-
-12.2 Phase 2: Federation
-   - Multiple registry nodes
-   - Cross-node synchronization
-   - Merkle tree anchoring
-
-12.3 Phase 3: Developer Tools
-   - SDKs (JavaScript, Python, CLI)
-   - Verification APIs
-   - Integration guides
-
-12.4 Phase 4: Long-term Durability
-   - Multi-chain anchoring
-   - Archival substrate integration
-   - Post-quantum cryptography
-
-12.5 Phase 5: Ecosystem
-   - Attestor framework
-   - DID integration
-   - Zero-knowledge enhancements
-
-───────────────────────────────────────────────
-13. LIMITATIONS
-───────────────────────────────────────────────
-
-PoHW cannot:
-- Prevent synthetic content generation
-- Guarantee moral purity of human work
-- Replace legal frameworks
-- Eliminate all forms of fraud
-
-PoHW can:
-- Verify authorship cryptographically
-- Preserve provenance across time
-- Enable accountability without surveillance
-- Provide durable verification infrastructure
-
-───────────────────────────────────────────────
-14. CONCLUSION
-───────────────────────────────────────────────
-
-PoHW is an architecture designed to survive its authors.
-Its purpose is the long-term continuity of human provenance
-through centuries of technological drift.
-
-It defines verification as civic right
-and durability as ethical constraint.
-Authorship becomes infrastructure—
-as fundamental as language or memory.
-
-In its mature form, PoHW disappears into context:
-the silent substrate of informational integrity.
-The human origin signal remains traceable,
-quietly verifiable, beyond the noise of automation.
-
-> timescale  : 100-year continuity
-> objective  : permanent authorship integrity
-> ethic      : verification as civic right
-> outcome    : humanity remains traceable to itself
-
-───────────────────────────────────────────────
-
-<a href="../">← Back to Home</a> | <a href="../architecture">Architecture →</a>
-</pre>
-</main>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>PROOF OF HUMAN WORK — FULL STANDARD</h1>
+                <p class="subtitle">version 1.0.0 (public draft) | author: gdn.sh : node[00] | date: 2025-11-25</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>0. ABSTRACT</h2>
+                </div>
+                <div class="content-section">
+                    <p>In the synthetic era, authorship no longer implies origin. The instruments of creation have detached from the human hand, and the provenance of thought—once implicit in expression—now demands proof.</p>
+                    <p>Proof of Human Work (PoHW) is a minimal, durable protocol for cryptographically attesting to human authorship. It operates without reliance on institutional authority, substituting centralised trust with verifiable continuity.</p>
+                    <p>The system defines authorship as an event of integrity: a moment where human intention, content, and computation intersect. Each proof represents not identity, but authorship—a claim that a work originated from human process, anchored by cryptographic evidence yet shielded by privacy.</p>
+                    <p>PoHW establishes a public trust infrastructure for a post-synthetic world: a distributed standard to preserve epistemic reliability across text, image, and code for the next century. It reintroduces accountability without exposure, authorship without surveillance, and origin without ownership.</p>
+                    <blockquote>
+                        <p><strong>objective:</strong> preservation of origin</p>
+                        <p><strong>horizon:</strong> 100-year verification standard</p>
+                        <p><strong>scope:</strong> human authorship in the synthetic media era</p>
+                    </blockquote>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>1. BACKGROUND & MOTIVATION</h2>
+                </div>
+                <div class="content-section">
+                    <p>The erosion of authorship is not a technical failure—it is an epistemic one. When machines generate with fluency equal to human language, the boundary between synthesis and origin collapses. In such a landscape, truth becomes a style, not a source.</p>
+                    <p>Existing verification models depend on institutional memory—publishers, universities, and certification bodies—each vulnerable to decay, bias, and discontinuity. These systems cannot persist for a century, nor can they scale across the decentralised fabric of digital creation.</p>
+                    <p>A cryptographic alternative is therefore required: one that preserves proof independent of institutions, that encodes authorship as data rather than decree, and that can survive the obsolescence of platforms, companies, and states.</p>
+                    <p>PoHW emerges from this necessity. It is not a marketplace for authenticity, but a protocol for epistemic survival—an open, verifiable layer ensuring that the human signal remains detectable within the noise of automation.</p>
+                    <p>The protocol assumes no moral purity in human work; it assumes only that human origin carries informational weight—that meaning, when authored, bears consequence. To preserve that consequence, authorship must be verifiable, not as identity, but as evidence of human agency.</p>
+                    <blockquote>
+                        <p><strong>premise:</strong> provenance is infrastructure</p>
+                        <p><strong>failure:</strong> institutional trust is non-durable</p>
+                        <p><strong>solution:</strong> verifiable human continuity</p>
+                        <p><strong>outcome:</strong> authorship persists beyond its medium</p>
+                    </blockquote>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>2. PHILOSOPHICAL FOUNDATIONS</h2>
+                </div>
+                <div class="content-section">
+                    <p>PoHW is designed around constraint, not expansion. It is engineered to verify the minimum necessary truth: that a human created, signed, and registered a work without revealing who that human is.</p>
+                    <p>The protocol follows four governing principles—each an invariant across architecture, governance, and ethics.</p>
+                    <h3>2.1 INTEGRITY</h3>
+                    <p>A proof must remain reproducible and immutable. Verification must yield the same outcome regardless of who verifies it, where it is stored, or when it is replayed. Cryptographic primitives replace institutional testimony.</p>
+                    <h3>2.2 PRIVACY</h3>
+                    <p>Human verification must never depend on exposure. Proofs confirm authorship without identity disclosure. Keys represent continuity, not personhood. The system treats anonymity as a civic right, not an evasion.</p>
+                    <h3>2.3 DURABILITY</h3>
+                    <p>Every proof must survive beyond its creator. Registries are federated and mirrored across time, anchored on multiple chains and archival substrates. The architecture assumes institutional death and designs for informational persistence.</p>
+                    <h3>2.4 ETHICAL GOVERNANCE</h3>
+                    <p>No entity owns verification. The Foundation maintains stewardship; the Labs execute development; neither can unilaterally alter protocol truth. The design encodes restraint—the refusal to monetise human verification as product.</p>
+                    <p>PoHW aligns cryptography with ethics, treating authorship not as possession, but as responsibility. It defines proof as a public good: lightweight, verifiable, and free of coercion.</p>
+                    <blockquote>
+                        <p><strong>trust basis:</strong> computation over institution</p>
+                        <p><strong>guarantee:</strong> verifiable authorship without identity</p>
+                        <p><strong>horizon:</strong> one protocol, one proof standard, one human origin</p>
+                    </blockquote>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>3. DESIGN PRINCIPLES</h2>
+                </div>
+                <div class="content-section">
+                    <h3>3.1 Minimal → Durable → Ethical</h3>
+                    <p>The protocol minimizes surface area to maximize longevity. Every feature must justify its existence against a 100-year horizon.</p>
+                    <h3>3.2 Cryptographic Primitives Over Institutions</h3>
+                    <p>Trust derives from mathematics, not authority. Verification is reproducible by anyone, anywhere, anytime.</p>
+                    <h3>3.3 Privacy by Design</h3>
+                    <p>Authorship verification without identity revelation. The system proves "a human authored this" not "this human authored this."</p>
+                    <h3>3.4 Fail Visible, Not Silent</h3>
+                    <p>Corruption, obsolescence, and compromise must be detectable. The system cannot lie quietly.</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>4. THREAT LANDSCAPE</h2>
+                </div>
+                <div class="content-section">
+                    <p>PoHW assumes that every layer can be corrupted or abandoned. It is designed to fail visibly, not silently.</p>
+                    <p>Threats include:</p>
+                    <ul class="info-list">
+                        <li>Synthetic authorship (AI-generated content)</li>
+                        <li>Identity substitution (impersonation)</li>
+                        <li>Mass automation (bot farms)</li>
+                        <li>Registry corruption (compromised nodes)</li>
+                        <li>Technological obsolescence (protocol deprecation)</li>
+                    </ul>
+                    <p>Defence rests on continuity, transparency, and redundancy. Security is defined as auditable integrity—a system that cannot lie quietly.</p>
+                    <blockquote>
+                        <p><strong>adversary:</strong> synthesis, impersonation, entropy</p>
+                        <p><strong>defence:</strong> continuity, transparency, redundancy</p>
+                        <p><strong>posture:</strong> fail visible, persist human</p>
+                    </blockquote>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>5. REFERENCE ARCHITECTURE</h2>
+                </div>
+                <div class="content-section">
+                    <p>PoHW operates as a layered verification stack. Each layer performs a discrete function—from the initial act of authorship to the public replay of its proof.</p>
+                    <h3>LAYER 1 : CLAIM</h3>
+                    <p>The creation event. Human work is canonicalised—normalised into a consistent digital form—then hashed using deterministic cryptographic functions.</p>
+                    <h3>LAYER 2 : VERIFICATION</h3>
+                    <p>The human layer. A decentralised identifier (DID) and private key sign the hash. The signature represents authorship without identity exposure.</p>
+                    <h3>LAYER 3 : REGISTRY</h3>
+                    <p>The persistence layer. Signed claims are batched into Merkle trees and anchored across multiple public ledgers and archives.</p>
+                    <h3>LAYER 4 : RETRIEVAL</h3>
+                    <p>The verification endpoint. Anyone can submit a file to re-hash and confirm its inclusion within a Merkle root and timestamp.</p>
+                    <h3>DATA FLOW</h3>
+                    <p><code>human creates → canonicalise → hash → sign → anchor → verify</code></p>
+                    <p>Each proof links the act of creation to a verifiable, time-anchored event. No personal data, no institutional trust, no proprietary dependency.</p>
+                    <blockquote>
+                        <p><strong>origin event:</strong> human work</p>
+                        <p><strong>proof object:</strong> hash + signature + timestamp</p>
+                        <p><strong>verification:</strong> public, open, reproducible</p>
+                        <p><strong>objective:</strong> integrity across time and medium</p>
+                    </blockquote>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>6. IDENTITY & HUMAN VERIFICATION MODEL</h2>
+                </div>
+                <div class="content-section">
+                    <p>Authorship must be verifiable without confession. The human is treated not as biometric subject but as cryptographic presence—provable, continuous, privately held.</p>
+                    <p>Verification confirms key control, not identity. Reputation derives from persistence: the continuity of a signing key across time. Automation decays; lineage persists.</p>
+                    <p>Presence is ensured through local hardware signing events; rate-limiting enforces human cadence. Verification reveals no data beyond proof validity.</p>
+                    <blockquote>
+                        <p><strong>subject:</strong> human keyholder</p>
+                        <p><strong>proof type:</strong> signature + continuity</p>
+                        <p><strong>verifier:</strong> any public node</p>
+                        <p><strong>trust basis:</strong> persistence, not persona</p>
+                    </blockquote>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>7. REGISTRIES & DURABILITY</h2>
+                </div>
+                <div class="content-section">
+                    <p>Registries are federated and mirrored across time. They batch signed claims into Merkle trees and anchor roots across multiple public ledgers and archival substrates.</p>
+                    <p>Every registry node must:</p>
+                    <ul class="info-list">
+                        <li>Accept verification requests</li>
+                        <li>Maintain Merkle tree state</li>
+                        <li>Anchor roots periodically</li>
+                        <li>Sync with other registry nodes</li>
+                        <li>Provide public audit logs</li>
+                    </ul>
+                    <p>Durability is achieved through:</p>
+                    <ul class="info-list">
+                        <li>Multiple registry nodes (federation)</li>
+                        <li>Multiple anchoring chains (redundancy)</li>
+                        <li>Multiple archival substrates (persistence)</li>
+                        <li>Open verification (transparency)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>8. WALLETS</h2>
+                </div>
+                <div class="content-section">
+                    <p>PoHW wallets manage private keys and sign attestations. They must:</p>
+                    <ul class="info-list">
+                        <li>Generate and store keys securely</li>
+                        <li>Sign canonicalised content</li>
+                        <li>Submit to registry nodes</li>
+                        <li>Verify third-party attestations</li>
+                    </ul>
+                    <p>Wallet implementations should prioritize:</p>
+                    <ul class="info-list">
+                        <li>Local key storage (no cloud sync)</li>
+                        <li>Hardware security modules (HSM) support</li>
+                        <li>Rate limiting (prevent automation)</li>
+                        <li>Privacy preservation (no identity leakage)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>9. GOVERNANCE</h2>
+                </div>
+                <div class="content-section">
+                    <p>Governance is divided between stewardship and execution. The Foundation preserves ethics and standards. The Labs implement infrastructure and code. No unilateral control, no ownership.</p>
+                    <p>All governance actions are recorded as verifiable claims within the PoHW ledger itself. Governance becomes an act of proof.</p>
+                    <blockquote>
+                        <p><strong>foundation:</strong> ethical permanence</p>
+                        <p><strong>labs:</strong> technical execution</p>
+                        <p><strong>model:</strong> dual-entity, consensus-based</p>
+                        <p><strong>doctrine:</strong> stewardship without possession</p>
+                    </blockquote>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>10. COMPLIANCE</h2>
+                </div>
+                <div class="content-section">
+                    <p>PoHW operates as a public good protocol. It does not:</p>
+                    <ul class="info-list">
+                        <li>Require identity disclosure</li>
+                        <li>Collect personal data</li>
+                        <li>Monetize verification</li>
+                        <li>Create gatekeeping barriers</li>
+                    </ul>
+                    <p>Compliance is achieved through:</p>
+                    <ul class="info-list">
+                        <li>Open source implementations</li>
+                        <li>Public audit logs</li>
+                        <li>Transparent governance</li>
+                        <li>Verifiable claims</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>11. SOCIAL DIMENSIONS</h2>
+                </div>
+                <div class="content-section">
+                    <p>PoHW treats verification as a civic right. It enables:</p>
+                    <ul class="info-list">
+                        <li>Authorship verification without surveillance</li>
+                        <li>Reputation through persistence, not persona</li>
+                        <li>Accountability without exposure</li>
+                        <li>Origin preservation for future generations</li>
+                    </ul>
+                    <p>The protocol assumes no moral purity in human work; it assumes only that human origin carries informational weight.</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>12. ROADMAP</h2>
+                </div>
+                <div class="content-section">
+                    <h3>12.1 Phase 1: Core Protocol (Current)</h3>
+                    <ul class="info-list">
+                        <li>Minimal verification endpoints</li>
+                        <li>Registry node implementation</li>
+                        <li>Basic wallet support</li>
+                    </ul>
+                    <h3>12.2 Phase 2: Federation</h3>
+                    <ul class="info-list">
+                        <li>Multiple registry nodes</li>
+                        <li>Cross-node synchronization</li>
+                        <li>Merkle tree anchoring</li>
+                    </ul>
+                    <h3>12.3 Phase 3: Developer Tools</h3>
+                    <ul class="info-list">
+                        <li>SDKs (JavaScript, Python, CLI)</li>
+                        <li>Verification APIs</li>
+                        <li>Integration guides</li>
+                    </ul>
+                    <h3>12.4 Phase 4: Long-term Durability</h3>
+                    <ul class="info-list">
+                        <li>Multi-chain anchoring</li>
+                        <li>Archival substrate integration</li>
+                        <li>Post-quantum cryptography</li>
+                    </ul>
+                    <h3>12.5 Phase 5: Ecosystem</h3>
+                    <ul class="info-list">
+                        <li>Attestor framework</li>
+                        <li>DID integration</li>
+                        <li>Zero-knowledge enhancements</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>13. LIMITATIONS</h2>
+                </div>
+                <div class="content-section">
+                    <p>PoHW cannot:</p>
+                    <ul class="info-list">
+                        <li>Prevent synthetic content generation</li>
+                        <li>Guarantee moral purity of human work</li>
+                        <li>Replace legal frameworks</li>
+                        <li>Eliminate all forms of fraud</li>
+                    </ul>
+                    <p>PoHW can:</p>
+                    <ul class="info-list">
+                        <li>Verify authorship cryptographically</li>
+                        <li>Preserve provenance across time</li>
+                        <li>Enable accountability without surveillance</li>
+                        <li>Provide durable verification infrastructure</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>14. CONCLUSION</h2>
+                </div>
+                <div class="content-section">
+                    <p>PoHW is an architecture designed to survive its authors. Its purpose is the long-term continuity of human provenance through centuries of technological drift.</p>
+                    <p>It defines verification as civic right and durability as ethical constraint. Authorship becomes infrastructure—as fundamental as language or memory.</p>
+                    <p>In its mature form, PoHW disappears into context: the silent substrate of informational integrity. The human origin signal remains traceable, quietly verifiable, beyond the noise of automation.</p>
+                    <blockquote>
+                        <p><strong>timescale:</strong> 100-year continuity</p>
+                        <p><strong>objective:</strong> permanent authorship integrity</p>
+                        <p><strong>ethic:</strong> verification as civic right</p>
+                        <p><strong>outcome:</strong> humanity remains traceable to itself</p>
+                    </blockquote>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../architecture/">Architecture</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/pohw" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
 </body>
 </html>
-
