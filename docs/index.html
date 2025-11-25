@@ -1,238 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PoHW Developer Documentation</title>
-<link rel="stylesheet" href="../style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoHW Developer Documentation</title>
+    <link rel="stylesheet" href="../shared-styles.css">
 </head>
 <body>
-<main>
-<pre>
-PROOF OF HUMAN WORK — DEVELOPER DOCUMENTATION
-──────────────────────────────────────────────
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>PROOF OF HUMAN WORK — DEVELOPER DOCUMENTATION</h1>
+                <p class="subtitle">API reference, integration guides, and best practices</p>
+            </div>
+        </header>
 
-QUICK START
-───────────
+        <main>
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>QUICK START</h2>
+                </div>
+                <div class="content-section">
+                    <ol class="info-list" style="list-style: decimal; padding-left: 2rem;">
+                        <li>Generate a keypair</li>
+                        <li>Canonicalize your content</li>
+                        <li>Hash the content</li>
+                        <li>Sign the hash</li>
+                        <li>Submit to registry</li>
+                        <li>Verify attestation</li>
+                    </ol>
+                </div>
+            </div>
 
-1. Generate a keypair
-2. Canonicalize your content
-3. Hash the content
-4. Sign the hash
-5. Submit to registry
-6. Verify attestation
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>HOW TO SIGN A FILE</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Step 1: Canonicalize Content</h3>
+                    <p>Normalize your file to a consistent format:</p>
+                    <ul class="info-list">
+                        <li>Remove trailing whitespace</li>
+                        <li>Normalize line endings (LF)</li>
+                        <li>Sort if structured data (JSON keys sorted)</li>
+                    </ul>
 
-HOW TO SIGN A FILE
-──────────────────
+                    <h3>Step 2: Hash the Content</h3>
+                    <pre><code>$ openssl dgst -sha256 file.txt
+> SHA256(file.txt)= 0x...</code></pre>
 
-Step 1: Canonicalize Content
-   Normalize your file to a consistent format:
-   - Remove trailing whitespace
-   - Normalize line endings (LF)
-   - Sort if structured data (JSON keys sorted)
+                    <h3>Step 3: Sign the Hash</h3>
+                    <pre><code>$ echo "0x..." | openssl dgst -sha256 -sign private.pem > signature.bin</code></pre>
 
-Step 2: Hash the Content
-   $ openssl dgst -sha256 file.txt
-   > SHA256(file.txt)= 0x...
-
-Step 3: Sign the Hash
-   $ echo "0x..." | openssl dgst -sha256 -sign private.pem > signature.bin
-
-Step 4: Submit to Registry
-   POST /pohw/attest
-   {
-     "hash": "0x...",
-     "signature": "<base64>",
-     "did": "did:pohw:your-did"
-   }
-
-HOW TO VERIFY A FILE
-────────────────────
-
-Step 1: Re-hash the Content
-   $ openssl dgst -sha256 file.txt
-   > SHA256(file.txt)= 0x...
-
-Step 2: Fetch Signature
-   GET /pohw/verify/{hash}
-
-Step 3: Verify Signature
-   $ openssl dgst -sha256 -verify public.pem -signature signature.bin hash.txt
-
-Step 4: Check Merkle Proof
-   Verify inclusion in Merkle tree and chain anchors.
-
-API ENDPOINTS
-─────────────
-
-POST /pohw/attest
-   Submit a new attestation
-   Body: {hash, signature, did, timestamp}
-   Response: {receipt_hash, merkle_root}
-
-GET /pohw/verify/{hash}
-   Verify an attestation
-   Response: {valid, signer, timestamp, merkle_proof}
-
-GET /pohw/status
-   Registry node status
-   Response: {status, latest_root, anchored_at}
-
-GET /pohw/proof/{hash}
-   Get Merkle proof for hash
-   Response: {proof, root, anchors}
-
-SDKs FOR JAVASCRIPT/PYTHON/CLI
-───────────────────────────────
-
-JavaScript SDK:
-   npm install @pohw/sdk
-   
-   import { PoHW } from '@pohw/sdk';
-   const pohw = new PoHW({registry: 'https://proofofhumanwork.org'});
-   const receipt = await pohw.attest(content, privateKey);
-   const verification = await pohw.verify(content);
-
-Python SDK:
-   pip install pohw-sdk
-   
-   from pohw import PoHW
-   pohw = PoHW(registry='https://proofofhumanwork.org')
-   receipt = pohw.attest(content, private_key)
-   verification = pohw.verify(content)
-
-CLI Tool:
-   pohw attest file.txt --key private.pem
-   pohw verify file.txt
-   pohw status
-
-VERIFICATION CLIENT INTEGRATION
-───────────────────────────────
-
-Integration Pattern:
-   1. User uploads file to your service
-   2. Canonicalize and hash file
-   3. Query registry: GET /pohw/verify/{hash}
-   4. If found, verify signature
-   5. Check Merkle proof and chain anchors
-   6. Display verification status
-
-Example (JavaScript):
-   async function verifyFile(file) {
-     const hash = await sha256(file);
-     const response = await fetch(`https://gdn.sh/pohw/verify/${hash}`);
-     const data = await response.json();
-     
-     if (data.valid) {
-       // Verify signature cryptographically
-       // Check Merkle proof
-       // Display verified status
-     }
-   }
-
-ZERO-KNOWLEDGE FOOTPRINT
-────────────────────────
-
-PoHW reveals:
-- Content hash (not content itself)
-- Signature validity
-- Signer DID (not identity)
-- Timestamp
-- Merkle proof
-
-PoHW does NOT reveal:
-- Original content
-- Private keys
-- Identity information
-- Location data
-- Metadata beyond protocol needs
-
-HOW TO GENERATE PROCESS DIGESTS
-────────────────────────────────
-
-For code/content that changes:
-1. Capture snapshot at commit/publish time
-2. Canonicalize entire snapshot
-3. Hash snapshot
-4. Sign hash
-5. Attest snapshot hash
-
-For continuous content:
-1. Define canonicalization rules
-2. Hash at intervals
-3. Chain hashes (hash[i] includes hash[i-1])
-4. Attest chain root
-
-ATTESTATION FORMAT
-──────────────────
-
-Canonical JSON Format (for signing):
+                    <h3>Step 4: Submit to Registry</h3>
+                    <pre><code>POST /pohw/attest
 {
+  "hash": "0x...",
+  "signature": "&lt;base64&gt;",
+  "did": "did:pohw:your-did"
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>HOW TO VERIFY A FILE</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Step 1: Re-hash the Content</h3>
+                    <pre><code>$ openssl dgst -sha256 file.txt
+> SHA256(file.txt)= 0x...</code></pre>
+
+                    <h3>Step 2: Fetch Signature</h3>
+                    <pre><code>GET /pohw/verify/{hash}</code></pre>
+
+                    <h3>Step 3: Verify Signature</h3>
+                    <pre><code>$ openssl dgst -sha256 -verify public.pem -signature signature.bin hash.txt</code></pre>
+
+                    <h3>Step 4: Check Merkle Proof</h3>
+                    <p>Verify inclusion in Merkle tree and chain anchors.</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>API ENDPOINTS</h2>
+                </div>
+                <div class="content-section">
+                    <h3>POST /pohw/attest</h3>
+                    <p>Submit a new attestation</p>
+                    <p><strong>Body:</strong> {hash, signature, did, timestamp}</p>
+                    <p><strong>Response:</strong> {receipt_hash, merkle_root}</p>
+
+                    <h3>GET /pohw/verify/{hash}</h3>
+                    <p>Verify an attestation</p>
+                    <p><strong>Response:</strong> {valid, signer, timestamp, merkle_proof}</p>
+
+                    <h3>GET /pohw/status</h3>
+                    <p>Registry node status</p>
+                    <p><strong>Response:</strong> {status, latest_root, anchored_at}</p>
+
+                    <h3>GET /pohw/proof/{hash}</h3>
+                    <p>Get Merkle proof for hash</p>
+                    <p><strong>Response:</strong> {proof, root, anchors}</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>SDKs FOR JAVASCRIPT/PYTHON/CLI</h2>
+                </div>
+                <div class="content-section">
+                    <h3>JavaScript SDK:</h3>
+                    <pre><code>npm install @pohw/sdk
+
+import { PoHW } from '@pohw/sdk';
+const pohw = new PoHW({registry: 'https://proofofhumanwork.org'});
+const receipt = await pohw.attest(content, privateKey);
+const verification = await pohw.verify(content);</code></pre>
+
+                    <h3>Python SDK:</h3>
+                    <pre><code>pip install pohw-sdk
+
+from pohw import PoHW
+pohw = PoHW(registry='https://proofofhumanwork.org')
+receipt = pohw.attest(content, private_key)
+verification = pohw.verify(content)</code></pre>
+
+                    <h3>CLI Tool:</h3>
+                    <pre><code>pohw attest file.txt --key private.pem
+pohw verify file.txt
+pohw status</code></pre>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>VERIFICATION CLIENT INTEGRATION</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Integration Pattern:</h3>
+                    <ol class="info-list" style="list-style: decimal; padding-left: 2rem;">
+                        <li>User uploads file to your service</li>
+                        <li>Canonicalize and hash file</li>
+                        <li>Query registry: GET /pohw/verify/{hash}</li>
+                        <li>If found, verify signature</li>
+                        <li>Check Merkle proof and chain anchors</li>
+                        <li>Display verification status</li>
+                    </ol>
+
+                    <h3>Example (JavaScript):</h3>
+                    <pre><code>async function verifyFile(file) {
+  const hash = await sha256(file);
+  const response = await fetch(`https://gdn.sh/pohw/verify/${hash}`);
+  const data = await response.json();
+  
+  if (data.valid) {
+    // Verify signature cryptographically
+    // Check Merkle proof
+    // Display verified status
+  }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>ZERO-KNOWLEDGE FOOTPRINT</h2>
+                </div>
+                <div class="content-section">
+                    <h3>PoHW reveals:</h3>
+                    <ul class="info-list">
+                        <li>Content hash (not content itself)</li>
+                        <li>Signature validity</li>
+                        <li>Signer DID (not identity)</li>
+                        <li>Timestamp</li>
+                        <li>Merkle proof</li>
+                    </ul>
+
+                    <h3>PoHW does NOT reveal:</h3>
+                    <ul class="info-list">
+                        <li>Original content</li>
+                        <li>Private keys</li>
+                        <li>Identity information</li>
+                        <li>Location data</li>
+                        <li>Metadata beyond protocol needs</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>HOW TO GENERATE PROCESS DIGESTS</h2>
+                </div>
+                <div class="content-section">
+                    <h3>For code/content that changes:</h3>
+                    <ol class="info-list" style="list-style: decimal; padding-left: 2rem;">
+                        <li>Capture snapshot at commit/publish time</li>
+                        <li>Canonicalize entire snapshot</li>
+                        <li>Hash snapshot</li>
+                        <li>Sign hash</li>
+                        <li>Attest snapshot hash</li>
+                    </ol>
+
+                    <h3>For continuous content:</h3>
+                    <ol class="info-list" style="list-style: decimal; padding-left: 2rem;">
+                        <li>Define canonicalization rules</li>
+                        <li>Hash at intervals</li>
+                        <li>Chain hashes (hash[i] includes hash[i-1])</li>
+                        <li>Attest chain root</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>ATTESTATION FORMAT</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Canonical JSON Format (for signing):</h3>
+                    <pre><code>{
   "hash": "0x361132bb73b257cb8fcb0001d2328005f6b33b6ac5359f2394bc01c7571cc646",
   "did": "did:pohw:gdn.sh",
   "timestamp": "2025-11-25T00:00:00Z",
   "registry": "proofofhumanwork.org",
   "protocol": "Proof of Human Work",
   "version": "1.0.0"
-}
+}</code></pre>
+                    <p><strong>Signature:</strong> Ed25519 signature of canonical JSON</p>
+                    <p><strong>Format:</strong> Binary or Base64-encoded</p>
+                </div>
+            </div>
 
-Signature: Ed25519 signature of canonical JSON
-Format: Binary or Base64-encoded
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>REGISTRY NODE OPERATION</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Running a Registry Node:</h3>
+                    <ol class="info-list" style="list-style: decimal; padding-left: 2rem;">
+                        <li>Setup server with API endpoints</li>
+                        <li>Initialize Merkle tree state</li>
+                        <li>Accept attestation submissions</li>
+                        <li>Batch into Merkle trees</li>
+                        <li>Anchor roots to chains periodically</li>
+                        <li>Sync with other registry nodes</li>
+                        <li>Provide verification endpoints</li>
+                    </ol>
 
-REGISTRY NODE OPERATION
-───────────────────────
+                    <h3>Requirements:</h3>
+                    <ul class="info-list">
+                        <li>Persistent storage for Merkle tree</li>
+                        <li>Chain integration (Bitcoin, Ethereum, etc.)</li>
+                        <li>Rate limiting</li>
+                        <li>CORS configuration</li>
+                        <li>Public key endpoint</li>
+                    </ul>
+                </div>
+            </div>
 
-Running a Registry Node:
-1. Setup server with API endpoints
-2. Initialize Merkle tree state
-3. Accept attestation submissions
-4. Batch into Merkle trees
-5. Anchor roots to chains periodically
-6. Sync with other registry nodes
-7. Provide verification endpoints
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>BEST PRACTICES</h2>
+                </div>
+                <div class="content-section">
+                    <ol class="info-list" style="list-style: decimal; padding-left: 2rem;">
+                        <li>Always canonicalize before hashing</li>
+                        <li>Store private keys securely (HSM recommended)</li>
+                        <li>Verify signatures before trusting</li>
+                        <li>Check Merkle proofs and chain anchors</li>
+                        <li>Use rate limiting to prevent automation</li>
+                        <li>Preserve privacy—don't leak identity</li>
+                        <li>Monitor registry node status</li>
+                        <li>Keep SDKs updated</li>
+                    </ol>
+                </div>
+            </div>
 
-Requirements:
-- Persistent storage for Merkle tree
-- Chain integration (Bitcoin, Ethereum, etc.)
-- Rate limiting
-- CORS configuration
-- Public key endpoint
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>TROUBLESHOOTING</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Signature Verification Fails:</h3>
+                    <ul class="info-list">
+                        <li>Check canonicalization matches</li>
+                        <li>Verify public key matches private key</li>
+                        <li>Ensure signature format is correct</li>
+                    </ul>
 
-BEST PRACTICES
-──────────────
+                    <h3>Attestation Not Found:</h3>
+                    <ul class="info-list">
+                        <li>Check hash matches exactly</li>
+                        <li>Verify registry node is operational</li>
+                        <li>Check timestamp is within validity window</li>
+                    </ul>
 
-1. Always canonicalize before hashing
-2. Store private keys securely (HSM recommended)
-3. Verify signatures before trusting
-4. Check Merkle proofs and chain anchors
-5. Use rate limiting to prevent automation
-6. Preserve privacy—don't leak identity
-7. Monitor registry node status
-8. Keep SDKs updated
+                    <h3>Merkle Proof Invalid:</h3>
+                    <ul class="info-list">
+                        <li>Verify proof path is correct</li>
+                        <li>Check Merkle root matches chain anchor</li>
+                        <li>Ensure registry node is synced</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
 
-TROUBLESHOOTING
-───────────────
-
-Common Issues:
-
-Signature Verification Fails:
-- Check canonicalization matches
-- Verify public key matches private key
-- Ensure signature format is correct
-
-Attestation Not Found:
-- Check hash matches exactly
-- Verify registry node is operational
-- Check timestamp is within validity window
-
-Merkle Proof Invalid:
-- Verify proof path is correct
-- Check Merkle root matches chain anchor
-- Ensure registry node is synced
-
-<a href="../">← Back to Home</a> | <a href="../sdk">SDKs →</a>
-</pre>
-</main>
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../sdk/">SDKs</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="https://github.com/pohw" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
 </body>
 </html>
-
