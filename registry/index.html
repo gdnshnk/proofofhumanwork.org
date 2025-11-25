@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoHW Registry Documentation</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<pre>
+PROOF OF HUMAN WORK — REGISTRY NODE OPERATION
+──────────────────────────────────────────────
+
+OVERVIEW
+────────
+
+Registry nodes are the persistence layer of the PoHW protocol.
+They maintain Merkle trees of attestations and anchor roots
+to multiple blockchains and archival substrates.
+
+HOW TO RUN A PoHW REGISTRY NODE
+────────────────────────────────
+
+Prerequisites:
+- Server with persistent storage
+- Network access to blockchain nodes
+- SSL certificate for HTTPS
+- Public IP address
+
+Step 1: Install Registry Software
+  $ git clone https://github.com/pohw/registry-node
+  $ cd registry-node
+  $ npm install  # or appropriate package manager
+
+Step 2: Configure Node
+  Create config.json:
+  {
+    "node_id": "your-node-id",
+    "merkle_batch_size": 1000,
+    "anchor_interval": 3600,
+    "chains": ["bitcoin", "ethereum"],
+    "storage": {
+      "type": "postgresql",
+      "connection": "..."
+    }
+  }
+
+Step 3: Initialize Merkle Tree
+  $ pohw-registry init
+
+Step 4: Start Node
+  $ pohw-registry start
+
+MERKLE BATCHING
+───────────────
+
+Registry nodes batch attestations into Merkle trees:
+
+1. Accept attestation submissions
+2. Validate signatures
+3. Add to pending batch
+4. When batch size reached, build Merkle tree
+5. Generate Merkle root
+6. Anchor root to chains
+7. Make proofs available
+
+Batch Size: Configurable (default: 1000 attestations)
+Anchor Interval: Periodic anchoring even if batch not full
+
+MULTI-CHAIN ANCHORING
+─────────────────────
+
+Registry nodes anchor Merkle roots to multiple chains:
+
+Supported Chains:
+- Bitcoin (OP_RETURN)
+- Ethereum (contract or transaction)
+- IPFS (content addressing)
+- Arweave (permanent storage)
+
+Anchor Format:
+{
+  "merkle_root": "0x...",
+  "timestamp": "2025-11-25T00:00:00Z",
+  "block_height": 12345,
+  "tx_hash": "0x...",
+  "chain": "bitcoin"
+}
+
+CROSS-REGISTRY SYNC
+───────────────────
+
+Registry nodes sync with each other:
+
+1. Discover other nodes via registry list
+2. Exchange Merkle roots periodically
+3. Verify roots match (consensus)
+4. Replicate attestations for redundancy
+5. Handle conflicts via transparency logs
+
+Sync Protocol:
+- HTTP-based sync API
+- Merkle root exchange
+- Conflict resolution
+- State reconciliation
+
+AUDIT LOGS
+──────────
+
+Every registry node maintains public audit logs:
+
+Log Entries Include:
+- Attestation submissions (hash, timestamp)
+- Merkle tree constructions (root, size)
+- Chain anchorings (chain, tx, height)
+- Sync events (peer, action)
+- Errors and warnings
+
+Audit Log Format:
+{
+  "timestamp": "2025-11-25T00:00:00Z",
+  "type": "attestation|merkle|anchor|sync|error",
+  "data": {...}
+}
+
+Public Access: GET /pohw/audit?from=timestamp&to=timestamp
+
+REVOCATION RULES
+────────────────
+
+Attestations can be revoked by signer:
+
+1. Signer submits revocation request
+2. Registry validates signature
+3. Mark attestation as revoked
+4. Update Merkle tree (new root)
+5. Anchor revocation to chains
+6. Propagate to other nodes
+
+Revocation Format:
+{
+  "hash": "0x...",
+  "signature": "...",
+  "revocation_reason": "optional",
+  "timestamp": "2025-11-25T00:00:00Z"
+}
+
+FEDERATION POLICIES
+───────────────────
+
+Registry nodes form federations:
+
+Federation Rules:
+- Nodes must maintain public keys
+- Nodes must provide audit logs
+- Nodes must anchor to at least 2 chains
+- Nodes must sync with peers
+- Nodes must follow consensus protocol
+
+Federation Discovery:
+- Central registry list (proofofhumanwork.org)
+- DNS-based discovery
+- Peer-to-peer announcement
+
+REQUIREMENTS FOR REGISTRY OPERATORS
+────────────────────────────────────
+
+Minimum Requirements:
+- 99% uptime
+- < 1 hour anchoring latency
+- Public audit logs
+- CORS enabled for verification
+- SSL certificate
+- Persistent storage
+- Multiple chain access
+
+Recommended:
+- Redundant infrastructure
+- Monitoring and alerting
+- Backup procedures
+- Rate limiting
+- DDoS protection
+
+REGISTRY API ENDPOINTS
+──────────────────────
+
+POST /pohw/attest
+  Submit attestation
+  Auth: Signature verification
+  Response: {receipt_hash, merkle_root}
+
+GET /pohw/verify/{hash}
+  Verify attestation
+  Response: {valid, signer, timestamp, merkle_proof}
+
+GET /pohw/proof/{hash}
+  Get Merkle proof
+  Response: {proof, root, anchors}
+
+GET /pohw/status
+  Node status
+  Response: {status, latest_root, anchored_at, sync_status}
+
+GET /pohw/audit
+  Audit logs
+  Query: from, to, limit
+  Response: [{timestamp, type, data}, ...]
+
+GET /pohw/peers
+  List peer nodes
+  Response: [{node_id, url, status}, ...]
+
+MONITORING
+──────────
+
+Registry nodes should expose metrics:
+
+- Attestations per second
+- Merkle tree size
+- Anchoring latency
+- Sync status
+- Error rates
+- Storage usage
+
+Monitoring Endpoint: GET /pohw/metrics
+
+<a href="../">← Back to Home</a> | <a href="../attestors">Attestors →</a>
+</pre>
+</main>
+</body>
+</html>
+
