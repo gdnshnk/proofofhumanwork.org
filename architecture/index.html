@@ -1,23 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PoHW Architecture</title>
-<link rel="stylesheet" href="../style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoHW Architecture</title>
+    <link rel="stylesheet" href="../shared-styles.css">
 </head>
 <body>
-<main>
-<pre>
-PROOF OF HUMAN WORK — ARCHITECTURE
-───────────────────────────────────
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>PROOF OF HUMAN WORK — ARCHITECTURE</h1>
+                <p class="subtitle">System architecture & data flows</p>
+            </div>
+        </header>
 
-REFERENCE ARCHITECTURE DIAGRAMS
-────────────────────────────────
-
-1. FOUR-LAYER PROTOCOL STACK
-─────────────────────────────
-
+        <main>
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>1. FOUR-LAYER PROTOCOL STACK</h2>
+                </div>
+                <div class="content-section">
+                    <pre style="background: var(--bg-tertiary); padding: 1rem; border: 1px solid var(--border-color); overflow-x: auto;">
 ┌─────────────────────────────────────────────┐
 │  LAYER 4: RETRIEVAL                        │
 │  Verification endpoints, query interfaces  │
@@ -37,31 +41,35 @@ REFERENCE ARCHITECTURE DIAGRAMS
 │  LAYER 1: CLAIM                            │
 │  Content canonicalization, hashing         │
 └─────────────────────────────────────────────┘
+                    </pre>
+                </div>
+            </div>
 
-2. DATA FLOW SEQUENCE
-─────────────────────
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>2. DATA FLOW SEQUENCE</h2>
+                </div>
+                <div class="content-section">
+                    <ul class="info-list">
+                        <li><strong>Human Creates Content</strong></li>
+                        <li><strong>Canonicalize</strong> (normalize format)</li>
+                        <li><strong>Hash</strong> (SHA-256 / BLAKE3)</li>
+                        <li><strong>Sign with Private Key</strong> (Ed25519)</li>
+                        <li><strong>Submit to Registry Node</strong></li>
+                        <li><strong>Merkle Tree Batching</strong></li>
+                        <li><strong>Multi-Chain Anchoring</strong></li>
+                        <li><strong>Verification Endpoint Available</strong></li>
+                    </ul>
+                </div>
+            </div>
 
-Human Creates Content
-         ↓
-Canonicalize (normalize format)
-         ↓
-Hash (SHA-256 / BLAKE3)
-         ↓
-Sign with Private Key (Ed25519)
-         ↓
-Submit to Registry Node
-         ↓
-Merkle Tree Batching
-         ↓
-Multi-Chain Anchoring
-         ↓
-Verification Endpoint Available
-
-3. PROTOCOL OBJECTS (PAV EXTENSIONS)
-────────────────────────────────────
-
-ATTESTATION OBJECT:
-{
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>3. PROTOCOL OBJECTS (PAV EXTENSIONS)</h2>
+                </div>
+                <div class="content-section">
+                    <h3>ATTESTATION OBJECT:</h3>
+                    <pre><code>{
   "hash": "0x...",
   "signature": "...",
   "did": "did:pohw:...",
@@ -69,28 +77,33 @@ ATTESTATION OBJECT:
   "registry": "proofofhumanwork.org",
   "merkle_root": "0x...",
   "merkle_proof": [...]
-}
+}</code></pre>
 
-VERIFICATION REQUEST:
-{
-  "content": "<file_hash>",
-  "signature": "<signature>",
+                    <h3>VERIFICATION REQUEST:</h3>
+                    <pre><code>{
+  "content": "&lt;file_hash&gt;",
+  "signature": "&lt;signature&gt;",
   "did": "did:pohw:..."
-}
+}</code></pre>
 
-VERIFICATION RESPONSE:
-{
+                    <h3>VERIFICATION RESPONSE:</h3>
+                    <pre><code>{
   "valid": true|false,
   "signer": "did:pohw:...",
   "timestamp": "2025-11-25T00:00:00Z",
   "registry": "proofofhumanwork.org",
   "merkle_root": "0x...",
   "merkle_proof": [...]
-}
+}</code></pre>
+                </div>
+            </div>
 
-4. MERKLE ANCHORING
-───────────────────
-
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>4. MERKLE ANCHORING</h2>
+                </div>
+                <div class="content-section">
+                    <pre style="background: var(--bg-tertiary); padding: 1rem; border: 1px solid var(--border-color); overflow-x: auto;">
 [Attestation 1] [Attestation 2] [Attestation 3] [Attestation 4]
       │              │              │              │
       └──────────────┴──────────────┴──────────────┘
@@ -101,41 +114,48 @@ VERIFICATION RESPONSE:
       │              │              │
   [Chain A]     [Chain B]     [Archive C]
    (Bitcoin)    (Ethereum)    (IPFS/Arweave)
+                    </pre>
+                </div>
+            </div>
 
-5. DID-BASED IDENTITY FLOW
-──────────────────────────
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>5. DID-BASED IDENTITY FLOW</h2>
+                </div>
+                <div class="content-section">
+                    <ul class="info-list">
+                        <li><strong>User Generates Keypair</strong></li>
+                        <li><strong>Create DID:</strong> did:pohw:gdn.sh</li>
+                        <li><strong>Register DID on Registry</strong></li>
+                        <li><strong>Sign Content with Private Key</strong></li>
+                        <li><strong>Verify with Public Key</strong> (DID resolution)</li>
+                        <li><strong>Reputation through Continuity</strong></li>
+                    </ul>
+                </div>
+            </div>
 
-User Generates Keypair
-         ↓
-Create DID: did:pohw:gdn.sh
-         ↓
-Register DID on Registry
-         ↓
-Sign Content with Private Key
-         ↓
-Verify with Public Key (DID resolution)
-         ↓
-Reputation through Continuity
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>6. LIVENESS/SESSION ATTESTATIONS</h2>
+                </div>
+                <div class="content-section">
+                    <ul class="info-list">
+                        <li><strong>Hardware Signing Event</strong></li>
+                        <li><strong>Local Rate Limiting</strong></li>
+                        <li><strong>Session Token Generation</strong></li>
+                        <li><strong>Attestation with Liveness Proof</strong></li>
+                        <li><strong>Registry Verification</strong></li>
+                    </ul>
+                </div>
+            </div>
 
-6. LIVENESS/SESSION ATTESTATIONS
-─────────────────────────────────
-
-Hardware Signing Event
-         ↓
-Local Rate Limiting
-         ↓
-Session Token Generation
-         ↓
-Attestation with Liveness Proof
-         ↓
-Registry Verification
-
-7. PROOF RECEIPTS
-─────────────────
-
-After verification, user receives:
-
-{
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>7. PROOF RECEIPTS</h2>
+                </div>
+                <div class="content-section">
+                    <p>After verification, user receives:</p>
+                    <pre><code>{
   "verified": true,
   "receipt_hash": "0x...",
   "verification_timestamp": "2025-11-25T00:00:00Z",
@@ -147,42 +167,67 @@ After verification, user receives:
     {"chain": "bitcoin", "tx": "0x..."},
     {"chain": "ethereum", "tx": "0x..."}
   ]
-}
+}</code></pre>
+                </div>
+            </div>
 
-SYSTEM COMPONENTS
-─────────────────
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>SYSTEM COMPONENTS</h2>
+                </div>
+                <div class="content-section">
+                    <h3>REGISTRY NODES:</h3>
+                    <ul class="info-list">
+                        <li>Accept verification requests</li>
+                        <li>Maintain Merkle tree state</li>
+                        <li>Anchor roots to chains</li>
+                        <li>Sync with other nodes</li>
+                        <li>Provide audit logs</li>
+                    </ul>
 
-REGISTRY NODES:
-- Accept verification requests
-- Maintain Merkle tree state
-- Anchor roots to chains
-- Sync with other nodes
-- Provide audit logs
+                    <h3>VERIFICATION CLIENTS:</h3>
+                    <ul class="info-list">
+                        <li>Submit content + signature</li>
+                        <li>Query verification status</li>
+                        <li>Verify Merkle proofs</li>
+                        <li>Check chain anchors</li>
+                    </ul>
 
-VERIFICATION CLIENTS:
-- Submit content + signature
-- Query verification status
-- Verify Merkle proofs
-- Check chain anchors
+                    <h3>WALLETS:</h3>
+                    <ul class="info-list">
+                        <li>Generate and store keys</li>
+                        <li>Sign content</li>
+                        <li>Submit attestations</li>
+                        <li>Verify third-party proofs</li>
+                    </ul>
+                </div>
+            </div>
 
-WALLETS:
-- Generate and store keys
-- Sign content
-- Submit attestations
-- Verify third-party proofs
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>INTEGRATION POINTS</h2>
+                </div>
+                <div class="content-section">
+                    <ul class="info-list">
+                        <li>REST API endpoints</li>
+                        <li>GraphQL queries</li>
+                        <li>WebSocket subscriptions</li>
+                        <li>CLI tools</li>
+                        <li>SDK libraries (JS, Python, Go)</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
 
-INTEGRATION POINTS
-──────────────────
-
-- REST API endpoints
-- GraphQL queries
-- WebSocket subscriptions
-- CLI tools
-- SDK libraries (JS, Python, Go)
-
-<a href="../">← Back to Home</a> | <a href="../docs">Developer Docs →</a>
-</pre>
-</main>
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../docs/">Developer Docs</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="https://github.com/pohw" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
 </body>
 </html>
-
