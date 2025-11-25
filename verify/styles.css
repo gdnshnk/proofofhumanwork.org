@@ -1,0 +1,786 @@
+/**
+ * PoHW Verification Web App - Branded Styles
+ * Minimal, durable, long-term design aligned with PoHW protocol
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --bg-primary: #0c0c0c;
+    --bg-secondary: #111111;
+    --bg-tertiary: #1a1a1a;
+    --text-primary: #d1d1d1;
+    --text-secondary: #a0a0a0;
+    --text-tertiary: #666666;
+    --accent-green: #7ef9a9;
+    --accent-green-bright: #00ff9c;
+    --accent-green-hover: #adffda;
+    --accent-green-glow: rgba(0, 255, 120, 0.2);
+    --border-color: #333333;
+    --border-dashed: #444444;
+    --success-color: #00ff9c;
+    --error-color: #ff6b6b;
+    --shadow-glow: 0 0 10px rgba(0, 255, 120, 0.1);
+    --text-glow: 0 0 2px rgba(0, 255, 120, 0.2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'IBM Plex Mono', monospace;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 4vw;
+}
+
+::selection {
+    background: var(--accent-green-bright);
+    color: var(--bg-primary);
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Header */
+header {
+    text-align: left;
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed var(--border-dashed);
+}
+
+.header-content h1 {
+    font-size: 1.8rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    text-shadow: var(--text-glow);
+    letter-spacing: 0.05em;
+}
+
+.subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+/* Cards */
+.verification-card,
+.info-card,
+.result-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-glow);
+}
+
+.card-header {
+    margin-bottom: 1.5rem;
+}
+
+.card-header h2 {
+    font-size: 1.2rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+
+.card-header p {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Tabs */
+.verification-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px dashed var(--border-dashed);
+}
+
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 400;
+    font-family: 'IBM Plex Mono', monospace;
+    cursor: pointer;
+    border-bottom: 1px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+}
+
+.tab-button:hover {
+    color: var(--accent-green);
+    background: var(--bg-tertiary);
+}
+
+.tab-button.active {
+    color: var(--accent-green-bright);
+    border-bottom-color: var(--accent-green-bright);
+    text-shadow: 0 0 3px var(--accent-green-glow);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Upload Area */
+.upload-area {
+    border: 1px dashed var(--border-dashed);
+    border-radius: 0;
+    padding: 3rem 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: var(--bg-tertiary);
+}
+
+.upload-area:hover {
+    border-color: var(--accent-green);
+    background: var(--bg-secondary);
+    box-shadow: 0 0 10px var(--accent-green-glow);
+}
+
+.upload-area.dragover {
+    border-color: var(--accent-green-bright);
+    background: var(--bg-secondary);
+    box-shadow: 0 0 15px var(--accent-green-glow);
+}
+
+.upload-icon {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+
+.upload-text {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.upload-hint {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+}
+
+.file-input {
+    display: none;
+}
+
+.file-info {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    font-size: 0.85rem;
+}
+
+.file-info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.file-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.file-info-item strong {
+    color: var(--text-primary);
+}
+
+/* Input Groups */
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-group label {
+    display: block;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+}
+
+.hash-input,
+.content-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    font-size: 0.9rem;
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+.hash-input:focus,
+.content-textarea:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 5px var(--accent-green-glow);
+    background: var(--bg-secondary);
+}
+
+.registry-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    font-size: 0.9rem;
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--bg-tertiary);
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    transition: all 0.2s;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237ef9a9' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.5rem;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    text-shadow: none;
+    -webkit-text-shadow: none;
+    -moz-text-shadow: none;
+    filter: none;
+    -webkit-filter: none;
+    -moz-filter: none;
+}
+
+.registry-select::-webkit-appearance {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.registry-select::-moz-appearance {
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.registry-select:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 5px var(--accent-green-glow);
+    background-color: var(--bg-secondary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237ef9a9' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    -webkit-box-shadow: 0 0 5px var(--accent-green-glow);
+    -moz-box-shadow: 0 0 5px var(--accent-green-glow);
+}
+
+.registry-select:hover {
+    border-color: var(--accent-green);
+    background-color: var(--bg-secondary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237ef9a9' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+}
+
+.registry-select option {
+    background: var(--bg-tertiary);
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    border: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+}
+
+.content-textarea {
+    resize: vertical;
+    min-height: 200px;
+}
+
+.input-hint {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    margin-top: 0.5rem;
+}
+
+.registry-selector {
+    margin: 1.5rem 0;
+}
+
+.registry-selector label {
+    display: block;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+}
+
+/* Verify Button */
+.verify-button {
+    width: 100%;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    color: var(--accent-green-bright);
+    border: 1px solid var(--accent-green);
+    font-size: 0.9rem;
+    font-weight: 400;
+    font-family: 'IBM Plex Mono', monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    letter-spacing: 0.02em;
+    text-shadow: var(--text-glow);
+}
+
+.verify-button:hover:not(:disabled) {
+    background: var(--bg-secondary);
+    border-color: var(--accent-green-bright);
+    color: var(--accent-green-hover);
+    box-shadow: 0 0 10px var(--accent-green-glow);
+    text-shadow: 0 0 4px var(--accent-green-glow);
+}
+
+.verify-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.button-loader {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(126, 249, 169, 0.3);
+    border-top-color: var(--accent-green);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Results */
+.results-section {
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--border-dashed);
+}
+
+.result-header h3 {
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+}
+
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid;
+    font-size: 0.8rem;
+    font-weight: 400;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.05em;
+}
+
+.status-badge.valid {
+    background: transparent;
+    border-color: var(--success-color);
+    color: var(--success-color);
+    text-shadow: 0 0 3px var(--accent-green-glow);
+}
+
+.status-badge.invalid {
+    background: transparent;
+    border-color: var(--error-color);
+    color: var(--error-color);
+}
+
+.result-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 0.75rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    font-size: 0.85rem;
+}
+
+.result-label {
+    font-weight: 400;
+    color: var(--text-secondary);
+    min-width: 120px;
+    letter-spacing: 0.02em;
+}
+
+.result-value {
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    word-break: break-all;
+    color: var(--text-primary);
+}
+
+.hash-value {
+    color: var(--accent-green);
+    text-shadow: 0 0 2px var(--accent-green-glow);
+}
+
+/* Verdict Section */
+.verdict-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--border-dashed);
+}
+
+.verdict-section h4 {
+    font-size: 0.95rem;
+    font-weight: 400;
+    margin-bottom: 2rem;
+    margin-top: 0;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+
+.verdict-section .result-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.verdict-type {
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.verdict-type.verdict-human-authored {
+    color: var(--success-color);
+    text-shadow: 0 0 3px var(--accent-green-glow);
+}
+
+.verdict-type.verdict-human-approved {
+    color: var(--accent-green);
+    text-shadow: 0 0 2px var(--accent-green-glow);
+}
+
+.verdict-type.verdict-ai-assisted {
+    color: #ffa500;
+    text-shadow: 0 0 2px rgba(255, 165, 0, 0.3);
+}
+
+.verdict-type.verdict-indeterminate {
+    color: var(--text-secondary);
+}
+
+/* PAV Ontology Section */
+.pav-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--border-dashed);
+}
+
+.pav-section h4 {
+    font-size: 0.95rem;
+    font-weight: 400;
+    margin-bottom: 2rem;
+    margin-top: 0;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+
+.pav-subsection {
+    margin-bottom: 2.5rem;
+}
+
+.pav-subsection:last-child {
+    margin-bottom: 0;
+}
+
+.pav-subsection h5 {
+    font-size: 0.85rem;
+    font-weight: 400;
+    margin-bottom: 1.25rem;
+    margin-top: 0;
+    color: var(--accent-green);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    padding-bottom: 0;
+}
+
+/* Merkle & Anchors Sections */
+.merkle-section,
+.anchors-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--border-dashed);
+}
+
+.merkle-section h4,
+.anchors-section h4 {
+    font-size: 0.95rem;
+    font-weight: 400;
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    color: var(--text-primary);
+    letter-spacing: 0.02em;
+}
+
+.proof-path {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0.75rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+}
+
+.proof-path-item {
+    padding: 0.4rem 0.6rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.anchors-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.anchor-item {
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-left: 2px solid var(--accent-green);
+}
+
+.anchor-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.anchor-chain {
+    font-weight: 400;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+}
+
+.anchor-link {
+    color: var(--accent-green);
+    text-decoration: none;
+    font-size: 0.8rem;
+    border-bottom: 1px dotted var(--accent-green);
+    transition: color 0.2s;
+}
+
+.anchor-link:hover {
+    color: var(--accent-green-hover);
+    border-bottom-color: var(--accent-green-hover);
+}
+
+.anchor-tx {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    word-break: break-all;
+}
+
+/* Error Section */
+.error-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--border-dashed);
+}
+
+.error-message {
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-left: 2px solid var(--error-color);
+    border: 1px solid var(--border-color);
+    border-left: 2px solid var(--error-color);
+    color: var(--error-color);
+    font-size: 0.85rem;
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+/* Info Card */
+.info-card h3 {
+    font-size: 1rem;
+    font-weight: 400;
+    margin-bottom: 1rem;
+    letter-spacing: 0.02em;
+}
+
+.info-list {
+    list-style: none;
+    margin-bottom: 1.5rem;
+}
+
+.info-list li {
+    padding: 0.75rem 0;
+    border-bottom: 1px dashed var(--border-dashed);
+    font-size: 0.85rem;
+    line-height: 1.8;
+}
+
+.info-list li:last-child {
+    border-bottom: none;
+}
+
+.info-list strong {
+    color: var(--accent-green);
+    font-weight: 400;
+}
+
+.privacy-note {
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-left: 2px solid var(--accent-green);
+    border: 1px solid var(--border-color);
+    border-left: 2px solid var(--accent-green);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.privacy-note strong {
+    color: var(--accent-green);
+}
+
+/* Footer */
+footer {
+    text-align: left;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--border-dashed);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+footer p {
+    margin-bottom: 0.5rem;
+}
+
+footer a {
+    color: var(--accent-green);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--accent-green);
+    transition: color 0.2s;
+}
+
+footer a:hover {
+    color: var(--accent-green-hover);
+    border-bottom-color: var(--accent-green-hover);
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-green);
+    opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    body {
+        padding: 6vw;
+        font-size: 14px;
+    }
+
+    .header-content h1 {
+        font-size: 1.5rem;
+    }
+
+    .verification-card,
+    .info-card,
+    .result-card {
+        padding: 1.5rem;
+    }
+
+    .verification-tabs {
+        flex-wrap: wrap;
+    }
+
+    .result-item {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .result-label {
+        min-width: auto;
+    }
+
+    .result-value {
+        text-align: left;
+    }
+}
