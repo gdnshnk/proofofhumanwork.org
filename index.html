@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proof of Human Work</title>
+<title>Proof of Human Work — Protocol Specification</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,56 +11,99 @@
 <pre>
 PROOF OF HUMAN WORK
 ────────────────────
-A minimal, durable protocol for cryptographically attesting to human authorship.
+A minimal, durable protocol for cryptographically attesting to human authorship
+in the age of synthetic media.
+
+OVERVIEW
+────────
+Proof of Human Work (PoHW) is a cryptographic protocol that preserves the human
+origin signal in the synthetic media era. It enables verification of authorship
+without identity disclosure—proving that work originated from human process,
+anchored by cryptographic evidence yet shielded by privacy.
+
+The protocol operates through a four-layer architecture: Claim (content hashing),
+Verification (human signatures via DIDs), Registry (federated Merkle anchoring),
+and Retrieval (open verification endpoints).
 
 WHAT IS PoHW?
 ─────────────
-Proof of Human Work is a cryptographic protocol that preserves the human origin
-signal in the synthetic media era. It enables verification of authorship without
-identity disclosure—proving that work originated from human process, anchored by
+PoHW provides a deterministic framework for proving when and by whom a work was
+created and approved. Rather than attempting to detect AI output, PoHW creates
+cryptographic proof at the moment of authorship—immutable, verifiable, and
+portable across centuries.
+
+The system defines authorship as an event of integrity: a moment where human
+intention, content, and computation intersect. Each proof represents not identity,
+but authorship—a claim that a work originated from human process, anchored by
 cryptographic evidence yet shielded by privacy.
 
 WHY PoHW EXISTS
 ───────────────
 In the synthetic era, authorship no longer implies origin. When machines generate
 with fluency equal to human language, the boundary between synthesis and origin
-collapses. PoHW provides a durable, institutional-independent standard to preserve
-epistemic reliability across text, image, and code for the next century.
+collapses. Traditional verification models depend on institutional memory—
+publishers, universities, and certification bodies—each vulnerable to decay,
+bias, and discontinuity.
 
-QUICK LINKS
+PoHW provides a durable, institutional-independent standard to preserve epistemic
+reliability across text, image, and code for the next century. It reintroduces
+accountability without exposure, authorship without surveillance, and origin
+without ownership.
+
+CORE PRINCIPLES
+───────────────
+• Minimal → Durable → Ethical design philosophy
+• Privacy-preserving (pseudonymous by default)
+• Federated architecture (no single point of failure)
+• Multi-chain anchoring (Bitcoin, Ethereum, IPFS, Arweave)
+• Open verification (anyone can verify, no gatekeeping)
+
+QUICK START
 ───────────
-<a href="/spec">Download Full Standard</a>
-<a href="/architecture">View Architecture</a>
-<a href="/verify">Verify a Proof</a>
+<a href="/spec">Full Protocol Specification</a>
+<a href="/architecture">System Architecture</a>
 <a href="/docs">Developer Documentation</a>
 <a href="/sdk">SDKs & Libraries</a>
+<a href="/verify">Verification Interface</a>
 
 PROTOCOL STATUS
 ───────────────
 Version: 1.0.0 (live draft)
+Status: Active Development
 Registry: proofofhumanwork.org
-Verification Node: <a href="https://gdn.sh">gdn.sh</a>
+Primary Node: <a href="https://gdn.sh">gdn.sh</a>
 
-Verification Node Status:
-node: gdn.sh
-status: <span id="sig-status">loading...</span>
-hash: <span id="sig-hash">loading...</span>
-verified: <span id="sig-date">loading...</span>
+Node Status:
+  node: gdn.sh
+  status: <span id="sig-status">loading...</span>
+  latest hash: <span id="sig-hash">loading...</span>
+  verified: <span id="sig-date">loading...</span>
 
-NAVIGATION
-──────────
-<a href="/spec">/spec</a>          — Full protocol specification
-<a href="/architecture">/architecture</a> — System architecture & diagrams
-<a href="/whitepaper">/whitepaper</a>    — PDF whitepaper
-<a href="/docs">/docs</a>          — Developer documentation
-<a href="/sdk">/sdk</a>            — Software development kits
-<a href="/registry">/registry</a>      — Registry node documentation
-<a href="/attestors">/attestors</a>     — Attestor framework & rules
-<a href="/governance">/governance</a>    — Governance & Foundation
-<a href="/roadmap">/roadmap</a>        — Development roadmap
-<a href="/verify">/verify</a>        — Verification interface
-<a href="/research">/research</a>      — Future work & research
-<a href="/foundation">/foundation</a>   — Foundation documents
+DOCUMENTATION
+─────────────
+<a href="/spec">/spec</a>              Full protocol specification (14 sections)
+<a href="/architecture">/architecture</a>    System architecture & data flows
+<a href="/whitepaper">/whitepaper</a>        PDF whitepaper download
+<a href="/docs">/docs</a>              Developer documentation & APIs
+<a href="/sdk">/sdk</a>                SDKs (JavaScript, Python, Go, Rust, CLI)
+<a href="/registry">/registry</a>          Registry node operation guide
+<a href="/attestors">/attestors</a>         Attestor framework & accreditation
+<a href="/governance">/governance</a>        Governance model & Foundation
+<a href="/roadmap">/roadmap</a>            Development roadmap & phases
+<a href="/verify">/verify</a>            Online verification interface
+<a href="/research">/research</a>          Future work & research initiatives
+<a href="/foundation">/foundation</a>       Foundation mission & transparency
+
+INTEGRATION
+───────────
+PoHW integrates with existing standards:
+• eIDAS 2.0 (European Digital Identity)
+• C2PA (Content Authenticity Initiative)
+• DOIs, ORCID, Crossref (Academic Publishing)
+• UETA (US Electronic Signatures)
+• W3C DIDs & Verifiable Credentials
+
+For implementation details, see <a href="/docs">Developer Documentation</a>.
 </pre>
 </main>
 
@@ -75,6 +118,8 @@ async function loadVerification() {
     document.getElementById("sig-date").textContent = data.created || "n/a";
   } catch (err) {
     document.getElementById("sig-status").textContent = "unreachable";
+    document.getElementById("sig-hash").textContent = "—";
+    document.getElementById("sig-date").textContent = "—";
     console.error("Verification fetch failed:", err);
   }
 }
