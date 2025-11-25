@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PoHW Verification Interface</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+<pre>
+PROOF OF HUMAN WORK — VERIFICATION INTERFACE
+─────────────────────────────────────────────
+
+VERIFY A PROOF
+──────────────
+
+Upload your file and signature to verify authorship.
+
+[File Upload Area]
+┌─────────────────────────────────────────┐
+│  Drop file here or click to browse     │
+│                                         │
+│  [Choose File]                          │
+└─────────────────────────────────────────┘
+
+[Signature Upload]
+┌─────────────────────────────────────────┐
+│  Drop signature file here               │
+│                                         │
+│  [Choose Signature File]                │
+└─────────────────────────────────────────┘
+
+[Verify Button]
+[  Verify  ]
+
+VERIFICATION RESULT
+───────────────────
+
+Status: <span id="verification-status">—</span>
+Signer: <span id="verifier-did">—</span>
+Timestamp: <span id="verification-time">—</span>
+Hash: <span id="content-hash">—</span>
+Registry: <span id="registry-node">—</span>
+
+Merkle Proof:
+<span id="merkle-proof">—</span>
+
+Chain Anchors:
+<span id="chain-anchors">—</span>
+
+VERIFICATION METHODS
+────────────────────
+
+Method 1: Web Interface
+   Use this page to upload files and verify.
+
+Method 2: API
+   POST /pohw/verify
+   {
+     "content": "<base64>",
+     "signature": "<base64>"
+   }
+
+Method 3: CLI
+   $ pohw verify file.txt
+
+Method 4: SDK
+   const verification = await pohw.verify(content);
+
+WHAT GETS VERIFIED
+──────────────────
+
+✓ Content hash matches
+✓ Signature is valid
+✓ Signer DID is verified
+✓ Attestation exists in registry
+✓ Merkle proof is valid
+✓ Chain anchors confirm timestamp
+✓ No revocation found
+
+PRIVACY
+───────
+
+This verification process:
+- Does NOT reveal original content
+- Does NOT expose identity
+- Does NOT track users
+- Does NOT store files
+
+Only the hash and signature are used for verification.
+
+VERIFICATION NODES
+──────────────────
+
+Current Active Nodes:
+- gdn.sh (primary)
+- [Additional nodes as they come online]
+
+You can specify a node:
+[Node Selection]
+Default: gdn.sh
+Custom: [________________]
+
+<a href="../">← Back to Home</a> | <a href="../research">Research →</a>
+
+<script>
+// Simple verification interface
+document.addEventListener('DOMContentLoaded', function() {
+  // File upload handlers
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.id = 'file-input';
+  
+  const verifyButton = document.createElement('button');
+  verifyButton.textContent = 'Verify';
+  verifyButton.onclick = async function() {
+    // Verification logic would go here
+    document.getElementById('verification-status').textContent = 'Verification in progress...';
+    // Implementation would fetch from registry and verify
+  };
+  
+  // Basic UI setup would continue here
+});
+</script>
+</pre>
+</main>
+</body>
+</html>
+
