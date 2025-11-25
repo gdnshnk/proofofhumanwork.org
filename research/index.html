@@ -1,205 +1,269 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PoHW Research</title>
-<link rel="stylesheet" href="../style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoHW Research</title>
+    <link rel="stylesheet" href="../shared-styles.css">
 </head>
 <body>
-<main>
-<pre>
-PROOF OF HUMAN WORK — RESEARCH & FUTURE WORK
-─────────────────────────────────────────────
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>PROOF OF HUMAN WORK — RESEARCH & FUTURE WORK</h1>
+                <p class="subtitle">Ongoing research initiatives and future directions</p>
+            </div>
+        </header>
 
-ONGOING RESEARCH
-────────────────
+        <main>
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>1. POST-QUANTUM SIGNATURES</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Status: Early Research Phase | Timeline: 2026-2027</p>
+                </div>
+                <div class="content-section">
+                    <h3>Challenge:</h3>
+                    <p>Current cryptographic signatures (Ed25519) may be vulnerable to quantum computing attacks in the future.</p>
 
-1. POST-QUANTUM SIGNATURES
-───────────────────────────
-Status: Early Research Phase
-Timeline: 2026-2027
+                    <h3>Research Areas:</h3>
+                    <ul class="info-list">
+                        <li>Lattice-based signatures (Dilithium, SPHINCS+)</li>
+                        <li>Hash-based signatures</li>
+                        <li>Isogeny-based cryptography</li>
+                        <li>Migration strategies for existing proofs</li>
+                    </ul>
 
-Challenge:
-Current cryptographic signatures (Ed25519) may be vulnerable
-to quantum computing attacks in the future.
+                    <h3>Goal:</h3>
+                    <p>Ensure PoHW attestations remain secure beyond the quantum era while maintaining compatibility with existing infrastructure.</p>
 
-Research Areas:
-- Lattice-based signatures (Dilithium, SPHINCS+)
-- Hash-based signatures
-- Isogeny-based cryptography
-- Migration strategies for existing proofs
+                    <h3>Publications:</h3>
+                    <ul class="info-list">
+                        <li>[Pending] Post-Quantum Migration Strategy</li>
+                        <li>[Pending] Performance Analysis of PQ Signatures</li>
+                    </ul>
+                </div>
+            </div>
 
-Goal:
-Ensure PoHW attestations remain secure beyond the quantum era
-while maintaining compatibility with existing infrastructure.
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>2. ZERO-KNOWLEDGE PROOFS</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Status: Exploration Phase | Timeline: 2026-2027</p>
+                </div>
+                <div class="content-section">
+                    <h3>Challenge:</h3>
+                    <p>Enable verification of human authorship without revealing any information about the content or signer.</p>
 
-Publications:
-- [Pending] Post-Quantum Migration Strategy
-- [Pending] Performance Analysis of PQ Signatures
+                    <h3>Research Areas:</h3>
+                    <ul class="info-list">
+                        <li>zk-SNARKs for authorship proofs</li>
+                        <li>zk-STARKs for verification</li>
+                        <li>Privacy-preserving attestations</li>
+                        <li>Selective disclosure mechanisms</li>
+                    </ul>
 
-2. ZERO-KNOWLEDGE PROOFS
-─────────────────────────
-Status: Exploration Phase
-Timeline: 2026-2027
+                    <h3>Goal:</h3>
+                    <p>Enhance privacy while maintaining verifiability.</p>
 
-Challenge:
-Enable verification of human authorship without revealing
-any information about the content or signer.
+                    <h3>Publications:</h3>
+                    <ul class="info-list">
+                        <li>[Pending] ZK-Proofs for Authorship Verification</li>
+                        <li>[Pending] Privacy Analysis of PoHW</li>
+                    </ul>
+                </div>
+            </div>
 
-Research Areas:
-- zk-SNARKs for authorship proofs
-- zk-STARKs for verification
-- Privacy-preserving attestations
-- Selective disclosure mechanisms
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>3. HUMAN PRESENCE METRICS</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Status: Design Phase | Timeline: 2026</p>
+                </div>
+                <div class="content-section">
+                    <h3>Challenge:</h3>
+                    <p>Detect and verify human presence in creation process without biometric surveillance.</p>
 
-Goal:
-Enhance privacy while maintaining verifiability.
+                    <h3>Research Areas:</h3>
+                    <ul class="info-list">
+                        <li>Behavioral analysis (typing patterns, cadence)</li>
+                        <li>Hardware attestation (secure enclaves)</li>
+                        <li>Rate limiting strategies</li>
+                        <li>Liveness detection methods</li>
+                    </ul>
 
-Publications:
-- [Pending] ZK-Proofs for Authorship Verification
-- [Pending] Privacy Analysis of PoHW
+                    <h3>Goal:</h3>
+                    <p>Improve confidence in human authorship while preserving privacy.</p>
 
-3. HUMAN PRESENCE METRICS
-──────────────────────────
-Status: Design Phase
-Timeline: 2026
+                    <h3>Publications:</h3>
+                    <ul class="info-list">
+                        <li>[Pending] Human Presence Verification Methods</li>
+                        <li>[Pending] Privacy-Preserving Liveness Detection</li>
+                    </ul>
+                </div>
+            </div>
 
-Challenge:
-Detect and verify human presence in creation process
-without biometric surveillance.
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>4. LONG-TERM DURABILITY</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Status: Continuous Research | Timeline: Ongoing</p>
+                </div>
+                <div class="content-section">
+                    <h3>Challenge:</h3>
+                    <p>Ensure proofs remain verifiable for 100+ years despite technological changes and platform obsolescence.</p>
 
-Research Areas:
-- Behavioral analysis (typing patterns, cadence)
-- Hardware attestation (secure enclaves)
-- Rate limiting strategies
-- Liveness detection methods
+                    <h3>Research Areas:</h3>
+                    <ul class="info-list">
+                        <li>Format migration strategies</li>
+                        <li>Protocol versioning</li>
+                        <li>Archive substrate evaluation</li>
+                        <li>Redundancy optimization</li>
+                    </ul>
 
-Goal:
-Improve confidence in human authorship while preserving privacy.
+                    <h3>Goal:</h3>
+                    <p>Guarantee proof persistence across technological generations.</p>
 
-Publications:
-- [Pending] Human Presence Verification Methods
-- [Pending] Privacy-Preserving Liveness Detection
+                    <h3>Publications:</h3>
+                    <ul class="info-list">
+                        <li>[Ongoing] Durability Assessment Report</li>
+                        <li>[Ongoing] Archive Substrate Comparison</li>
+                    </ul>
+                </div>
+            </div>
 
-4. LONG-TERM DURABILITY
-───────────────────────
-Status: Continuous Research
-Timeline: Ongoing
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>5. PRIVACY ENHANCEMENTS</h2>
+                    <p style="color: var(--accent-green); margin-top: 0.5rem;">Status: Active Development | Timeline: Ongoing</p>
+                </div>
+                <div class="content-section">
+                    <h3>Research Areas:</h3>
+                    <ul class="info-list">
+                        <li>Anonymous credentials</li>
+                        <li>Unlinkable attestations</li>
+                        <li>Differential privacy</li>
+                        <li>Metadata minimization</li>
+                    </ul>
 
-Challenge:
-Ensure proofs remain verifiable for 100+ years despite
-technological changes and platform obsolescence.
+                    <h3>Goal:</h3>
+                    <p>Maximize privacy while maintaining verification capability.</p>
+                </div>
+            </div>
 
-Research Areas:
-- Format migration strategies
-- Protocol versioning
-- Archive substrate evaluation
-- Redundancy optimization
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>FUTURE WORK</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Short-Term (2026):</h3>
+                    <ul class="info-list">
+                        <li>Multi-signature support</li>
+                        <li>Key rotation protocols</li>
+                        <li>Enhanced Merkle tree structures</li>
+                        <li>Improved SDK ecosystem</li>
+                    </ul>
 
-Goal:
-Guarantee proof persistence across technological generations.
+                    <h3>Mid-Term (2027):</h3>
+                    <ul class="info-list">
+                        <li>Advanced ZK-proof integration</li>
+                        <li>Post-quantum signature adoption</li>
+                        <li>Enhanced attestor framework</li>
+                        <li>Community reputation systems</li>
+                    </ul>
 
-Publications:
-- [Ongoing] Durability Assessment Report
-- [Ongoing] Archive Substrate Comparison
+                    <h3>Long-Term (2028+):</h3>
+                    <ul class="info-list">
+                        <li>Full protocol maturity</li>
+                        <li>Global adoption</li>
+                        <li>Integration with other standards</li>
+                        <li>Interoperability frameworks</li>
+                    </ul>
+                </div>
+            </div>
 
-5. PRIVACY ENHANCEMENTS
-───────────────────────
-Status: Active Development
-Timeline: Ongoing
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>RESEARCH COLLABORATIONS</h2>
+                </div>
+                <div class="content-section">
+                    <p>We collaborate with:</p>
+                    <ul class="info-list">
+                        <li>Academic institutions</li>
+                        <li>Cryptography research groups</li>
+                        <li>Standards organizations (W3C, IETF)</li>
+                        <li>Privacy advocacy groups</li>
+                        <li>Open source communities</li>
+                    </ul>
+                    <p><strong>If you're interested in collaborating:</strong> research@proofofhumanwork.org</p>
+                </div>
+            </div>
 
-Research Areas:
-- Anonymous credentials
-- Unlinkable attestations
-- Differential privacy
-- Metadata minimization
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>PUBLICATIONS</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Academic Papers:</h3>
+                    <ul class="info-list">
+                        <li>[Forthcoming] Proof of Human Work: A Cryptographic Protocol for Authorship Verification in the Synthetic Era</li>
+                    </ul>
 
-Goal:
-Maximize privacy while maintaining verification capability.
+                    <h3>Technical Reports:</h3>
+                    <ul class="info-list">
+                        <li>Protocol Specification v1.0.0</li>
+                        <li>Security Analysis Report</li>
+                        <li>Privacy Assessment</li>
+                    </ul>
 
-FUTURE WORK
-───────────
+                    <h3>Research Papers:</h3>
+                    <ul class="info-list">
+                        <li>[In Review] Post-Quantum Migration Strategies</li>
+                        <li>[In Preparation] ZK-Proofs for Authorship</li>
+                    </ul>
+                </div>
+            </div>
 
-Short-Term (2026):
-- Multi-signature support
-- Key rotation protocols
-- Enhanced Merkle tree structures
-- Improved SDK ecosystem
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>CALL FOR RESEARCH</h2>
+                </div>
+                <div class="content-section">
+                    <p>We welcome research contributions on:</p>
+                    <ul class="info-list">
+                        <li>Cryptography and security</li>
+                        <li>Privacy-preserving technologies</li>
+                        <li>Distributed systems</li>
+                        <li>Long-term preservation</li>
+                        <li>Human-computer interaction</li>
+                        <li>Ethics and governance</li>
+                    </ul>
+                    <p><strong>Submit research proposals:</strong> <a href="https://github.com/pohw/research" target="_blank">https://github.com/pohw/research</a></p>
+                </div>
+            </div>
 
-Mid-Term (2027):
-- Advanced ZK-proof integration
-- Post-quantum signature adoption
-- Enhanced attestor framework
-- Community reputation systems
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>RESEARCH GRANTS</h2>
+                </div>
+                <div class="content-section">
+                    <p>PoHW Foundation offers research grants for:</p>
+                    <ul class="info-list">
+                        <li>Post-quantum cryptography research</li>
+                        <li>Privacy enhancement projects</li>
+                        <li>Durability studies</li>
+                        <li>Protocol improvements</li>
+                    </ul>
+                    <p><strong>Grant Application:</strong> <a href="https://proofofhumanwork.org/foundation/grants" target="_blank">https://proofofhumanwork.org/foundation/grants</a></p>
+                </div>
+            </div>
+        </main>
 
-Long-Term (2028+):
-- Full protocol maturity
-- Global adoption
-- Integration with other standards
-- Interoperability frameworks
-
-RESEARCH COLLABORATIONS
-───────────────────────
-
-We collaborate with:
-
-- Academic institutions
-- Cryptography research groups
-- Standards organizations (W3C, IETF)
-- Privacy advocacy groups
-- Open source communities
-
-If you're interested in collaborating:
-research@proofofhumanwork.org
-
-PUBLICATIONS
-────────────
-
-Academic Papers:
-- [Forthcoming] Proof of Human Work: A Cryptographic Protocol
-  for Authorship Verification in the Synthetic Era
-
-Technical Reports:
-- Protocol Specification v1.0.0
-- Security Analysis Report
-- Privacy Assessment
-
-Research Papers:
-- [In Review] Post-Quantum Migration Strategies
-- [In Preparation] ZK-Proofs for Authorship
-
-CALL FOR RESEARCH
-─────────────────
-
-We welcome research contributions on:
-
-- Cryptography and security
-- Privacy-preserving technologies
-- Distributed systems
-- Long-term preservation
-- Human-computer interaction
-- Ethics and governance
-
-Submit research proposals:
-https://github.com/pohw/research
-
-RESEARCH GRANTS
-───────────────
-
-PoHW Foundation offers research grants for:
-
-- Post-quantum cryptography research
-- Privacy enhancement projects
-- Durability studies
-- Protocol improvements
-
-Grant Application:
-https://proofofhumanwork.org/foundation/grants
-
-<a href="../">← Back to Home</a> | <a href="../foundation">Foundation →</a>
-</pre>
-</main>
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../foundation/">Foundation</a> | 
+                <a href="../roadmap/">Roadmap</a> | 
+                <a href="https://github.com/pohw" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
 </body>
 </html>
-
