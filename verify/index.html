@@ -1,130 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PoHW Verification Interface</title>
-<link rel="stylesheet" href="../style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoHW Verification — Proof of Human Work</title>
+    <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
-<main>
-<pre>
-PROOF OF HUMAN WORK — VERIFICATION INTERFACE
-─────────────────────────────────────────────
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>PROOF OF HUMAN WORK</h1>
+                <p class="subtitle">Verification Interface</p>
+            </div>
+        </header>
 
-VERIFY A PROOF
-──────────────
+        <main>
+            <div class="verification-card">
+                <div class="card-header">
+                    <h2>VERIFY PROOF</h2>
+                    <p>Upload a file, paste content, or enter a hash to verify authorship</p>
+                </div>
 
-Upload your file and signature to verify authorship.
+                <div class="verification-tabs">
+                    <button class="tab-button active" data-tab="file">FILE</button>
+                    <button class="tab-button" data-tab="hash">HASH</button>
+                    <button class="tab-button" data-tab="content">CONTENT</button>
+                </div>
 
-[File Upload Area]
-┌─────────────────────────────────────────┐
-│  Drop file here or click to browse     │
-│                                         │
-│  [Choose File]                          │
-└─────────────────────────────────────────┘
+                <!-- File Upload Tab -->
+                <div class="tab-content active" id="file-tab">
+                    <div class="upload-area" id="upload-area">
+                        <svg class="upload-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <p class="upload-text">Drop your file here or click to browse</p>
+                        <p class="upload-hint">Supports text, images, documents, and more</p>
+                        <input type="file" id="file-input" class="file-input" multiple>
+                    </div>
+                    <div id="file-info" class="file-info hidden"></div>
+                </div>
 
-[Signature Upload]
-┌─────────────────────────────────────────┐
-│  Drop signature file here               │
-│                                         │
-│  [Choose Signature File]                │
-└─────────────────────────────────────────┘
+                <!-- Hash Input Tab -->
+                <div class="tab-content" id="hash-tab">
+                    <div class="input-group">
+                        <label for="hash-input">Content Hash</label>
+                        <input type="text" id="hash-input" placeholder="0xabc123..." class="hash-input">
+                        <p class="input-hint">Enter the hash of the content you want to verify</p>
+                    </div>
+                </div>
 
-[Verify Button]
-[  Verify  ]
+                <!-- Content Paste Tab -->
+                <div class="tab-content" id="content-tab">
+                    <div class="input-group">
+                        <label for="content-textarea">Content</label>
+                        <textarea id="content-textarea" placeholder="Paste your content here..." rows="10" class="content-textarea"></textarea>
+                        <p class="input-hint">The content will be hashed and verified</p>
+                    </div>
+                </div>
 
-VERIFICATION RESULT
-───────────────────
+                <div class="registry-selector">
+                    <label for="registry-select">Registry Node</label>
+                    <select id="registry-select" class="registry-select">
+                        <option value="https://pohw-registry-node-production.up.railway.app" selected>Production (Railway)</option>
+                        <option value="http://localhost:3000">Local Development</option>
+                        <option value="https://gdn.sh">gdn.sh</option>
+                    </select>
+                </div>
 
-Status: <span id="verification-status">—</span>
-Signer: <span id="verifier-did">—</span>
-Timestamp: <span id="verification-time">—</span>
-Hash: <span id="content-hash">—</span>
-Registry: <span id="registry-node">—</span>
+                <button id="verify-button" class="verify-button">
+                    <span class="button-text">Verify Proof</span>
+                    <span class="button-loader hidden"></span>
+                </button>
+            </div>
 
-Merkle Proof:
-<span id="merkle-proof">—</span>
+            <!-- Results Section -->
+            <div id="results-section" class="results-section hidden">
+                <div class="result-card" id="result-card">
+                    <div class="result-header">
+                        <h3>VERIFICATION RESULT</h3>
+                        <div class="status-badge" id="status-badge"></div>
+                    </div>
 
-Chain Anchors:
-<span id="chain-anchors">—</span>
+                    <div class="result-content">
+                        <div class="result-item">
+                            <span class="result-label">Status</span>
+                            <span class="result-value" id="result-status">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Signer DID</span>
+                            <span class="result-value" id="result-signer">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Timestamp</span>
+                            <span class="result-value" id="result-timestamp">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Content Hash</span>
+                            <span class="result-value hash-value" id="result-hash">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Registry</span>
+                            <span class="result-value" id="result-registry">—</span>
+                        </div>
+                    </div>
 
-VERIFICATION METHODS
-────────────────────
+                    <!-- Merkle Proof Section -->
+                    <div id="merkle-section" class="merkle-section hidden">
+                        <h4>MERKLE PROOF</h4>
+                        <div class="result-item">
+                            <span class="result-label">Merkle Root</span>
+                            <span class="result-value hash-value" id="merkle-root">—</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Proof Path</span>
+                            <div class="proof-path" id="proof-path"></div>
+                        </div>
+                    </div>
 
-Method 1: Web Interface
-   Use this page to upload files and verify.
+                    <!-- Deterministic Verdict Section -->
+                    <div id="verdict-section" class="verdict-section">
+                        <h4>DETERMINISTIC VERDICT</h4>
+                        <div class="result-content">
+                            <div class="result-item">
+                                <span class="result-label">Verdict Type</span>
+                                <span class="result-value verdict-type" id="verdict-type">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Verdict Explanation</span>
+                                <span class="result-value" id="verdict-explanation">—</span>
+                            </div>
+                        </div>
+                    </div>
 
-Method 2: API
-   POST /pohw/verify
-   {
-     "content": "<base64>",
-     "signature": "<base64>"
-   }
+                    <!-- PAV Ontology Section -->
+                    <div id="pav-section" class="pav-section">
+                        <h4>PAV ONTOLOGY</h4>
+                        
+                        <!-- Core Provenance -->
+                        <div class="pav-subsection">
+                            <h5>Core Provenance</h5>
+                            <div class="result-content">
+                                <div class="result-item">
+                                    <span class="result-label">Created By (DID)</span>
+                                    <span class="result-value" id="pav-created-by">—</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Created On</span>
+                                    <span class="result-value" id="pav-created-on">—</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Derived From</span>
+                                    <span class="result-value hash-value" id="pav-derived-from">—</span>
+                                </div>
+                            </div>
+                        </div>
 
-Method 3: CLI
-   $ pohw verify file.txt
+                        <!-- Environment Attestations -->
+                        <div class="pav-subsection">
+                            <h5>Environment Attestations</h5>
+                            <div class="result-content">
+                                <div class="result-item">
+                                    <span class="result-label">Authored On Device</span>
+                                    <span class="result-value" id="pav-device">—</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Environment Attestation</span>
+                                    <span class="result-value" id="pav-environment">—</span>
+                                </div>
+                            </div>
+                        </div>
 
-Method 4: SDK
-   const verification = await pohw.verify(content);
+                        <!-- Process Layer Evidence -->
+                        <div class="pav-subsection">
+                            <h5>Process Layer Evidence</h5>
+                            <div class="result-content">
+                                <div class="result-item">
+                                    <span class="result-label">Process Digest</span>
+                                    <span class="result-value hash-value" id="pav-process-digest">—</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Entropy Proof</span>
+                                    <span class="result-value" id="pav-entropy">—</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Temporal Coherence</span>
+                                    <span class="result-value" id="pav-coherence">—</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Compound Hash</span>
+                                    <span class="result-value hash-value" id="pav-compound-hash">—</span>
+                                </div>
+                            </div>
+                        </div>
 
-WHAT GETS VERIFIED
-──────────────────
+                        <!-- Cryptographic Attestations -->
+                        <div class="pav-subsection">
+                            <h5>Cryptographic Attestations</h5>
+                            <div class="result-content">
+                                <div class="result-item">
+                                    <span class="result-label">Digital Signature</span>
+                                    <span class="result-value hash-value" id="pav-signature">—</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Merkle Inclusion</span>
+                                    <span class="result-value" id="pav-merkle-inclusion">—</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-✓ Content hash matches
-✓ Signature is valid
-✓ Signer DID is verified
-✓ Attestation exists in registry
-✓ Merkle proof is valid
-✓ Chain anchors confirm timestamp
-✓ No revocation found
+                    <!-- Blockchain Anchors Section -->
+                    <div id="anchors-section" class="anchors-section hidden">
+                        <h4>BLOCKCHAIN ANCHORS</h4>
+                        <div id="anchors-list" class="anchors-list"></div>
+                    </div>
 
-PRIVACY
-───────
+                    <!-- Error Section -->
+                    <div id="error-section" class="error-section hidden">
+                        <div class="error-message" id="error-message"></div>
+                    </div>
+                </div>
+            </div>
 
-This verification process:
-- Does NOT reveal original content
-- Does NOT expose identity
-- Does NOT track users
-- Does NOT store files
+            <!-- Info Section -->
+            <div class="info-card">
+                <h3>VERIFICATION PROCESS</h3>
+                <ul class="info-list">
+                    <li>
+                        <strong>Content Hash:</strong> File is hashed using SHA-256 (client-side)
+                    </li>
+                    <li>
+                        <strong>Registry Lookup:</strong> Hash queried against PoHW registry
+                    </li>
+                    <li>
+                        <strong>Signature Check:</strong> Cryptographic signature verified
+                    </li>
+                    <li>
+                        <strong>Merkle Proof:</strong> Inclusion in Merkle batch confirmed
+                    </li>
+                    <li>
+                        <strong>Blockchain Anchors:</strong> Timestamp verified on public chains
+                    </li>
+                </ul>
+                <div class="privacy-note">
+                    <strong>PRIVACY:</strong> Content never leaves your browser. Only hashes are transmitted.
+                </div>
+            </div>
+        </main>
 
-Only the hash and signature are used for verification.
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/pohw" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
 
-VERIFICATION NODES
-──────────────────
-
-Current Active Nodes:
-- gdn.sh (primary)
-- [Additional nodes as they come online]
-
-You can specify a node:
-[Node Selection]
-Default: gdn.sh
-Custom: [________________]
-
-<a href="../">← Back to Home</a> | <a href="../research">Research →</a>
-
-<script>
-// Simple verification interface
-document.addEventListener('DOMContentLoaded', function() {
-  // File upload handlers
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.id = 'file-input';
-  
-  const verifyButton = document.createElement('button');
-  verifyButton.textContent = 'Verify';
-  verifyButton.onclick = async function() {
-    // Verification logic would go here
-    document.getElementById('verification-status').textContent = 'Verification in progress...';
-    // Implementation would fetch from registry and verify
-  };
-  
-  // Basic UI setup would continue here
-});
-</script>
-</pre>
-</main>
+    <script src="crypto-utils.js"></script>
+    <script src="verification.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
 
