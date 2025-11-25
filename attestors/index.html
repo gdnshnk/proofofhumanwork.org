@@ -1,107 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PoHW Attestor Framework</title>
-<link rel="stylesheet" href="../style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoHW Attestor Framework</title>
+    <link rel="stylesheet" href="../shared-styles.css">
 </head>
 <body>
-<main>
-<pre>
-PROOF OF HUMAN WORK — ATTESTOR FRAMEWORK
-─────────────────────────────────────────
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>PROOF OF HUMAN WORK — ATTESTOR FRAMEWORK</h1>
+                <p class="subtitle">Accreditation, credentials, and human verification</p>
+            </div>
+        </header>
 
-OVERVIEW
-────────
+        <main>
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>OVERVIEW</h2>
+                </div>
+                <div class="content-section">
+                    <p>Attestors are entities that issue human credentials and verify human presence. They play a crucial role in ensuring the "human" aspect of Proof of Human Work.</p>
+                </div>
+            </div>
 
-Attestors are entities that issue human credentials and verify
-human presence. They play a crucial role in ensuring the "human"
-aspect of Proof of Human Work.
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>FORMAL RULES FOR ATTESTORS</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Who Can Issue Human Credentials:</h3>
+                    <ol class="info-list" style="list-style: decimal; padding-left: 2rem;">
+                        <li>Accredited institutions (universities, organizations)</li>
+                        <li>Trusted verification providers</li>
+                        <li>Community-validated attestors</li>
+                        <li>Self-attestors (with reputation thresholds)</li>
+                    </ol>
 
-FORMAL RULES FOR ATTESTORS
-──────────────────────────
+                    <h3>Attestation Types:</h3>
+                    <ul class="info-list">
+                        <li>Identity verification (KYC/AML compliant)</li>
+                        <li>Credential verification (degrees, certificates)</li>
+                        <li>Reputation-based (community validation)</li>
+                        <li>Hardware-based (biometric, hardware keys)</li>
+                    </ul>
+                </div>
+            </div>
 
-Who Can Issue Human Credentials:
-1. Accredited institutions (universities, organizations)
-2. Trusted verification providers
-3. Community-validated attestors
-4. Self-attestors (with reputation thresholds)
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>ATTESTOR AUDIT PROCESS</h2>
+                </div>
+                <div class="content-section">
+                    <p>Attestors must:</p>
+                    <ol class="info-list" style="list-style: decimal; padding-left: 2rem;">
+                        <li><strong>Register with PoHW Foundation</strong>
+                            <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                <li>Submit public key</li>
+                                <li>Provide identity information</li>
+                                <li>Agree to audit terms</li>
+                            </ul>
+                        </li>
+                        <li><strong>Maintain Public Key</strong>
+                            <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                <li>Publish at /.well-known/public.txt</li>
+                                <li>Rotate keys securely</li>
+                                <li>Revoke compromised keys</li>
+                            </ul>
+                        </li>
+                        <li><strong>Submit Audit Logs</strong>
+                            <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                <li>All credential issuances</li>
+                                <li>Revocations</li>
+                                <li>Key rotations</li>
+                                <li>Anomaly reports</li>
+                            </ul>
+                        </li>
+                        <li><strong>Undergo Periodic Audits</strong>
+                            <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                                <li>Annual review</li>
+                                <li>Random spot checks</li>
+                                <li>Incident response audits</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
 
-Attestation Types:
-- Identity verification (KYC/AML compliant)
-- Credential verification (degrees, certificates)
-- Reputation-based (community validation)
-- Hardware-based (biometric, hardware keys)
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>AUDIT CRITERIA</h2>
+                </div>
+                <div class="content-section">
+                    <p>Attestors are evaluated on:</p>
+                    <ul class="info-list">
+                        <li>Accuracy of credentials issued</li>
+                        <li>Rate of false positives/negatives</li>
+                        <li>Response to revocation requests</li>
+                        <li>Key management practices</li>
+                        <li>Transparency of processes</li>
+                        <li>Compliance with privacy standards</li>
+                    </ul>
+                    <p>Attestors failing audits may be:</p>
+                    <ul class="info-list">
+                        <li>Suspended from issuing credentials</li>
+                        <li>Required to improve processes</li>
+                        <li>Removed from attestor registry</li>
+                    </ul>
+                </div>
+            </div>
 
-ATTESTOR AUDIT PROCESS
-──────────────────────
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>REVOCATION REGISTRY</h2>
+                </div>
+                <div class="content-section">
+                    <p>Attestors maintain revocation lists:</p>
+                    <ul class="info-list">
+                        <li>Revoked credential hashes</li>
+                        <li>Revocation reasons (optional)</li>
+                        <li>Revocation timestamps</li>
+                        <li>Public access via API</li>
+                    </ul>
 
-Attestors must:
-
-1. Register with PoHW Foundation
-   - Submit public key
-   - Provide identity information
-   - Agree to audit terms
-
-2. Maintain Public Key
-   - Publish at /.well-known/public.txt
-   - Rotate keys securely
-   - Revoke compromised keys
-
-3. Submit Audit Logs
-   - All credential issuances
-   - Revocations
-   - Key rotations
-   - Anomaly reports
-
-4. Undergo Periodic Audits
-   - Annual review
-   - Random spot checks
-   - Incident response audits
-
-AUDIT CRITERIA
-──────────────
-
-Attestors are evaluated on:
-
-- Accuracy of credentials issued
-- Rate of false positives/negatives
-- Response to revocation requests
-- Key management practices
-- Transparency of processes
-- Compliance with privacy standards
-
-Attestors failing audits may be:
-- Suspended from issuing credentials
-- Required to improve processes
-- Removed from attestor registry
-
-REVOCATION REGISTRY
-───────────────────
-
-Attestors maintain revocation lists:
-
-- Revoked credential hashes
-- Revocation reasons (optional)
-- Revocation timestamps
-- Public access via API
-
-Revocation Format:
-{
+                    <h3>Revocation Format:</h3>
+                    <pre><code>{
   "credential_hash": "0x...",
   "revoked_at": "2025-11-25T00:00:00Z",
   "reason": "compromised|expired|fraud",
   "attestor_signature": "..."
-}
+}</code></pre>
+                </div>
+            </div>
 
-DID CREDENTIALS BINDING
-───────────────────────
-
-Attestors issue DID-based credentials:
-
-Credential Format (W3C Verifiable Credentials):
-{
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>DID CREDENTIALS BINDING</h2>
+                </div>
+                <div class="content-section">
+                    <p>Attestors issue DID-based credentials:</p>
+                    <h3>Credential Format (W3C Verifiable Credentials):</h3>
+                    <pre><code>{
   "@context": ["https://www.w3.org/2018/credentials/v1"],
   "type": ["VerifiableCredential", "HumanCredential"],
   "issuer": "did:pohw:attestor:example",
@@ -118,102 +158,126 @@ Credential Format (W3C Verifiable Credentials):
     "proofPurpose": "assertionMethod",
     "proofValue": "..."
   }
-}
+}</code></pre>
+                </div>
+            </div>
 
-BINDING TO PROOF EVENTS
-────────────────────────
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>BINDING TO PROOF EVENTS</h2>
+                </div>
+                <div class="content-section">
+                    <ol class="info-list" style="list-style: decimal; padding-left: 2rem;">
+                        <li>User holds human credential from attestor</li>
+                        <li>User creates content and generates PoHW attestation</li>
+                        <li>Attestation includes credential reference</li>
+                        <li>Verifier checks credential validity</li>
+                        <li>Verifier verifies credential binds to attestation</li>
+                    </ol>
+                </div>
+            </div>
 
-Human credentials bind to PoHW attestations:
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>ATTESTOR TYPES</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Institutional Attestors:</h3>
+                    <ul class="info-list">
+                        <li>Universities</li>
+                        <li>Certification bodies</li>
+                        <li>Government agencies</li>
+                        <li>Professional organizations</li>
+                    </ul>
 
-1. User holds human credential from attestor
-2. User creates content and generates PoHW attestation
-3. Attestation includes credential reference:
-   {
-     "hash": "0x...",
-     "signature": "...",
-     "did": "did:pohw:user:example",
-     "human_credential": "did:pohw:attestor:example:credential:123",
-     "timestamp": "2025-11-25T00:00:00Z"
-   }
-4. Verifier checks credential validity
-5. Verifier verifies credential binds to attestation
+                    <h3>Commercial Attestors:</h3>
+                    <ul class="info-list">
+                        <li>Identity verification services</li>
+                        <li>KYC providers</li>
+                        <li>Authentication platforms</li>
+                    </ul>
 
-ATTESTOR TYPES
-──────────────
+                    <h3>Community Attestors:</h3>
+                    <ul class="info-list">
+                        <li>Peer validation networks</li>
+                        <li>Reputation systems</li>
+                        <li>Social proof mechanisms</li>
+                    </ul>
 
-Institutional Attestors:
-- Universities
-- Certification bodies
-- Government agencies
-- Professional organizations
+                    <h3>Self-Attestors:</h3>
+                    <ul class="info-list">
+                        <li>Individual verification</li>
+                        <li>Hardware-based proofs</li>
+                        <li>Reputation thresholds required</li>
+                    </ul>
+                </div>
+            </div>
 
-Commercial Attestors:
-- Identity verification services
-- KYC providers
-- Authentication platforms
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>ATTESTOR API</h2>
+                </div>
+                <div class="content-section">
+                    <h3>POST /attest/credential</h3>
+                    <p>Issue human credential</p>
+                    <p><strong>Auth:</strong> Attestor signature</p>
+                    <p><strong>Response:</strong> {credential, credential_hash}</p>
 
-Community Attestors:
-- Peer validation networks
-- Reputation systems
-- Social proof mechanisms
+                    <h3>GET /verify/credential/{hash}</h3>
+                    <p>Verify credential validity</p>
+                    <p><strong>Response:</strong> {valid, issuer, issued_at, revoked}</p>
 
-Self-Attestors:
-- Individual verification
-- Hardware-based proofs
-- Reputation thresholds required
+                    <h3>GET /revoke/credential/{hash}</h3>
+                    <p>Revoke credential</p>
+                    <p><strong>Auth:</strong> Attestor signature</p>
+                    <p><strong>Response:</strong> {revoked, timestamp}</p>
 
-ATTESTOR API
-────────────
+                    <h3>GET /attest/audit</h3>
+                    <p>Attestor audit logs</p>
+                    <p><strong>Response:</strong> [{timestamp, action, credential_hash}, ...]</p>
+                </div>
+            </div>
 
-Standard Endpoints:
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>TRANSPARENCY REQUIREMENTS</h2>
+                </div>
+                <div class="content-section">
+                    <p>Attestors must publish:</p>
+                    <ul class="info-list">
+                        <li>Public key (/.well-known/public.txt)</li>
+                        <li>Audit logs (publicly accessible)</li>
+                        <li>Revocation registry (queryable)</li>
+                        <li>Attestation statistics (anonymized)</li>
+                        <li>Policies and procedures</li>
+                    </ul>
+                </div>
+            </div>
 
-POST /attest/credential
-  Issue human credential
-  Auth: Attestor signature
-  Response: {credential, credential_hash}
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>PRIVACY CONSIDERATIONS</h2>
+                </div>
+                <div class="content-section">
+                    <p>Attestors must:</p>
+                    <ul class="info-list">
+                        <li>Minimize data collection</li>
+                        <li>Use zero-knowledge proofs where possible</li>
+                        <li>Allow credential pseudonymity</li>
+                        <li>Enable selective disclosure</li>
+                        <li>Respect user privacy rights</li>
+                    </ul>
+                </div>
+            </div>
 
-GET /verify/credential/{hash}
-  Verify credential validity
-  Response: {valid, issuer, issued_at, revoked}
-
-GET /revoke/credential/{hash}
-  Revoke credential
-  Auth: Attestor signature
-  Response: {revoked, timestamp}
-
-GET /attest/audit
-  Attestor audit logs
-  Response: [{timestamp, action, credential_hash}, ...]
-
-TRANSPARENCY REQUIREMENTS
-─────────────────────────
-
-Attestors must publish:
-
-- Public key (/.well-known/public.txt)
-- Audit logs (publicly accessible)
-- Revocation registry (queryable)
-- Attestation statistics (anonymized)
-- Policies and procedures
-
-PRIVACY CONSIDERATIONS
-──────────────────────
-
-Attestors must:
-
-- Minimize data collection
-- Use zero-knowledge proofs where possible
-- Allow credential pseudonymity
-- Enable selective disclosure
-- Respect user privacy rights
-
-ATTESTOR REGISTRY
-─────────────────
-
-PoHW Foundation maintains public attestor registry:
-
-Registry Format:
-{
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>ATTESTOR REGISTRY</h2>
+                </div>
+                <div class="content-section">
+                    <p>PoHW Foundation maintains public attestor registry:</p>
+                    <h3>Registry Format:</h3>
+                    <pre><code>{
   "attestor_id": "did:pohw:attestor:example",
   "name": "Example Attestor",
   "public_key": "https://attestor.example/.well-known/public.txt",
@@ -221,13 +285,21 @@ Registry Format:
   "status": "active|suspended|revoked",
   "registered_at": "2025-01-01T00:00:00Z",
   "last_audit": "2025-11-01T00:00:00Z"
-}
+}</code></pre>
+                    <p><strong>Registry Location:</strong> <a href="https://proofofhumanwork.org/attestors/registry.json" target="_blank">https://proofofhumanwork.org/attestors/registry.json</a></p>
+                </div>
+            </div>
+        </main>
 
-Registry Location: https://proofofhumanwork.org/attestors/registry.json
-
-<a href="../">← Back to Home</a> | <a href="../governance">Governance →</a>
-</pre>
-</main>
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../governance/">Governance</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/pohw" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
 </body>
 </html>
-
