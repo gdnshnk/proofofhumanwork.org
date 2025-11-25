@@ -1,181 +1,232 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PoHW SDKs & Libraries</title>
-<link rel="stylesheet" href="../style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoHW SDKs & Libraries</title>
+    <link rel="stylesheet" href="../shared-styles.css">
 </head>
 <body>
-<main>
-<pre>
-PROOF OF HUMAN WORK — SDKs & LIBRARIES
-──────────────────────────────────────
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>PROOF OF HUMAN WORK — SDKs & LIBRARIES</h1>
+                <p class="subtitle">Client libraries and tools for all platforms</p>
+            </div>
+        </header>
 
-AVAILABLE SDKs
-──────────────
+        <main>
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>CLI Tool</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Installation:</h3>
+                    <pre><code>$ npm install -g @pohw/cli
+# or
+$ cargo install pohw-cli</code></pre>
 
-CLI Tool
-────────
-Installation:
-  $ npm install -g @pohw/cli
-  # or
-  $ cargo install pohw-cli
+                    <h3>Usage:</h3>
+                    <pre><code>$ pohw attest file.txt --key ~/.pohw/key.pem
+$ pohw verify file.txt
+$ pohw status --node gdn.sh</code></pre>
 
-Usage:
-  $ pohw attest file.txt --key ~/.pohw/key.pem
-  $ pohw verify file.txt
-  $ pohw status --node gdn.sh
+                    <p><strong>GitHub:</strong> <a href="https://github.com/pohw/cli" target="_blank">https://github.com/pohw/cli</a></p>
+                    <p><strong>Documentation:</strong> <a href="https://docs.pohw.org/cli" target="_blank">https://docs.pohw.org/cli</a></p>
+                </div>
+            </div>
 
-GitHub: https://github.com/pohw/cli
-Documentation: https://docs.pohw.org/cli
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>JavaScript/TypeScript SDK</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Installation:</h3>
+                    <pre><code>$ npm install @pohw/sdk</code></pre>
 
-JavaScript/TypeScript SDK
-─────────────────────────
-Installation:
-  $ npm install @pohw/sdk
+                    <h3>Usage:</h3>
+                    <pre><code>import { PoHW } from '@pohw/sdk';
 
-Usage:
-  import { PoHW } from '@pohw/sdk';
-  
-  const pohw = new PoHW({
-    registry: 'https://proofofhumanwork.org'
-  });
-  
-  // Attest content
-  const receipt = await pohw.attest(
-    content,
-    privateKey,
-    { did: 'did:pohw:my-did' }
-  );
-  
-  // Verify content
-  const verification = await pohw.verify(content);
+const pohw = new PoHW({
+  registry: 'https://proofofhumanwork.org'
+});
 
-GitHub: https://github.com/pohw/js-sdk
-Documentation: https://docs.pohw.org/js
+// Attest content
+const receipt = await pohw.attest(
+  content,
+  privateKey,
+  { did: 'did:pohw:my-did' }
+);
 
-Python SDK
-──────────
-Installation:
-  $ pip install pohw-sdk
+// Verify content
+const verification = await pohw.verify(content);</code></pre>
 
-Usage:
-  from pohw import PoHW
-  
-  pohw = PoHW(registry='https://proofofhumanwork.org')
-  
-  # Attest content
-  receipt = pohw.attest(content, private_key, did='did:pohw:my-did')
-  
-  # Verify content
-  verification = pohw.verify(content)
+                    <p><strong>GitHub:</strong> <a href="https://github.com/pohw/js-sdk" target="_blank">https://github.com/pohw/js-sdk</a></p>
+                    <p><strong>Documentation:</strong> <a href="https://docs.pohw.org/js" target="_blank">https://docs.pohw.org/js</a></p>
+                </div>
+            </div>
 
-GitHub: https://github.com/pohw/py-sdk
-Documentation: https://docs.pohw.org/python
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>Python SDK</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Installation:</h3>
+                    <pre><code>$ pip install pohw-sdk</code></pre>
 
-Go SDK
-──────
-Installation:
-  $ go get github.com/pohw/go-sdk
+                    <h3>Usage:</h3>
+                    <pre><code>from pohw import PoHW
 
-Usage:
-  import "github.com/pohw/go-sdk"
-  
-  client := pohw.NewClient("https://proofofhumanwork.org")
-  
-  receipt, err := client.Attest(content, privateKey, pohw.AttestOptions{
-    DID: "did:pohw:my-did",
-  })
-  
-  verification, err := client.Verify(content)
+pohw = PoHW(registry='https://proofofhumanwork.org')
 
-GitHub: https://github.com/pohw/go-sdk
-Documentation: https://docs.pohw.org/go
+# Attest content
+receipt = pohw.attest(content, private_key, did='did:pohw:my-did')
 
-Rust SDK
-────────
-Cargo.toml:
-  [dependencies]
-  pohw-sdk = "1.0"
+# Verify content
+verification = pohw.verify(content)</code></pre>
 
-Usage:
-  use pohw_sdk::PoHW;
-  
-  let client = PoHW::new("https://proofofhumanwork.org");
-  let receipt = client.attest(content, private_key, did)?;
-  let verification = client.verify(content)?;
+                    <p><strong>GitHub:</strong> <a href="https://github.com/pohw/py-sdk" target="_blank">https://github.com/pohw/py-sdk</a></p>
+                    <p><strong>Documentation:</strong> <a href="https://docs.pohw.org/python" target="_blank">https://docs.pohw.org/python</a></p>
+                </div>
+            </div>
 
-GitHub: https://github.com/pohw/rust-sdk
-Documentation: https://docs.pohw.org/rust
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>Go SDK</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Installation:</h3>
+                    <pre><code>$ go get github.com/pohw/go-sdk</code></pre>
 
-iOS SDK (Swift)
-───────────────
-Installation:
-  Swift Package Manager
-  Repository: https://github.com/pohw/ios-sdk
+                    <h3>Usage:</h3>
+                    <pre><code>import "github.com/pohw/go-sdk"
 
-Usage:
-  import PoHWSDK
-  
-  let client = PoHWClient(registry: "https://proofofhumanwork.org")
-  let receipt = try await client.attest(content, privateKey: key, did: did)
-  let verification = try await client.verify(content)
+client := pohw.NewClient("https://proofofhumanwork.org")
 
-Android SDK (Kotlin)
-────────────────────
-Installation:
-  repositories {
-    maven { url "https://maven.pohw.org" }
-  }
-  
-  dependencies {
-    implementation "org.pohw:sdk:1.0.0"
-  }
+receipt, err := client.Attest(content, privateKey, pohw.AttestOptions{
+  DID: "did:pohw:my-did",
+})
 
-Usage:
-  import org.pohw.sdk.PoHW
-  
-  val client = PoHW(registry = "https://proofofhumanwork.org")
-  val receipt = client.attest(content, privateKey, did = did)
-  val verification = client.verify(content)
+verification, err := client.Verify(content)</code></pre>
 
-EXAMPLE LIBRARIES
-─────────────────
+                    <p><strong>GitHub:</strong> <a href="https://github.com/pohw/go-sdk" target="_blank">https://github.com/pohw/go-sdk</a></p>
+                    <p><strong>Documentation:</strong> <a href="https://docs.pohw.org/go" target="_blank">https://docs.pohw.org/go</a></p>
+                </div>
+            </div>
 
-Web Integration (React):
-  npm install @pohw/react
-  
-  import { usePoHW } from '@pohw/react';
-  
-  function MyComponent() {
-    const { attest, verify } = usePoHW();
-    // ...
-  }
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>Rust SDK</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Cargo.toml:</h3>
+                    <pre><code>[dependencies]
+pohw-sdk = "1.0"</code></pre>
 
-WordPress Plugin:
-  GitHub: https://github.com/pohw/wordpress-plugin
-  Installation: WordPress admin → Plugins → Add New
+                    <h3>Usage:</h3>
+                    <pre><code>use pohw_sdk::PoHW;
 
-Browser Extension:
-  GitHub: https://github.com/pohw/browser-extension
-  Chrome/ Firefox/ Safari support
+let client = PoHW::new("https://proofofhumanwork.org");
+let receipt = client.attest(content, private_key, did)?;
+let verification = client.verify(content)?;</code></pre>
 
-CONTRIBUTING
-────────────
+                    <p><strong>GitHub:</strong> <a href="https://github.com/pohw/rust-sdk" target="_blank">https://github.com/pohw/rust-sdk</a></p>
+                    <p><strong>Documentation:</strong> <a href="https://docs.pohw.org/rust" target="_blank">https://docs.pohw.org/rust</a></p>
+                </div>
+            </div>
 
-All SDKs are open source.
-Contributions welcome:
-- Bug reports
-- Feature requests
-- Pull requests
-- Documentation improvements
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>iOS SDK (Swift)</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Installation:</h3>
+                    <p>Swift Package Manager</p>
+                    <p><strong>Repository:</strong> <a href="https://github.com/pohw/ios-sdk" target="_blank">https://github.com/pohw/ios-sdk</a></p>
 
-See each SDK's GitHub repository for contribution guidelines.
+                    <h3>Usage:</h3>
+                    <pre><code>import PoHWSDK
 
-<a href="../">← Back to Home</a> | <a href="../registry">Registry →</a>
-</pre>
-</main>
+let client = PoHWClient(registry: "https://proofofhumanwork.org")
+let receipt = try await client.attest(content, privateKey: key, did: did)
+let verification = try await client.verify(content)</code></pre>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>Android SDK (Kotlin)</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Installation:</h3>
+                    <pre><code>repositories {
+  maven { url "https://maven.pohw.org" }
+}
+
+dependencies {
+  implementation "org.pohw:sdk:1.0.0"
+}</code></pre>
+
+                    <h3>Usage:</h3>
+                    <pre><code>import org.pohw.sdk.PoHW
+
+val client = PoHW(registry = "https://proofofhumanwork.org")
+val receipt = client.attest(content, privateKey, did = did)
+val verification = client.verify(content)</code></pre>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>EXAMPLE LIBRARIES</h2>
+                </div>
+                <div class="content-section">
+                    <h3>Web Integration (React):</h3>
+                    <pre><code>npm install @pohw/react
+
+import { usePoHW } from '@pohw/react';
+
+function MyComponent() {
+  const { attest, verify } = usePoHW();
+  // ...
+}</code></pre>
+
+                    <h3>WordPress Plugin:</h3>
+                    <p><strong>GitHub:</strong> <a href="https://github.com/pohw/wordpress-plugin" target="_blank">https://github.com/pohw/wordpress-plugin</a></p>
+                    <p><strong>Installation:</strong> WordPress admin → Plugins → Add New</p>
+
+                    <h3>Browser Extension:</h3>
+                    <p><strong>GitHub:</strong> <a href="https://github.com/pohw/browser-extension" target="_blank">https://github.com/pohw/browser-extension</a></p>
+                    <p>Chrome/ Firefox/ Safari support</p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>CONTRIBUTING</h2>
+                </div>
+                <div class="content-section">
+                    <p>All SDKs are open source. Contributions welcome:</p>
+                    <ul class="info-list">
+                        <li>Bug reports</li>
+                        <li>Feature requests</li>
+                        <li>Pull requests</li>
+                        <li>Documentation improvements</li>
+                    </ul>
+                    <p>See each SDK's GitHub repository for contribution guidelines.</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../registry/">Registry</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/pohw" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
 </body>
 </html>
-
