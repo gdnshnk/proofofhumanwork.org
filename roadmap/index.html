@@ -1,209 +1,263 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PoHW Roadmap</title>
-<link rel="stylesheet" href="../style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoHW Roadmap</title>
+    <link rel="stylesheet" href="../shared-styles.css">
 </head>
 <body>
-<main>
-<pre>
-PROOF OF HUMAN WORK — DEVELOPMENT ROADMAP
-──────────────────────────────────────────
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>PROOF OF HUMAN WORK — DEVELOPMENT ROADMAP</h1>
+                <p class="subtitle">Development phases, milestones, and research initiatives</p>
+            </div>
+        </header>
 
-PHASE 1: CORE PROTOCOL (CURRENT)
-─────────────────────────────────
-Status: ✅ Complete
+        <main>
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>PHASE 1: CORE PROTOCOL (CURRENT)</h2>
+                    <p style="color: var(--success-color); margin-top: 0.5rem;">Status: ✅ Complete</p>
+                </div>
+                <div class="content-section">
+                    <h3>Deliverables:</h3>
+                    <ul class="info-list">
+                        <li>Minimal verification endpoints</li>
+                        <li>Basic registry node implementation</li>
+                        <li>Canonical JSON format specification</li>
+                        <li>Ed25519 signature support</li>
+                        <li>SHA-256 hashing</li>
+                        <li>Public key infrastructure</li>
+                        <li>Reference implementation (gdn.sh)</li>
+                    </ul>
+                    <p><strong>Timeline:</strong> 2025 Q3-Q4</p>
+                </div>
+            </div>
 
-Deliverables:
-- Minimal verification endpoints
-- Basic registry node implementation
-- Canonical JSON format specification
-- Ed25519 signature support
-- SHA-256 hashing
-- Public key infrastructure
-- Reference implementation (gdn.sh)
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>PHASE 2: FEDERATION</h2>
+                    <p style="color: #ffa500; margin-top: 0.5rem;">Status: 🚧 In Progress</p>
+                </div>
+                <div class="content-section">
+                    <h3>Deliverables:</h3>
+                    <ul class="info-list">
+                        <li>Multiple registry nodes</li>
+                        <li>Cross-node synchronization protocol</li>
+                        <li>Merkle tree batching</li>
+                        <li>Multi-chain anchoring (Bitcoin, Ethereum)</li>
+                        <li>Peer discovery mechanism</li>
+                        <li>Consensus protocol</li>
+                    </ul>
+                    <p><strong>Timeline:</strong> 2025 Q4 - 2026 Q1</p>
+                </div>
+            </div>
 
-Timeline: 2025 Q3-Q4
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>PHASE 3: DEVELOPER TOOLS</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Status: 📋 Planned</p>
+                </div>
+                <div class="content-section">
+                    <h3>Deliverables:</h3>
+                    <ul class="info-list">
+                        <li>JavaScript/TypeScript SDK</li>
+                        <li>Python SDK</li>
+                        <li>CLI tool</li>
+                        <li>Go SDK</li>
+                        <li>Rust SDK</li>
+                        <li>iOS/Android SDKs</li>
+                        <li>Browser extensions</li>
+                        <li>WordPress plugin</li>
+                        <li>Integration guides</li>
+                        <li>API documentation</li>
+                    </ul>
+                    <p><strong>Timeline:</strong> 2026 Q1-Q2</p>
+                </div>
+            </div>
 
-PHASE 2: FEDERATION
-───────────────────
-Status: 🚧 In Progress
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>PHASE 4: LONG-TERM DURABILITY</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Status: 📋 Planned</p>
+                </div>
+                <div class="content-section">
+                    <h3>Deliverables:</h3>
+                    <ul class="info-list">
+                        <li>IPFS integration</li>
+                        <li>Arweave anchoring</li>
+                        <li>Additional blockchain support</li>
+                        <li>Post-quantum cryptography research</li>
+                        <li>Archival substrate integration</li>
+                        <li>Multi-signature support</li>
+                        <li>Key rotation protocols</li>
+                    </ul>
+                    <p><strong>Timeline:</strong> 2026 Q2-Q4</p>
+                </div>
+            </div>
 
-Deliverables:
-- Multiple registry nodes
-- Cross-node synchronization protocol
-- Merkle tree batching
-- Multi-chain anchoring (Bitcoin, Ethereum)
-- Peer discovery mechanism
-- Consensus protocol
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>PHASE 5: ECOSYSTEM</h2>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">Status: 📋 Planned</p>
+                </div>
+                <div class="content-section">
+                    <h3>Deliverables:</h3>
+                    <ul class="info-list">
+                        <li>Attestor framework implementation</li>
+                        <li>DID integration (W3C standards)</li>
+                        <li>Zero-knowledge proof research</li>
+                        <li>Credential binding</li>
+                        <li>Reputation systems</li>
+                        <li>Community tools</li>
+                        <li>Analytics dashboards</li>
+                    </ul>
+                    <p><strong>Timeline:</strong> 2027 Q1-Q4</p>
+                </div>
+            </div>
 
-Timeline: 2025 Q4 - 2026 Q1
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>RESEARCH INITIATIVES</h2>
+                </div>
+                <div class="content-section">
+                    <h3>1. Post-Quantum Signatures</h3>
+                    <p><strong>Status:</strong> Early research | <strong>Timeline:</strong> 2026-2027</p>
 
-PHASE 3: DEVELOPER TOOLS
-─────────────────────────
-Status: 📋 Planned
+                    <h3>2. Zero-Knowledge Proofs</h3>
+                    <p><strong>Status:</strong> Exploration phase | <strong>Timeline:</strong> 2026-2027</p>
 
-Deliverables:
-- JavaScript/TypeScript SDK
-- Python SDK
-- CLI tool
-- Go SDK
-- Rust SDK
-- iOS/Android SDKs
-- Browser extensions
-- WordPress plugin
-- Integration guides
-- API documentation
+                    <h3>3. Human Presence Metrics</h3>
+                    <p><strong>Status:</strong> Design phase | <strong>Timeline:</strong> 2026</p>
 
-Timeline: 2026 Q1-Q2
+                    <h3>4. Long-Term Durability</h3>
+                    <p><strong>Status:</strong> Continuous | <strong>Timeline:</strong> Ongoing</p>
 
-PHASE 4: LONG-TERM DURABILITY
-──────────────────────────────
-Status: 📋 Planned
+                    <h3>5. Privacy Enhancements</h3>
+                    <p><strong>Status:</strong> Active development | <strong>Timeline:</strong> Ongoing</p>
+                </div>
+            </div>
 
-Deliverables:
-- IPFS integration
-- Arweave anchoring
-- Additional blockchain support
-- Post-quantum cryptography research
-- Archival substrate integration
-- Multi-signature support
-- Key rotation protocols
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>CURRENT PRIORITIES (2025 Q4)</h2>
+                </div>
+                <div class="content-section">
+                    <h3>1. Registry Federation</h3>
+                    <ul class="info-list">
+                        <li>Cross-node sync protocol</li>
+                        <li>Consensus mechanism</li>
+                        <li>Multi-chain anchoring</li>
+                    </ul>
 
-Timeline: 2026 Q2-Q4
+                    <h3>2. Developer Experience</h3>
+                    <ul class="info-list">
+                        <li>JavaScript SDK release</li>
+                        <li>CLI tool v1.0</li>
+                        <li>Documentation completion</li>
+                    </ul>
 
-PHASE 5: ECOSYSTEM
-───────────────────
-Status: 📋 Planned
+                    <h3>3. Attestor Framework</h3>
+                    <ul class="info-list">
+                        <li>Framework specification</li>
+                        <li>Reference implementation</li>
+                        <li>Audit process design</li>
+                    </ul>
 
-Deliverables:
-- Attestor framework implementation
-- DID integration (W3C standards)
-- Zero-knowledge proof research
-- Credential binding
-- Reputation systems
-- Community tools
-- Analytics dashboards
+                    <h3>4. Community Building</h3>
+                    <ul class="info-list">
+                        <li>Developer documentation</li>
+                        <li>Tutorial creation</li>
+                        <li>Community engagement</li>
+                    </ul>
+                </div>
+            </div>
 
-Timeline: 2027 Q1-Q4
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>UPCOMING MILESTONES</h2>
+                </div>
+                <div class="content-section">
+                    <h3>2025 Q4:</h3>
+                    <ul class="info-list">
+                        <li>Registry federation alpha</li>
+                        <li>JavaScript SDK beta</li>
+                        <li>CLI tool v0.1</li>
+                    </ul>
 
-RESEARCH INITIATIVES
-────────────────────
+                    <h3>2026 Q1:</h3>
+                    <ul class="info-list">
+                        <li>Multi-chain anchoring</li>
+                        <li>Python SDK release</li>
+                        <li>Attestor framework beta</li>
+                    </ul>
 
-Ongoing Research:
+                    <h3>2026 Q2:</h3>
+                    <ul class="info-list">
+                        <li>SDK ecosystem complete</li>
+                        <li>Production registry nodes</li>
+                        <li>Community tools</li>
+                    </ul>
 
-1. Post-Quantum Signatures
-   Status: Early research
-   Timeline: 2026-2027
+                    <h3>2026 Q3:</h3>
+                    <ul class="info-list">
+                        <li>Post-quantum research results</li>
+                        <li>ZK-proof exploration</li>
+                        <li>Enhanced privacy features</li>
+                    </ul>
 
-2. Zero-Knowledge Proofs
-   Status: Exploration phase
-   Timeline: 2026-2027
+                    <h3>2026 Q4:</h3>
+                    <ul class="info-list">
+                        <li>Long-term durability solutions</li>
+                        <li>Ecosystem expansion</li>
+                        <li>Production readiness</li>
+                    </ul>
+                </div>
+            </div>
 
-3. Human Presence Metrics
-   Status: Design phase
-   Timeline: 2026
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>CONTRIBUTING</h2>
+                </div>
+                <div class="content-section">
+                    <h3>How to Contribute:</h3>
+                    <ol class="info-list" style="list-style: decimal; padding-left: 2rem;">
+                        <li><strong>Review GitHub Issues</strong> - <a href="https://github.com/pohw/protocol/issues" target="_blank">https://github.com/pohw/protocol/issues</a></li>
+                        <li><strong>Submit Proposals</strong> - <a href="https://github.com/pohw/governance" target="_blank">https://github.com/pohw/governance</a></li>
+                        <li><strong>Contribute Code</strong> - Fork repository, create feature branch, submit pull request</li>
+                        <li><strong>Improve Documentation</strong> - Fix typos, add examples, clarify concepts</li>
+                        <li><strong>Report Issues</strong> - Bug reports, security vulnerabilities, feature requests</li>
+                    </ol>
+                </div>
+            </div>
 
-4. Long-Term Durability
-   Status: Continuous
-   Timeline: Ongoing
+            <div class="info-card">
+                <div class="card-header">
+                    <h2>GET INVOLVED</h2>
+                </div>
+                <div class="content-section">
+                    <ul class="info-list">
+                        <li><strong>Developer:</strong> Join SDK development</li>
+                        <li><strong>Researcher:</strong> Contribute to research initiatives</li>
+                        <li><strong>Operator:</strong> Run registry nodes</li>
+                        <li><strong>Community:</strong> Help with documentation</li>
+                    </ul>
+                    <p><strong>Contact:</strong> labs@proofofhumanwork.org</p>
+                </div>
+            </div>
+        </main>
 
-5. Privacy Enhancements
-   Status: Active development
-   Timeline: Ongoing
-
-CURRENT PRIORITIES (2025 Q4)
-─────────────────────────────
-
-1. Registry Federation
-   - Cross-node sync protocol
-   - Consensus mechanism
-   - Multi-chain anchoring
-
-2. Developer Experience
-   - JavaScript SDK release
-   - CLI tool v1.0
-   - Documentation completion
-
-3. Attestor Framework
-   - Framework specification
-   - Reference implementation
-   - Audit process design
-
-4. Community Building
-   - Developer documentation
-   - Tutorial creation
-   - Community engagement
-
-UPCOMING MILESTONES
-───────────────────
-
-2025 Q4:
-- Registry federation alpha
-- JavaScript SDK beta
-- CLI tool v0.1
-
-2026 Q1:
-- Multi-chain anchoring
-- Python SDK release
-- Attestor framework beta
-
-2026 Q2:
-- SDK ecosystem complete
-- Production registry nodes
-- Community tools
-
-2026 Q3:
-- Post-quantum research results
-- ZK-proof exploration
-- Enhanced privacy features
-
-2026 Q4:
-- Long-term durability solutions
-- Ecosystem expansion
-- Production readiness
-
-CONTRIBUTING
-────────────
-
-How to Contribute:
-
-1. Review GitHub Issues
-   https://github.com/pohw/protocol/issues
-
-2. Submit Proposals
-   https://github.com/pohw/governance
-
-3. Contribute Code
-   - Fork repository
-   - Create feature branch
-   - Submit pull request
-
-4. Improve Documentation
-   - Fix typos
-   - Add examples
-   - Clarify concepts
-
-5. Report Issues
-   - Bug reports
-   - Security vulnerabilities
-   - Feature requests
-
-GET INVOLVED
-────────────
-
-- Developer: Join SDK development
-- Researcher: Contribute to research initiatives
-- Operator: Run registry nodes
-- Community: Help with documentation
-
-Contact: labs@proofofhumanwork.org
-
-<a href="../">← Back to Home</a> | <a href="../verify">Verify →</a>
-</pre>
-</main>
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../verify/">Verify</a> | 
+                <a href="../research/">Research</a> | 
+                <a href="https://github.com/pohw" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
 </body>
 </html>
-
