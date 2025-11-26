@@ -115,15 +115,37 @@
                     </div>
 
                     <!-- Merkle Proof Section -->
-                    <div id="merkle-section" class="merkle-section hidden">
+                    <div id="merkle-section" class="merkle-section">
                         <h4>MERKLE PROOF</h4>
-                        <div class="result-item">
-                            <span class="result-label">Merkle Root</span>
-                            <span class="result-value hash-value" id="merkle-root">—</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="result-label">Proof Path</span>
-                            <div class="proof-path" id="proof-path"></div>
+                        <div class="result-content">
+                            <div class="result-item">
+                                <span class="result-label">Batch Status</span>
+                                <span class="result-value" id="batch-status">—</span>
+                            </div>
+                            <div class="result-item" id="batch-id-item">
+                                <span class="result-label">Batch ID</span>
+                                <span class="result-value hash-value" id="batch-id">—</span>
+                            </div>
+                            <div class="result-item" id="batch-size-item">
+                                <span class="result-label">Batch Size</span>
+                                <span class="result-value" id="batch-size">—</span>
+                            </div>
+                            <div class="result-item" id="merkle-index-item">
+                                <span class="result-label">Position in Batch</span>
+                                <span class="result-value" id="merkle-index">—</span>
+                            </div>
+                            <div class="result-item" id="merkle-root-item">
+                                <span class="result-label">Merkle Root</span>
+                                <span class="result-value hash-value" id="merkle-root">—</span>
+                            </div>
+                            <div class="result-item" id="proof-path-item">
+                                <span class="result-label">Proof Path</span>
+                                <div class="proof-path" id="proof-path"></div>
+                            </div>
+                            <div class="result-item" id="pending-count-item">
+                                <span class="result-label">Pending Proofs</span>
+                                <span class="result-value" id="pending-count">—</span>
+                            </div>
                         </div>
                     </div>
 
