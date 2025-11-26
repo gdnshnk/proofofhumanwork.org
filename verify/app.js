@@ -139,7 +139,22 @@ function setupVerifyButton() {
  * Setup registry selector
  */
 function setupRegistrySelector() {
-    // Initialize with default selected value
+    // Auto-select localhost if running on localhost
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const localOption = document.getElementById('local-option');
+        if (localOption) {
+            registrySelect.value = 'http://localhost:3000';
+            console.log('[App] Auto-selected localhost for local development');
+        }
+    } else {
+        const prodOption = document.getElementById('prod-option');
+        if (prodOption) {
+            registrySelect.value = 'https://pohw-registry-node-production.up.railway.app';
+            console.log('[App] Auto-selected production registry');
+        }
+    }
+    
+    // Initialize with selected value
     verificationClient = new VerificationClient(registrySelect.value);
     console.log('[App] Initialized with registry:', registrySelect.value);
     
