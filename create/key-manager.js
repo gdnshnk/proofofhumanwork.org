@@ -70,43 +70,56 @@ class PoHWKeyManager {
         
         window._ed25519Loading = (async () => {
             try {
-                // Wait for the module script in HTML to load
+                // Wait for library to load (check multiple times)
                 let attempts = 0;
-                while (attempts < 40) { // Wait up to 2 seconds
+                const maxAttempts = 60; // 3 seconds
+                
+                while (attempts < maxAttempts) {
                     if (window.ed25519 && typeof window.ed25519.getPublicKey === 'function') {
+                        console.log('[KeyManager] Ed25519 library is ready');
                         return;
                     }
                     await new Promise(resolve => setTimeout(resolve, 50));
                     attempts++;
                 }
                 
-                // If still not loaded, try dynamic import
-                if (!window.ed25519) {
+                // If still not loaded, try dynamic import as last resort
+                if (!window.ed25519 || typeof window.ed25519.getPublicKey !== 'function') {
+                    console.log('[KeyManager] Trying dynamic import as fallback...');
                     try {
+                        // Try jsDelivr
                         const ed25519Module = await import('https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/index.js');
                         window.ed25519 = ed25519Module;
                         if (window.ed25519 && typeof window.ed25519.getPublicKey === 'function') {
+                            console.log('[KeyManager] ✅ Ed25519 loaded via dynamic import');
                             return;
                         }
                     } catch (importError) {
-                        console.warn('CDN import failed, trying unpkg:', importError);
+                        console.warn('[KeyManager] Dynamic import failed:', importError);
+                        // Try unpkg
                         try {
                             const ed25519Module = await import('https://unpkg.com/@noble/ed25519@1.7.3/index.js');
                             window.ed25519 = ed25519Module;
                             if (window.ed25519 && typeof window.ed25519.getPublicKey === 'function') {
+                                console.log('[KeyManager] ✅ Ed25519 loaded via unpkg');
                                 return;
                             }
                         } catch (unpkgError) {
-                            throw new Error('Failed to load Ed25519 library from all sources. Please check your internet connection and try again.');
+                            console.error('[KeyManager] All import methods failed');
                         }
                     }
                 }
                 
+                // Final check
                 if (!window.ed25519 || typeof window.ed25519.getPublicKey !== 'function') {
-                    throw new Error('Ed25519 library loaded but getPublicKey function not available');
+                    const errorMsg = 'Ed25519 library failed to load. Please:\n' +
+                        '1. Check your internet connection\n' +
+                        '2. Try refreshing the page\n' +
+                        '3. Check browser console for details';
+                    throw new Error(errorMsg);
                 }
             } catch (error) {
-                console.error('Ed25519 library loading error:', error);
+                console.error('[KeyManager] Ed25519 library loading error:', error);
                 throw error;
             }
         })();
