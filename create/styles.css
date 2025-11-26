@@ -1,0 +1,274 @@
+/**
+ * PoHW Proof Creator - Styles
+ * Based on verification interface styles
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+    --bg-primary: #0c0c0c;
+    --bg-secondary: #111111;
+    --bg-tertiary: #1a1a1a;
+    --text-primary: #d1d1d1;
+    --text-secondary: #a0a0a0;
+    --text-tertiary: #666666;
+    --accent-green: #7ef9a9;
+    --accent-green-bright: #00ff9c;
+    --accent-green-hover: #adffda;
+    --accent-green-glow: rgba(0, 255, 120, 0.2);
+    --border-color: #333333;
+    --border-dashed: #444444;
+    --success-color: #00ff9c;
+    --error-color: #ff6b6b;
+    --shadow-glow: 0 0 10px rgba(0, 255, 120, 0.1);
+}
+
+/* Key Management Section */
+.key-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.key-section h3 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.key-status {
+    margin-bottom: 1rem;
+}
+
+.key-status-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    align-items: center;
+}
+
+.key-label {
+    min-width: 80px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.key-status-text {
+    color: var(--text-primary);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+}
+
+.key-status-text.success {
+    color: var(--accent-green);
+}
+
+.did-value {
+    color: var(--accent-green);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    word-break: break-all;
+}
+
+.key-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    border-color: var(--accent-green);
+    color: var(--accent-green);
+}
+
+.action-btn.primary {
+    background: var(--accent-green);
+    color: var(--bg-primary);
+    border-color: var(--accent-green);
+}
+
+.action-btn.primary:hover {
+    background: var(--accent-green-hover);
+    border-color: var(--accent-green-hover);
+}
+
+.action-btn.secondary {
+    background: transparent;
+    color: var(--text-secondary);
+}
+
+.import-keys-input {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+}
+
+.import-keys-input textarea {
+    width: 100%;
+    min-height: 100px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.75rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    resize: vertical;
+    margin-bottom: 0.5rem;
+}
+
+.import-keys-input input[type="password"] {
+    width: 100%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.import-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* File List */
+.file-list {
+    margin-top: 1rem;
+}
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    margin-bottom: 0.5rem;
+}
+
+.file-name {
+    color: var(--text-primary);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+}
+
+.file-size {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Proof Actions */
+.proof-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.proof-actions .action-btn {
+    flex: 1;
+    min-width: 120px;
+}
+
+.proof-actions a.action-btn {
+    text-decoration: none;
+    text-align: center;
+}
+
+/* Success Message */
+.success-message {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    background: var(--accent-green);
+    color: var(--bg-primary);
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Registry Status */
+.node-status {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-indicator.online {
+    background: var(--accent-green);
+    box-shadow: 0 0 4px var(--accent-green);
+}
+
+.status-indicator.offline {
+    background: var(--error-color);
+}
+
+.status-response {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+/* Upload Area */
+.upload-area.dragover {
+    border-color: var(--accent-green);
+    background: var(--bg-tertiary);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .key-actions {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        width: 100%;
+    }
+    
+    .proof-actions {
+        flex-direction: column;
+    }
+    
+    .proof-actions .action-btn {
+        width: 100%;
+    }
+}
+
