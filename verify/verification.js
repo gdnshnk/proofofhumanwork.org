@@ -28,6 +28,16 @@ class VerificationClient {
      * @returns {Promise<Object>} Verification result
      */
     async verifyProof(hash) {
+        // Check if trying to use localhost from production site
+        if (this.registryUrl.includes('localhost') && 
+            window.location.hostname !== 'localhost' && 
+            window.location.hostname !== '127.0.0.1') {
+            return {
+                valid: false,
+                error: 'Cannot access localhost from production site. Please use Production (Railway) registry or access via localhost:8000'
+            };
+        }
+        
         // API now handles both with and without 0x prefix, so we can pass it as-is
         // But we'll normalize to remove 0x for URL encoding safety
         const normalizedHash = hash.startsWith('0x') ? hash.substring(2) : hash;
@@ -106,6 +116,76 @@ class VerificationClient {
         } catch (error) {
             console.error('Error fetching proof:', error);
             return null;
+        }
+    }
+
+    /**
+     * Get all proofs for a hash (with filtering)
+     * @param {string} hash - Content hash
+     * @param {Object} filters - Filter options (did, tier, from, to, sort, limit, offset)
+     * @returns {Promise<Object>} All proofs with pagination
+     */
+    async getAllProofs(hash, filters = {}) {
+        const normalizedHash = hash.startsWith('0x') ? hash.substring(2) : hash;
+        
+        // Build query string
+        const params = new URLSearchParams();
+        if (filters.did) params.append('did', filters.did);
+        if (filters.tier && filters.tier !== 'all') params.append('tier', filters.tier);
+        if (filters.from) params.append('from', filters.from);
+        if (filters.to) params.append('to', filters.to);
+        if (filters.sort) params.append('sort', filters.sort);
+        if (filters.limit) params.append('limit', filters.limit.toString());
+        if (filters.offset) params.append('offset', filters.offset.toString());
+        
+        const queryString = params.toString();
+        const url = `${this.registryUrl}/pohw/proofs/${normalizedHash}${queryString ? '?' + queryString : ''}`;
+        
+        try {
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching all proofs:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Check node status and health
+     * @returns {Promise<Object>} Node status
+     */
+    async checkNodeStatus() {
+        try {
+            const startTime = performance.now();
+            const response = await fetch(`${this.registryUrl}/pohw/status`);
+            const endTime = performance.now();
+            const responseTime = endTime - startTime;
+            
+            if (!response.ok) {
+                return {
+                    online: false,
+                    responseTime,
+                    error: `HTTP ${response.status}`
+                };
+            }
+            
+            const data = await response.json();
+            return {
+                online: true,
+                responseTime,
+                ...data
+            };
+        } catch (error) {
+            return {
+                online: false,
+                responseTime: null,
+                error: error.message
+            };
         }
     }
 
