@@ -7,6 +7,8 @@
 let keyManager = new PoHWKeyManager();
 let registryClient = new RegistryClient();
 let registryDiscovery = new RegistryDiscovery();
+let processTracker = new BrowserProcessTracker();
+let processTracker = new BrowserProcessTracker();
 
 // DOM Elements
 const generateKeysBtn = document.getElementById('generate-keys-btn');
@@ -38,6 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupTabs();
     setupFileUpload();
     setupKeyManagement();
+    setupProcessTracking();
     await setupRegistrySelector();
     setupCreateButton();
     await loadExistingKeys();
@@ -70,6 +73,7 @@ function setupFileUpload() {
     uploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadArea.classList.add('dragover');
+        processTracker.recordInput('file-drag');
     });
     uploadArea.addEventListener('dragleave', () => {
         uploadArea.classList.remove('dragover');
@@ -78,10 +82,12 @@ function setupFileUpload() {
         e.preventDefault();
         uploadArea.classList.remove('dragover');
         const files = Array.from(e.dataTransfer.files);
+        processTracker.recordInput('file-drop');
         handleFiles(files);
     });
     fileInput.addEventListener('change', (e) => {
         const files = Array.from(e.target.files);
+        processTracker.recordInput('file-select');
         handleFiles(files);
     });
 }
@@ -320,6 +326,53 @@ function updateNodeStatus(status) {
 }
 
 /**
+ * Setup process tracking
+ */
+function setupProcessTracking() {
+    // Start tracking when user interacts with content input
+    contentTextarea.addEventListener('focus', () => {
+        processTracker.startSession();
+        updateProcessStatus();
+    });
+    
+    // Track typing in textarea
+    contentTextarea.addEventListener('input', () => {
+        processTracker.recordInput('typing');
+        updateProcessStatus();
+    });
+    
+    // Track file selection
+    fileInput.addEventListener('change', () => {
+        if (fileInput.files.length > 0) {
+            processTracker.startSession();
+            processTracker.recordInput('file-select');
+            updateProcessStatus();
+        }
+    });
+    
+    // Update status periodically
+    setInterval(() => {
+        if (processTracker.isTracking) {
+            updateProcessStatus();
+        }
+    }, 2000);
+}
+
+/**
+ * Update process tracking status display
+ */
+function updateProcessStatus() {
+    // This could show a small indicator of tracking status
+    // For now, we'll just log it
+    const duration = processTracker.getSessionDuration();
+    const events = processTracker.getInputEventCount();
+    
+    if (duration > 0 && events > 0) {
+        console.log(`[ProcessTracker] Session: ${Math.round(duration/1000)}s, Events: ${events}`);
+    }
+}
+
+/**
  * Setup create button
  */
 function setupCreateButton() {
@@ -381,6 +434,50 @@ async function createProof() {
         // Get DID
         const did = keyManager.getDID();
         
+        // Generate process digest if tracking
+        let processDigest = null;
+        let processMetrics = null;
+        let compoundHash = null;
+        let entropyProof = null;
+        let temporalCoherence = null;
+        
+        if (processTracker.isTracking && processTracker.getInputEventCount() > 0) {
+            const digestResult = await processTracker.generateDigest();
+            if (digestResult) {
+                processDigest = digestResult.digest;
+                processMetrics = {
+                    duration: digestResult.metrics.duration,
+                    entropy: digestResult.metrics.entropy,
+                    temporalCoherence: digestResult.metrics.temporalCoherence,
+                    inputEvents: digestResult.metrics.inputEvents,
+                    meetsThresholds: digestResult.meetsThresholds
+                };
+                entropyProof = digestResult.metrics.entropy >= 0.3 ? 'entropy-verified' : null;
+                temporalCoherence = digestResult.metrics.temporalCoherence.toString();
+                
+                // Generate compound hash (content + process)
+                const compoundData = hash + processDigest;
+                const encoder = new TextEncoder();
+                const compoundBytes = encoder.encode(compoundData);
+                const compoundHashBuffer = await crypto.subtle.digest('SHA-256', compoundBytes);
+                const compoundHashArray = Array.from(new Uint8Array(compoundHashBuffer));
+                compoundHash = '0x' + compoundHashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            }
+        }
+        
+        // Detect environment
+        const environment = processTracker.detectEnvironment();
+        const platform = navigator.platform;
+        const screenInfo = `${screen.width}x${screen.height}`;
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        
+        const authoredOnDevice = `${platform} (${screenInfo})`;
+        const environmentAttestation = [
+            `browser: ${environment}`,
+            `timezone: ${timezone}`,
+            processMetrics && processMetrics.meetsThresholds ? 'human-only' : 'web-interface'
+        ];
+        
         // Create claim object
         const timestamp = new Date().toISOString();
         const claim = {
@@ -388,6 +485,14 @@ async function createProof() {
             did: did,
             timestamp: timestamp
         };
+        
+        // Add process data to claim if available
+        if (processDigest) {
+            claim.processDigest = processDigest;
+            if (compoundHash) {
+                claim.compoundHash = compoundHash;
+            }
+        }
         
         // Canonicalize and sign claim
         const canonicalClaim = JSON.stringify(claim, Object.keys(claim).sort());
@@ -398,7 +503,13 @@ async function createProof() {
             hash: hash,
             signature: signature,
             did: did,
-            timestamp: timestamp
+            timestamp: timestamp,
+            processDigest: processDigest,
+            compoundHash: compoundHash,
+            processMetrics: processMetrics,
+            assistanceProfile: processMetrics && processMetrics.meetsThresholds ? 'human-only' : undefined,
+            authoredOnDevice: authoredOnDevice,
+            environmentAttestation: environmentAttestation
         };
         
         // Submit to registry
