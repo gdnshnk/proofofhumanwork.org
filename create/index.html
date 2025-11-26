@@ -76,17 +76,15 @@
                     </div>
                     
                     <!-- Assistance Profile Selection -->
-                    <div class="assistance-profile-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #333;">
-                        <label for="assistance-profile" style="display: block; margin-bottom: 10px; color: #00ff88; font-weight: 500;">
-                            Assistance Profile (Whitepaper Section 8.5)
-                        </label>
-                        <select id="assistance-profile" style="width: 100%; padding: 10px; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 4px; font-size: 14px;">
+                    <div class="registry-selector" style="margin-top: 20px;">
+                        <label for="assistance-profile">Assistance Profile</label>
+                        <select id="assistance-profile" class="registry-select">
                             <option value="human-only">Human-Only (No AI assistance)</option>
                             <option value="AI-assisted">AI-Assisted (Human with AI help)</option>
                             <option value="AI-generated">AI-Generated (Primarily AI)</option>
                         </select>
                         <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
-                            Select how this content was created. This affects the verification tier shown to verifiers.
+                            Hint: Actual profile is determined from process data. This selection is used only if data is ambiguous.
                         </p>
                     </div>
                 </div>
