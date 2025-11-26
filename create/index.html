@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Proof — Proof of Human Work</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>CREATE PROOF</h1>
+                <p class="subtitle">Cryptographically prove your authorship</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="verification-card">
+                <div class="card-header">
+                    <h2>PROOF CREATION</h2>
+                </div>
+
+                <!-- Key Management Section -->
+                <div class="key-section">
+                    <h3>Your Identity</h3>
+                    <div id="key-status" class="key-status">
+                        <div class="key-status-item">
+                            <span class="key-label">Status:</span>
+                            <span id="key-status-text" class="key-status-text">No keys loaded</span>
+                        </div>
+                        <div class="key-status-item" id="did-display" style="display: none;">
+                            <span class="key-label">DID:</span>
+                            <span id="did-value" class="did-value">—</span>
+                        </div>
+                    </div>
+                    <div class="key-actions">
+                        <button id="generate-keys-btn" class="action-btn primary">Generate New Keys</button>
+                        <button id="import-keys-btn" class="action-btn">Import Keys</button>
+                        <button id="export-keys-btn" class="action-btn" style="display: none;">Export Keys</button>
+                    </div>
+                    <div id="import-keys-input" class="import-keys-input hidden">
+                        <textarea id="import-keys-textarea" placeholder="Paste your private key (hex format) or encrypted key"></textarea>
+                        <input type="password" id="import-password" placeholder="Password (if encrypted)" style="display: none;">
+                        <div class="import-actions">
+                            <button id="confirm-import-btn" class="action-btn">Import</button>
+                            <button id="cancel-import-btn" class="action-btn secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Input Section -->
+                <div class="input-section">
+                    <h3>Content to Prove</h3>
+                    <div class="input-tabs">
+                        <button class="tab-button active" data-tab="file">File</button>
+                        <button class="tab-button" data-tab="text">Text</button>
+                    </div>
+
+                    <div class="tab-content active" id="file-tab">
+                        <div class="upload-area" id="upload-area">
+                            <input type="file" id="file-input" class="file-input" multiple>
+                            <div class="upload-placeholder">
+                                <span class="upload-icon">📄</span>
+                                <p>Drag and drop files here or click to browse</p>
+                                <p class="upload-hint">Supports any file type</p>
+                            </div>
+                        </div>
+                        <div id="file-list" class="file-list"></div>
+                    </div>
+
+                    <div class="tab-content" id="text-tab">
+                        <textarea id="content-textarea" class="content-textarea" placeholder="Paste or type your content here..."></textarea>
+                        <p class="input-hint">The content will be hashed and signed</p>
+                    </div>
+                </div>
+
+                <!-- Registry Selector -->
+                <div class="registry-selector">
+                    <label for="registry-select">Registry Node</label>
+                    <select id="registry-select" class="registry-select">
+                        <option value="">Loading nodes...</option>
+                    </select>
+                    <div id="node-status" class="node-status"></div>
+                </div>
+
+                <!-- Create Proof Button -->
+                <button id="create-button" class="verify-button" disabled>
+                    <span class="button-text">Create Proof</span>
+                    <span class="button-loader hidden">⏳</span>
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-section" class="result-card hidden">
+                <div class="card-header">
+                    <h2>PROOF CREATED</h2>
+                    <span id="status-badge" class="status-badge">SUCCESS</span>
+                </div>
+
+                <div class="result-content">
+                    <div class="result-item">
+                        <span class="result-label">Status</span>
+                        <span class="result-value" id="result-status">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Content Hash</span>
+                        <span class="result-value hash-value" id="result-hash">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Signer DID</span>
+                        <span class="result-value" id="result-signer">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Timestamp</span>
+                        <span class="result-value" id="result-timestamp">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Registry</span>
+                        <span class="result-value" id="result-registry">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Proof Receipt</span>
+                        <span class="result-value hash-value" id="result-receipt">—</span>
+                    </div>
+                </div>
+
+                <div class="proof-actions">
+                    <button id="copy-hash-btn" class="action-btn">Copy Hash</button>
+                    <button id="copy-receipt-btn" class="action-btn">Copy Receipt</button>
+                    <a id="verify-link" href="../verify/" class="action-btn" target="_blank">Verify This Proof</a>
+                </div>
+
+                <div class="info-box">
+                    <strong>IMPORTANT:</strong> Save your proof hash and receipt. You can use the hash to verify this proof later.
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="error-section" class="error-section hidden">
+                <div class="error-message" id="error-message"></div>
+            </div>
+
+            <div class="info-box">
+                <strong>PRIVACY:</strong> Your content is hashed locally. Only the hash and signature are sent to the registry. Your original content never leaves your browser.
+            </div>
+        </main>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../verify/">Verify</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/pohw" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/index.js"></script>
+    <script src="../verify/crypto-utils.js"></script>
+    <script src="../verify/registry-discovery.js"></script>
+    <script src="key-manager.js"></script>
+    <script src="registry-client.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
