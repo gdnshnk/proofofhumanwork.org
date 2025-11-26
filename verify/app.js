@@ -3,7 +3,8 @@
  * Main application logic
  */
 
-let verificationClient = new VerificationClient();
+// Initialize with localhost by default (will be updated by setupRegistrySelector)
+let verificationClient = new VerificationClient('http://localhost:3000');
 
 // DOM Elements
 const fileInput = document.getElementById('file-input');
@@ -210,6 +211,11 @@ async function performVerification() {
             return;
         }
         
+        // Ensure we're using the current registry selection
+        const currentRegistry = registrySelect.value;
+        verificationClient = new VerificationClient(currentRegistry);
+        console.log('[App] Using registry:', currentRegistry);
+        
         // Verify with registry
         const result = await verificationClient.verifyProof(hash);
         
@@ -241,7 +247,21 @@ async function performVerification() {
         
     } catch (error) {
         console.error('Verification error:', error);
-        showError(error.message || 'An error occurred during verification');
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            registry: verificationClient.registryUrl,
+            hash: hash
+        });
+        
+        // More specific error messages
+        if (error.message && error.message.includes('Failed to fetch')) {
+            showError(`Cannot connect to registry at ${verificationClient.registryUrl}. Make sure the registry is running.`);
+        } else if (error.message && error.message.includes('CORS')) {
+            showError('CORS error: The registry may not allow requests from this origin.');
+        } else {
+            showError(error.message || 'An error occurred during verification');
+        }
     } finally {
         setLoading(false);
     }
