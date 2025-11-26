@@ -464,6 +464,17 @@ header {
     color: var(--text-primary);
 }
 
+.status-batched {
+    color: var(--accent-green);
+    text-shadow: 0 0 2px var(--accent-green-glow);
+    font-weight: 500;
+}
+
+.status-pending {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
 .hash-value {
     color: var(--accent-green);
     text-shadow: 0 0 2px var(--accent-green-glow);
