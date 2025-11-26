@@ -31,10 +31,11 @@ class PoHWKeyManager {
             await this.ensureEd25519Library();
             
             // Generate random private key (32 bytes for Ed25519)
-            const privateKeyBytes = ed25519.utils.randomPrivateKey();
+            const ed25519Lib = window.ed25519 || ed25519;
+            const privateKeyBytes = ed25519Lib.utils.randomPrivateKey();
             
             // Derive public key
-            const publicKey = await ed25519.getPublicKey(privateKeyBytes);
+            const publicKey = await ed25519Lib.getPublicKey(privateKeyBytes);
             const did = this.generateDID(publicKey);
             
             this.keyPair = {
@@ -57,34 +58,60 @@ class PoHWKeyManager {
      * Ensure Ed25519 library is loaded
      */
     async ensureEd25519Library() {
-        if (typeof ed25519 !== 'undefined' && ed25519.getPublicKey) {
+        // Check if already available
+        if (window.ed25519 && typeof window.ed25519.getPublicKey === 'function') {
             return;
         }
         
-        return new Promise((resolve, reject) => {
-            // Check if already loading
-            if (window._ed25519Loading) {
-                window._ed25519Loading.then(resolve).catch(reject);
-                return;
-            }
-            
-            window._ed25519Loading = new Promise((res, rej) => {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/index.js';
-                script.onload = () => {
-                    // Check if ed25519 is available
-                    if (typeof ed25519 !== 'undefined' && ed25519.getPublicKey) {
-                        res();
-                    } else {
-                        rej(new Error('Ed25519 library loaded but not available'));
+        // Check if already loading
+        if (window._ed25519Loading) {
+            return window._ed25519Loading;
+        }
+        
+        window._ed25519Loading = (async () => {
+            try {
+                // Wait for the module script in HTML to load
+                let attempts = 0;
+                while (attempts < 40) { // Wait up to 2 seconds
+                    if (window.ed25519 && typeof window.ed25519.getPublicKey === 'function') {
+                        return;
                     }
-                };
-                script.onerror = () => rej(new Error('Failed to load Ed25519 library'));
-                document.head.appendChild(script);
-            });
-            
-            window._ed25519Loading.then(resolve).catch(reject);
-        });
+                    await new Promise(resolve => setTimeout(resolve, 50));
+                    attempts++;
+                }
+                
+                // If still not loaded, try dynamic import
+                if (!window.ed25519) {
+                    try {
+                        const ed25519Module = await import('https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/index.js');
+                        window.ed25519 = ed25519Module;
+                        if (window.ed25519 && typeof window.ed25519.getPublicKey === 'function') {
+                            return;
+                        }
+                    } catch (importError) {
+                        console.warn('CDN import failed, trying unpkg:', importError);
+                        try {
+                            const ed25519Module = await import('https://unpkg.com/@noble/ed25519@1.7.3/index.js');
+                            window.ed25519 = ed25519Module;
+                            if (window.ed25519 && typeof window.ed25519.getPublicKey === 'function') {
+                                return;
+                            }
+                        } catch (unpkgError) {
+                            throw new Error('Failed to load Ed25519 library from all sources. Please check your internet connection and try again.');
+                        }
+                    }
+                }
+                
+                if (!window.ed25519 || typeof window.ed25519.getPublicKey !== 'function') {
+                    throw new Error('Ed25519 library loaded but getPublicKey function not available');
+                }
+            } catch (error) {
+                console.error('Ed25519 library loading error:', error);
+                throw error;
+            }
+        })();
+        
+        return window._ed25519Loading;
     }
 
     /**
@@ -114,7 +141,8 @@ class PoHWKeyManager {
             const data = JSON.parse(stored);
             const privateKeyBytes = new Uint8Array(Object.values(data.privateKey));
             
-            const publicKey = await ed25519.getPublicKey(privateKeyBytes);
+            const ed25519Lib = window.ed25519 || ed25519;
+            const publicKey = await ed25519Lib.getPublicKey(privateKeyBytes);
             const did = this.generateDID(publicKey);
             
             this.keyPair = {
@@ -149,7 +177,8 @@ class PoHWKeyManager {
                 throw new Error('Invalid private key length. Must be 32 bytes (64 hex characters).');
             }
             
-            const publicKey = await ed25519.getPublicKey(privateKeyBytes);
+            const ed25519Lib = window.ed25519 || ed25519;
+            const publicKey = await ed25519Lib.getPublicKey(privateKeyBytes);
             const did = this.generateDID(publicKey);
             
             this.keyPair = {
@@ -222,7 +251,8 @@ class PoHWKeyManager {
             ? new TextEncoder().encode(message)
             : message;
         
-        const signature = await ed25519.sign(messageBytes, this.keyPair.privateKey);
+        const ed25519Lib = window.ed25519 || ed25519;
+        const signature = await ed25519Lib.sign(messageBytes, this.keyPair.privateKey);
         
         // Convert signature to hex
         return Array.from(signature)
