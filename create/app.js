@@ -551,15 +551,41 @@ async function createProof() {
         const canonicalClaim = JSON.stringify(claim, Object.keys(claim).sort());
         const signature = await keyManager.sign(canonicalClaim);
         
-        // Get assistance profile from UI (user selection)
-        const assistanceProfileSelect = document.getElementById('assistance-profile');
-        const assistanceProfile = assistanceProfileSelect ? assistanceProfileSelect.value : 'human-only';
+        // Determine assistance profile from ACTUAL DATA (process metrics), not just user selection
+        // User selection is only a hint - the actual data determines the profile
+        let assistanceProfile = 'human-only'; // Default
         
-        // If process metrics don't meet thresholds and user selected "human-only", 
-        // we should warn them but still submit (whitepaper allows this)
-        if (processMetrics && !processMetrics.meetsThresholds && assistanceProfile === 'human-only') {
-            console.warn('[App] Process metrics do not meet human thresholds, but user selected "human-only". Submitting anyway (whitepaper allows assistance disclosure).');
+        if (processMetrics) {
+            // Determine from actual process data
+            if (processMetrics.meetsThresholds) {
+                // Meets human thresholds = human-only
+                assistanceProfile = 'human-only';
+            } else {
+                // Doesn't meet thresholds - check how far off
+                const entropy = processMetrics.entropy || 0;
+                const duration = processMetrics.duration || 0;
+                const inputEvents = processMetrics.inputEvents || 0;
+                
+                // Very low metrics = likely AI-generated
+                if (entropy < 0.1 && duration < 5000 && inputEvents < 5) {
+                    assistanceProfile = 'AI-generated';
+                } else {
+                    // Some activity but not meeting thresholds = AI-assisted
+                    assistanceProfile = 'AI-assisted';
+                }
+            }
+        } else {
+            // No process data - use user selection as hint
+            const assistanceProfileSelect = document.getElementById('assistance-profile');
+            assistanceProfile = assistanceProfileSelect ? assistanceProfileSelect.value : 'human-only';
         }
+        
+        console.log('[App] Assistance profile determined from data:', {
+            assistanceProfile: assistanceProfile,
+            hasProcessMetrics: !!processMetrics,
+            meetsThresholds: processMetrics?.meetsThresholds,
+            userSelection: document.getElementById('assistance-profile')?.value
+        });
         
         // Prepare attestation request (always include environment, conditionally include process data)
         const attestation = {
@@ -570,7 +596,7 @@ async function createProof() {
             // Always include environment attestation
             authoredOnDevice: authoredOnDevice,
             environmentAttestation: environmentAttestation,
-            // Always include assistance profile (user-selected)
+            // Assistance profile determined from actual data
             assistanceProfile: assistanceProfile,
             // Include process data if available
             ...(processDigest && {
