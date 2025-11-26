@@ -587,7 +587,13 @@ async function createProof() {
             userSelection: document.getElementById('assistance-profile')?.value
         });
         
+        // WORKAROUND for production server: If processMetrics don't meet thresholds,
+        // don't send processMetrics (production server rejects them)
+        // But still send processDigest and compoundHash for verification
+        const shouldSendProcessMetrics = processMetrics && processMetrics.meetsThresholds;
+        
         // Prepare attestation request (always include environment, conditionally include process data)
+        // IMPORTANT: Always send assistanceProfile to work with production server
         const attestation = {
             hash: hash,
             signature: signature,
@@ -596,15 +602,23 @@ async function createProof() {
             // Always include environment attestation
             authoredOnDevice: authoredOnDevice,
             environmentAttestation: environmentAttestation,
-            // Assistance profile determined from actual data
+            // ALWAYS include assistance profile (required for production server)
+            // This must match the actual data
             assistanceProfile: assistanceProfile,
-            // Include process data if available
+            // Include process digest and compound hash (always safe to send)
             ...(processDigest && {
                 processDigest: processDigest,
-                compoundHash: compoundHash,
+                compoundHash: compoundHash
+            }),
+            // Only send processMetrics if they meet thresholds (production server rejects otherwise)
+            ...(shouldSendProcessMetrics && {
                 processMetrics: processMetrics
             })
         };
+        
+        if (processMetrics && !processMetrics.meetsThresholds) {
+            console.warn('[App] Process metrics do not meet thresholds. Omitting processMetrics from request to avoid production server rejection. Assistance profile set to:', assistanceProfile);
+        }
         
         console.log('[App] Attestation data:', {
             hasProcessDigest: !!processDigest,
