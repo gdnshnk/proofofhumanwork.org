@@ -15,6 +15,14 @@ class VerificationClient {
     }
 
     /**
+     * Update registry URL dynamically
+     */
+    setRegistryUrl(url) {
+        this.registryUrl = url.replace(/\/$/, '');
+        console.log('[VerificationClient] Registry URL updated to:', this.registryUrl);
+    }
+
+    /**
      * Verify a proof by hash
      * @param {string} hash - Content hash (with or without 0x prefix)
      * @returns {Promise<Object>} Verification result
