@@ -276,7 +276,7 @@ class BrowserProcessTracker {
         }
         
         const metrics = {
-            sessionStart: new Date(this.sessionStart).toISOString(),
+            sessionStart: new Date(sessionStart).toISOString(),
             sessionEnd: new Date(now).toISOString(),
             duration: duration,
             entropy: entropy,
