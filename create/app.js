@@ -120,13 +120,22 @@ function setupKeyManagement() {
     generateKeysBtn.addEventListener('click', async () => {
         try {
             setLoading(true);
+            generateKeysBtn.disabled = true;
+            
+            // Wait a bit for ed25519 library to load if needed
+            if (typeof window.ed25519 === 'undefined') {
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
             const { did } = await keyManager.generateKeys();
             updateKeyStatus(true, did);
             showSuccess('Keys generated successfully!');
         } catch (error) {
-            showError('Failed to generate keys: ' + error.message);
+            console.error('Key generation error:', error);
+            showError('Failed to generate keys: ' + error.message + '. Please check the browser console for details.');
         } finally {
             setLoading(false);
+            generateKeysBtn.disabled = false;
         }
     });
     
@@ -373,13 +382,15 @@ async function createProof() {
         console.log('[App] Submitting attestation:', attestation);
         const receipt = await registryClient.submitAttestation(attestation);
         
+        console.log('[App] Receipt received:', receipt);
+        
         // Display results
         displayResults({
             hash: hash,
             did: did,
             timestamp: timestamp,
             registry: currentRegistry,
-            receipt: receipt.receipt_hash || receipt.hash || hash
+            receipt: receipt.receipt_hash || receipt.hash || receipt.proof_hash || hash
         });
         
     } catch (error) {
