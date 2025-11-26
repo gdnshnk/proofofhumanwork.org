@@ -31,13 +31,21 @@ class VerificationClient {
         console.log('[VerificationClient] Full URL:', url);
         
         try {
-            const response = await fetch(url);
+            console.log('[VerificationClient] Making request to:', url);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                },
+                mode: 'cors'
+            });
             
             console.log('[VerificationClient] Response status:', response.status);
+            console.log('[VerificationClient] Response headers:', [...response.headers.entries()]);
             
             if (!response.ok) {
                 const errorText = await response.text();
-                console.log('[VerificationClient] Error response:', errorText);
+                console.error('[VerificationClient] Error response:', errorText);
                 
                 if (response.status === 404) {
                     return {
@@ -45,14 +53,25 @@ class VerificationClient {
                         error: 'Proof not found in registry'
                     };
                 }
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
             }
             
             const data = await response.json();
             console.log('[VerificationClient] Verification result:', data);
             return data;
         } catch (error) {
-            console.error('[VerificationClient] Error:', error);
+            console.error('[VerificationClient] Fetch error:', error);
+            console.error('[VerificationClient] Error name:', error.name);
+            console.error('[VerificationClient] Error message:', error.message);
+            
+            // More specific error messages
+            if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                return {
+                    valid: false,
+                    error: `Cannot connect to registry at ${this.registryUrl}. Make sure the registry is running and accessible.`
+                };
+            }
+            
             return {
                 valid: false,
                 error: error.message || 'Failed to verify proof'
