@@ -555,22 +555,81 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
     verdictTypeEl.className = `result-value verdict-type verdict-${verdict.type}`;
     document.getElementById('verdict-explanation').textContent = verdict.explanation;
     
-    // Merkle proof section
+    // Merkle proof section - always show for transparency
     const merkleSection = document.getElementById('merkle-section');
-    if (result.merkle_root || result.merkle_proof) {
-        merkleSection.classList.remove('hidden');
-        document.getElementById('merkle-root').textContent = result.merkle_root || '—';
-        
-        const proofPath = document.getElementById('proof-path');
-        if (result.merkle_proof && result.merkle_proof.length > 0) {
-            proofPath.innerHTML = result.merkle_proof.map((item, idx) => 
-                `<div class="proof-path-item">${idx + 1}. ${item}</div>`
-            ).join('');
-        } else {
-            proofPath.innerHTML = '<div class="proof-path-item">No proof path available</div>';
-        }
+    merkleSection.classList.remove('hidden');
+    
+    // Batch status
+    const batchStatus = result.batch_status || 'pending';
+    const statusElement = document.getElementById('batch-status');
+    if (batchStatus === 'batched') {
+        statusElement.textContent = 'Batched';
+        statusElement.className = 'result-value status-batched';
     } else {
-        merkleSection.classList.add('hidden');
+        statusElement.textContent = 'Pending Batching';
+        statusElement.className = 'result-value status-pending';
+    }
+    
+    // Batch ID (only show if batched)
+    const batchIdItem = document.getElementById('batch-id-item');
+    const batchIdElement = document.getElementById('batch-id');
+    if (result.batch_id) {
+        batchIdItem.classList.remove('hidden');
+        batchIdElement.textContent = result.batch_id;
+    } else {
+        batchIdItem.classList.add('hidden');
+    }
+    
+    // Batch size (only show if batched)
+    const batchSizeItem = document.getElementById('batch-size-item');
+    const batchSizeElement = document.getElementById('batch-size');
+    if (result.batch_size !== undefined) {
+        batchSizeItem.classList.remove('hidden');
+        batchSizeElement.textContent = `${result.batch_size.toLocaleString()} proofs`;
+    } else {
+        batchSizeItem.classList.add('hidden');
+    }
+    
+    // Position in batch (only show if batched)
+    const merkleIndexItem = document.getElementById('merkle-index-item');
+    const merkleIndexElement = document.getElementById('merkle-index');
+    if (result.merkle_index !== undefined && result.batch_size !== undefined) {
+        merkleIndexItem.classList.remove('hidden');
+        merkleIndexElement.textContent = `Proof #${(result.merkle_index + 1).toLocaleString()} of ${result.batch_size.toLocaleString()}`;
+    } else {
+        merkleIndexItem.classList.add('hidden');
+    }
+    
+    // Merkle root (only show if batched)
+    const merkleRootItem = document.getElementById('merkle-root-item');
+    const merkleRootElement = document.getElementById('merkle-root');
+    if (result.merkle_root) {
+        merkleRootItem.classList.remove('hidden');
+        merkleRootElement.textContent = result.merkle_root;
+    } else {
+        merkleRootItem.classList.add('hidden');
+    }
+    
+    // Proof path (only show if batched)
+    const proofPathItem = document.getElementById('proof-path-item');
+    const proofPath = document.getElementById('proof-path');
+    if (result.merkle_proof && result.merkle_proof.length > 0) {
+        proofPathItem.classList.remove('hidden');
+        proofPath.innerHTML = result.merkle_proof.map((item, idx) => 
+            `<div class="proof-path-item">${idx + 1}. ${item}</div>`
+        ).join('');
+    } else {
+        proofPathItem.classList.add('hidden');
+    }
+    
+    // Pending count (always show for transparency)
+    const pendingCountItem = document.getElementById('pending-count-item');
+    const pendingCountElement = document.getElementById('pending-count');
+    if (result.pending_count !== undefined) {
+        pendingCountItem.classList.remove('hidden');
+        pendingCountElement.textContent = `${result.pending_count.toLocaleString()} proofs pending batching`;
+    } else {
+        pendingCountItem.classList.add('hidden');
     }
     
     // Blockchain anchors section
