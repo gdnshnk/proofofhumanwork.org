@@ -3,8 +3,8 @@
  * Main application logic
  */
 
-// Initialize with localhost by default (will be updated by setupRegistrySelector)
-let verificationClient = new VerificationClient('http://localhost:3000');
+// Initialize with default (will be updated by setupRegistrySelector)
+let verificationClient = new VerificationClient();
 
 // DOM Elements
 const fileInput = document.getElementById('file-input');
@@ -140,18 +140,20 @@ function setupVerifyButton() {
  * Setup registry selector
  */
 function setupRegistrySelector() {
-    // Auto-select localhost if running on localhost
+    // Auto-select based on hostname
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Local development - use localhost
         const localOption = document.getElementById('local-option');
         if (localOption) {
             registrySelect.value = 'http://localhost:3000';
             console.log('[App] Auto-selected localhost for local development');
         }
     } else {
+        // Production - use production registry
         const prodOption = document.getElementById('prod-option');
         if (prodOption) {
             registrySelect.value = 'https://pohw-registry-node-production.up.railway.app';
-            console.log('[App] Auto-selected production registry');
+            console.log('[App] Auto-selected production registry for', window.location.hostname);
         }
     }
     
@@ -161,7 +163,7 @@ function setupRegistrySelector() {
     
     registrySelect.addEventListener('change', (e) => {
         console.log('[App] Registry changed to:', e.target.value);
-        verificationClient = new VerificationClient(e.target.value);
+        verificationClient.setRegistryUrl(e.target.value);
     });
 }
 
