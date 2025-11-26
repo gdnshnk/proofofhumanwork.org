@@ -551,6 +551,16 @@ async function createProof() {
         const canonicalClaim = JSON.stringify(claim, Object.keys(claim).sort());
         const signature = await keyManager.sign(canonicalClaim);
         
+        // Get assistance profile from UI (user selection)
+        const assistanceProfileSelect = document.getElementById('assistance-profile');
+        const assistanceProfile = assistanceProfileSelect ? assistanceProfileSelect.value : 'human-only';
+        
+        // If process metrics don't meet thresholds and user selected "human-only", 
+        // we should warn them but still submit (whitepaper allows this)
+        if (processMetrics && !processMetrics.meetsThresholds && assistanceProfile === 'human-only') {
+            console.warn('[App] Process metrics do not meet human thresholds, but user selected "human-only". Submitting anyway (whitepaper allows assistance disclosure).');
+        }
+        
         // Prepare attestation request (always include environment, conditionally include process data)
         const attestation = {
             hash: hash,
@@ -560,18 +570,20 @@ async function createProof() {
             // Always include environment attestation
             authoredOnDevice: authoredOnDevice,
             environmentAttestation: environmentAttestation,
+            // Always include assistance profile (user-selected)
+            assistanceProfile: assistanceProfile,
             // Include process data if available
             ...(processDigest && {
                 processDigest: processDigest,
                 compoundHash: compoundHash,
-                processMetrics: processMetrics,
-                assistanceProfile: processMetrics && processMetrics.meetsThresholds ? 'human-only' : undefined
+                processMetrics: processMetrics
             })
         };
         
         console.log('[App] Attestation data:', {
             hasProcessDigest: !!processDigest,
             hasEnvironment: !!authoredOnDevice,
+            assistanceProfile: assistanceProfile,
             processMetrics: processMetrics
         });
         
