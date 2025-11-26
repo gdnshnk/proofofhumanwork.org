@@ -5,8 +5,13 @@
  */
 
 class VerificationClient {
-    constructor(registryUrl = 'https://pohw-registry-node-production.up.railway.app') {
-        this.registryUrl = registryUrl.replace(/\/$/, ''); // Remove trailing slash
+    constructor(registryUrl = null) {
+        // Default to localhost for development, production for production
+        const defaultUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:3000'
+            : 'https://pohw-registry-node-production.up.railway.app';
+        
+        this.registryUrl = (registryUrl || defaultUrl).replace(/\/$/, ''); // Remove trailing slash
     }
 
     /**
