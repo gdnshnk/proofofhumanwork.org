@@ -121,21 +121,47 @@ function setupKeyManagement() {
         try {
             setLoading(true);
             generateKeysBtn.disabled = true;
+            const originalText = generateKeysBtn.textContent;
+            generateKeysBtn.textContent = 'Loading library...';
             
-            // Wait a bit for ed25519 library to load if needed
-            if (typeof window.ed25519 === 'undefined') {
-                await new Promise(resolve => setTimeout(resolve, 500));
+            // Check for load error
+            if (window.ed25519LoadError) {
+                throw new Error(window.ed25519LoadError);
             }
             
+            // Wait for ed25519 library to be available (up to 5 seconds)
+            let waitAttempts = 0;
+            const maxWaitAttempts = 50; // 5 seconds
+            
+            while ((typeof window.ed25519 === 'undefined' || !window.ed25519.getPublicKey) && waitAttempts < maxWaitAttempts) {
+                if (window.ed25519LoadError) {
+                    throw new Error(window.ed25519LoadError);
+                }
+                await new Promise(resolve => setTimeout(resolve, 100));
+                waitAttempts++;
+                
+                // Update button text to show progress
+                if (waitAttempts % 10 === 0) {
+                    generateKeysBtn.textContent = `Loading library... (${waitAttempts * 100}ms)`;
+                }
+            }
+            
+            if (typeof window.ed25519 === 'undefined' || !window.ed25519.getPublicKey) {
+                throw new Error('Ed25519 library failed to load. Please refresh the page and try again. If the problem persists, check your internet connection.');
+            }
+            
+            generateKeysBtn.textContent = 'Generating keys...';
             const { did } = await keyManager.generateKeys();
             updateKeyStatus(true, did);
             showSuccess('Keys generated successfully!');
         } catch (error) {
             console.error('Key generation error:', error);
-            showError('Failed to generate keys: ' + error.message + '. Please check the browser console for details.');
+            const errorMsg = error.message || 'Unknown error';
+            showError('Failed to generate keys: ' + errorMsg + '\n\nPlease check the browser console (F12) for details.');
         } finally {
             setLoading(false);
             generateKeysBtn.disabled = false;
+            generateKeysBtn.textContent = 'Generate New Keys';
         }
     });
     
