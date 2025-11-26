@@ -5,6 +5,7 @@
 
 // Initialize with default (will be updated by setupRegistrySelector)
 let verificationClient = new VerificationClient();
+let registryDiscovery = new RegistryDiscovery();
 
 // DOM Elements
 const fileInput = document.getElementById('file-input');
@@ -137,34 +138,201 @@ function setupVerifyButton() {
 }
 
 /**
- * Setup registry selector
+ * Setup registry selector with dynamic discovery
  */
-function setupRegistrySelector() {
-    // Auto-select based on hostname
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        // Local development - use localhost
-        const localOption = document.getElementById('local-option');
-        if (localOption) {
-            registrySelect.value = 'http://localhost:3000';
-            console.log('[App] Auto-selected localhost for local development');
+async function setupRegistrySelector() {
+    // Discover registry nodes
+    try {
+        const nodes = await registryDiscovery.discoverNodes();
+        console.log('[App] Discovered', nodes.length, 'registry nodes');
+        
+        // Populate dropdown
+        registrySelect.innerHTML = '';
+        nodes.forEach(node => {
+            const option = document.createElement('option');
+            option.value = node.url;
+            option.textContent = node.name;
+            option.dataset.nodeId = node.id;
+            option.dataset.operator = node.operator;
+            option.dataset.verified = node.verified ? 'true' : 'false';
+            registrySelect.appendChild(option);
+        });
+        
+        // Check node statuses
+        const nodesWithStatus = await registryDiscovery.checkAllNodesStatus();
+        updateNodeStatusDisplay(nodesWithStatus);
+        
+        // Set default registry
+        const defaultUrl = registryDiscovery.getDefaultRegistry();
+        registrySelect.value = defaultUrl;
+        verificationClient = new VerificationClient(defaultUrl);
+        console.log('[App] Initialized with default registry:', defaultUrl);
+        
+    } catch (error) {
+        console.error('[App] Registry discovery failed:', error);
+        // Fallback to hardcoded defaults
+        registrySelect.innerHTML = `
+            <option value="https://gdn.sh">gdn.sh (Primary)</option>
+            <option value="https://pohw-registry-node-production.up.railway.app">Production (Railway)</option>
+        `;
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            const localOption = document.createElement('option');
+            localOption.value = 'http://localhost:3000';
+            localOption.textContent = 'Local Development';
+            registrySelect.insertBefore(localOption, registrySelect.firstChild);
         }
-    } else {
-        // Production - use production registry
-        const prodOption = document.getElementById('prod-option');
-        if (prodOption) {
-            registrySelect.value = 'https://pohw-registry-node-production.up.railway.app';
-            console.log('[App] Auto-selected production registry for', window.location.hostname);
-        }
+        registrySelect.value = registrySelect.options[0].value;
+        verificationClient = new VerificationClient(registrySelect.value);
     }
     
-    // Initialize with selected value
-    verificationClient = new VerificationClient(registrySelect.value);
-    console.log('[App] Initialized with registry:', registrySelect.value);
+    // Setup custom registry input
+    setupCustomRegistryInput();
     
-    registrySelect.addEventListener('change', (e) => {
-        console.log('[App] Registry changed to:', e.target.value);
-        verificationClient.setRegistryUrl(e.target.value);
+    // Handle registry change
+    registrySelect.addEventListener('change', async (e) => {
+        const selectedUrl = e.target.value;
+        console.log('[App] Registry changed to:', selectedUrl);
+        
+        // Warn if trying to use localhost from production site
+        if (selectedUrl.includes('localhost') && 
+            window.location.hostname !== 'localhost' && 
+            window.location.hostname !== '127.0.0.1') {
+            alert('⚠️ Localhost registry will not work from production site.\n\nPlease:\n1. Use a public registry, OR\n2. Access via http://localhost:8000/verify/');
+            return;
+        }
+        
+        verificationClient.setRegistryUrl(selectedUrl);
+        
+        // Update node status
+        const selectedOption = e.target.options[e.target.selectedIndex];
+        if (selectedOption) {
+            updateSingleNodeStatus(selectedUrl);
+        }
     });
+}
+
+/**
+ * Setup custom registry input
+ */
+function setupCustomRegistryInput() {
+    const addBtn = document.getElementById('add-custom-registry');
+    const customInput = document.getElementById('custom-registry-input');
+    const customUrlInput = document.getElementById('custom-registry-url');
+    const addCustomBtn = document.getElementById('add-custom-btn');
+    const cancelBtn = document.getElementById('cancel-custom-btn');
+    
+    if (!addBtn || !customInput) return;
+    
+    addBtn.addEventListener('click', () => {
+        customInput.classList.remove('hidden');
+        customUrlInput.focus();
+    });
+    
+    cancelBtn?.addEventListener('click', () => {
+        customInput.classList.add('hidden');
+        customUrlInput.value = '';
+    });
+    
+    addCustomBtn?.addEventListener('click', () => {
+        const url = customUrlInput.value.trim();
+        if (!url) return;
+        
+        // Validate URL
+        try {
+            new URL(url);
+            
+            // Add to dropdown
+            const option = document.createElement('option');
+            option.value = url;
+            option.textContent = `Custom: ${new URL(url).hostname}`;
+            option.dataset.nodeId = 'custom';
+            registrySelect.appendChild(option);
+            registrySelect.value = url;
+            
+            verificationClient.setRegistryUrl(url);
+            customInput.classList.add('hidden');
+            customUrlInput.value = '';
+            
+            // Check status
+            updateSingleNodeStatus(url);
+        } catch (e) {
+            alert('Invalid URL. Please enter a valid URL (e.g., https://example.com)');
+        }
+    });
+    
+    customUrlInput?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            addCustomBtn?.click();
+        }
+    });
+}
+
+/**
+ * Update node status display
+ */
+function updateNodeStatusDisplay(nodes) {
+    const statusEl = document.getElementById('node-status');
+    if (!statusEl) return;
+    
+    const selectedUrl = registrySelect.value;
+    const selectedNode = nodes.find(n => n.url === selectedUrl);
+    
+    if (selectedNode) {
+        if (selectedNode.online) {
+            statusEl.innerHTML = `
+                <span class="status-indicator online"></span>
+                <span class="status-text">Online</span>
+                ${selectedNode.responseTime ? `<span class="status-response">${selectedNode.responseTime.toFixed(0)}ms</span>` : ''}
+            `;
+            statusEl.className = 'node-status online';
+        } else {
+            statusEl.innerHTML = `
+                <span class="status-indicator offline"></span>
+                <span class="status-text">Offline</span>
+            `;
+            statusEl.className = 'node-status offline';
+        }
+    } else {
+        statusEl.innerHTML = '';
+        statusEl.className = 'node-status';
+    }
+}
+
+/**
+ * Update single node status
+ */
+async function updateSingleNodeStatus(url) {
+    const statusEl = document.getElementById('node-status');
+    if (!statusEl) return;
+    
+    statusEl.innerHTML = '<span class="status-text">Checking...</span>';
+    statusEl.className = 'node-status checking';
+    
+    try {
+        const client = new VerificationClient(url);
+        const status = await client.checkNodeStatus();
+        
+        if (status.online) {
+            statusEl.innerHTML = `
+                <span class="status-indicator online"></span>
+                <span class="status-text">Online</span>
+                ${status.responseTime ? `<span class="status-response">${status.responseTime.toFixed(0)}ms</span>` : ''}
+            `;
+            statusEl.className = 'node-status online';
+        } else {
+            statusEl.innerHTML = `
+                <span class="status-indicator offline"></span>
+                <span class="status-text">Offline</span>
+            `;
+            statusEl.className = 'node-status offline';
+        }
+    } catch (error) {
+        statusEl.innerHTML = `
+            <span class="status-indicator offline"></span>
+            <span class="status-text">Error</span>
+        `;
+        statusEl.className = 'node-status offline';
+    }
 }
 
 /**
@@ -244,8 +412,21 @@ async function performVerification() {
             }
         }
         
+        // Check if multiple proofs exist (only if verification was successful)
+        let allProofsData = null;
+        if (result.valid) {
+            try {
+                allProofsData = await verificationClient.getAllProofs(hash, { limit: 1 });
+                if (allProofsData && allProofsData.total > 1) {
+                    console.log(`[App] Found ${allProofsData.total} proofs for this hash`);
+                }
+            } catch (error) {
+                console.warn('[App] Could not fetch all proofs:', error);
+            }
+        }
+        
         // Display results
-        displayResults(result, hash, proofDetails, anchors, pavClaim, reputation);
+        displayResults(result, hash, proofDetails, anchors, pavClaim, reputation, allProofsData);
         
     } catch (error) {
         console.error('Verification error:', error);
@@ -335,7 +516,7 @@ function determineVerdict(result, pavClaim) {
 /**
  * Display verification results
  */
-function displayResults(result, hash, proofDetails, anchors, pavClaim, reputation) {
+function displayResults(result, hash, proofDetails, anchors, pavClaim, reputation, allProofsData = null) {
     resultsSection.classList.remove('hidden');
     
     // Determine verdict (Whitepaper requirement)
@@ -357,6 +538,16 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
     document.getElementById('result-timestamp').textContent = result.timestamp ? formatTimestamp(result.timestamp) : '—';
     document.getElementById('result-hash').textContent = hash;
     document.getElementById('result-registry').textContent = result.registry || verificationClient.registryUrl;
+    
+    // Show "View All Proofs" section if multiple proofs exist
+    const allProofsSection = document.getElementById('all-proofs-section');
+    if (allProofsData && allProofsData.total > 1 && result.valid) {
+        allProofsSection.classList.remove('hidden');
+        document.getElementById('proofs-count').textContent = `${allProofsData.total} proofs found`;
+        setupAllProofsView(hash, allProofsData);
+    } else {
+        allProofsSection.classList.add('hidden');
+    }
     
     // Deterministic Verdict (Whitepaper Section 5.2)
     const verdictTypeEl = document.getElementById('verdict-type');
@@ -594,4 +785,278 @@ function setLoading(loading) {
         buttonLoader.classList.add('hidden');
     }
 }
+
+/**
+ * Setup "View All Proofs" functionality with search/filter
+ */
+let currentProofsFilters = {
+    did: '',
+    tier: 'all',
+    from: null,
+    to: null,
+    sort: 'newest',
+    verifiedOnly: false,
+    limit: 50,
+    offset: 0
+};
+
+let currentHashForProofs = null;
+
+function setupAllProofsView(hash, initialData) {
+    currentHashForProofs = hash;
+    
+    // Load initial proofs
+    loadAllProofs(hash, currentProofsFilters);
+    
+    // Setup search/filter handlers
+    setupProofsSearchFilter();
+}
+
+function setupProofsSearchFilter() {
+    const searchInput = document.getElementById('proof-search-did');
+    const tierFilter = document.getElementById('proof-filter-tier');
+    const sortSelect = document.getElementById('proof-sort');
+    const verifiedCheckbox = document.getElementById('proof-filter-verified');
+    const fromDate = document.getElementById('proof-filter-from');
+    const toDate = document.getElementById('proof-filter-to');
+    const clearBtn = document.getElementById('clear-filters-btn');
+    
+    // Search by DID (debounced)
+    let searchTimeout;
+    searchInput?.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentProofsFilters.did = e.target.value.trim();
+            currentProofsFilters.offset = 0; // Reset to first page
+            loadAllProofs(currentHashForProofs, currentProofsFilters);
+        }, 300);
+    });
+    
+    // Tier filter
+    tierFilter?.addEventListener('change', (e) => {
+        currentProofsFilters.tier = e.target.value;
+        currentProofsFilters.offset = 0;
+        loadAllProofs(currentHashForProofs, currentProofsFilters);
+    });
+    
+    // Sort
+    sortSelect?.addEventListener('change', (e) => {
+        currentProofsFilters.sort = e.target.value;
+        currentProofsFilters.offset = 0;
+        loadAllProofs(currentHashForProofs, currentProofsFilters);
+    });
+    
+    // Verified only
+    verifiedCheckbox?.addEventListener('change', (e) => {
+        currentProofsFilters.verifiedOnly = e.target.checked;
+        if (e.target.checked) {
+            // If verified only, filter to green/blue
+            currentProofsFilters.tier = 'all'; // Will filter in loadAllProofs
+            tierFilter.value = 'all';
+        }
+        currentProofsFilters.offset = 0;
+        loadAllProofs(currentHashForProofs, currentProofsFilters);
+    });
+    
+    // Date filters
+    fromDate?.addEventListener('change', (e) => {
+        currentProofsFilters.from = e.target.value || null;
+        currentProofsFilters.offset = 0;
+        loadAllProofs(currentHashForProofs, currentProofsFilters);
+    });
+    
+    toDate?.addEventListener('change', (e) => {
+        currentProofsFilters.to = e.target.value || null;
+        currentProofsFilters.offset = 0;
+        loadAllProofs(currentHashForProofs, currentProofsFilters);
+    });
+    
+    // Clear filters
+    clearBtn?.addEventListener('click', () => {
+        currentProofsFilters = {
+            did: '',
+            tier: 'all',
+            from: null,
+            to: null,
+            sort: 'newest',
+            verifiedOnly: false,
+            limit: 50,
+            offset: 0
+        };
+        
+        searchInput.value = '';
+        tierFilter.value = 'all';
+        sortSelect.value = 'newest';
+        verifiedCheckbox.checked = false;
+        fromDate.value = '';
+        toDate.value = '';
+        
+        loadAllProofs(currentHashForProofs, currentProofsFilters);
+    });
+}
+
+async function loadAllProofs(hash, filters) {
+    if (!hash) return;
+    
+    const proofsList = document.getElementById('proofs-list');
+    const proofsCount = document.getElementById('proofs-count');
+    const pagination = document.getElementById('proofs-pagination');
+    
+    proofsList.innerHTML = '<div class="loading-proofs">Loading proofs...</div>';
+    
+    try {
+        // Apply verified-only filter client-side if needed
+        let apiFilters = { ...filters };
+        if (filters.verifiedOnly) {
+            // We'll filter client-side, but also set tier to help
+            // The API will return all, we filter to green/blue
+        }
+        
+        const data = await verificationClient.getAllProofs(hash, apiFilters);
+        
+        // Apply verified-only filter if needed (client-side for accurate count)
+        let filteredProofs = data.proofs;
+        let total = data.total;
+        
+        if (filters.verifiedOnly) {
+            filteredProofs = filteredProofs.filter(p => p.tier === 'green' || p.tier === 'blue');
+            // For verified-only, we need to fetch all and filter to get accurate count
+            // For now, estimate based on current page
+            if (data.has_more || filters.offset > 0) {
+                // If there are more pages, we can't know exact count without fetching all
+                // Show approximate count
+                total = filteredProofs.length + (data.has_more ? ' (showing filtered)' : '');
+            } else {
+                total = filteredProofs.length;
+            }
+        }
+        proofsCount.textContent = `${total} proof${total !== 1 ? 's' : ''} found`;
+        
+        // Display proofs
+        if (filteredProofs.length === 0) {
+            proofsList.innerHTML = '<div class="no-proofs">No proofs match your filters.</div>';
+            pagination.classList.add('hidden');
+        } else {
+            proofsList.innerHTML = filteredProofs.map((proof, index) => {
+                const tierClass = `tier-${proof.tier || 'grey'}`;
+                const tierLabel = (proof.tier || 'grey').charAt(0).toUpperCase() + (proof.tier || 'grey').slice(1);
+                return `
+                    <div class="proof-item ${tierClass}">
+                        <div class="proof-header">
+                            <span class="proof-number">Proof #${filters.offset + index + 1}</span>
+                            <span class="proof-tier ${tierClass}">${tierLabel}</span>
+                        </div>
+                        <div class="proof-details">
+                            <div class="proof-detail-item">
+                                <span class="proof-label">Signer DID:</span>
+                                <span class="proof-value">${proof.did}</span>
+                            </div>
+                            <div class="proof-detail-item">
+                                <span class="proof-label">Timestamp:</span>
+                                <span class="proof-value">${formatTimestamp(proof.timestamp)}</span>
+                            </div>
+                            ${proof.batch_id ? `
+                            <div class="proof-detail-item">
+                                <span class="proof-label">Batch ID:</span>
+                                <span class="proof-value">${proof.batch_id}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                        <button class="view-proof-btn" onclick="viewProofDetails('${proof.did}', '${proof.timestamp}')">View Details</button>
+                    </div>
+                `;
+            }).join('');
+            
+            // Setup pagination (use numeric total for pagination)
+            const numericTotal = typeof total === 'number' ? total : data.total;
+            setupPagination(numericTotal, filters.limit, filters.offset);
+        }
+    } catch (error) {
+        console.error('Error loading all proofs:', error);
+        proofsList.innerHTML = `<div class="error-proofs">Error loading proofs: ${error.message}</div>`;
+        pagination.classList.add('hidden');
+    }
+}
+
+function setupPagination(total, limit, offset) {
+    const pagination = document.getElementById('proofs-pagination');
+    if (total <= limit) {
+        pagination.classList.add('hidden');
+        return;
+    }
+    
+    pagination.classList.remove('hidden');
+    const currentPage = Math.floor(offset / limit) + 1;
+    const totalPages = Math.ceil(total / limit);
+    
+    let paginationHTML = '<div class="pagination-controls">';
+    
+    // Previous button
+    if (offset > 0) {
+        paginationHTML += `<button class="pagination-btn" onclick="changeProofsPage(${offset - limit})">← Previous</button>`;
+    }
+    
+    // Page numbers
+    const maxPagesToShow = 10;
+    let startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+    
+    if (startPage > 1) {
+        paginationHTML += `<button class="pagination-btn" onclick="changeProofsPage(0)">1</button>`;
+        if (startPage > 2) {
+            paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+        }
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageOffset = (i - 1) * limit;
+        paginationHTML += `<button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changeProofsPage(${pageOffset})">${i}</button>`;
+    }
+    
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+        }
+        const lastPageOffset = (totalPages - 1) * limit;
+        paginationHTML += `<button class="pagination-btn" onclick="changeProofsPage(${lastPageOffset})">${totalPages}</button>`;
+    }
+    
+    // Next button
+    if (offset + limit < total) {
+        paginationHTML += `<button class="pagination-btn" onclick="changeProofsPage(${offset + limit})">Next →</button>`;
+    }
+    
+    paginationHTML += '</div>';
+    pagination.innerHTML = paginationHTML;
+}
+
+// Global function for pagination (called from onclick)
+window.changeProofsPage = function(newOffset) {
+    currentProofsFilters.offset = newOffset;
+    loadAllProofs(currentHashForProofs, currentProofsFilters);
+    // Scroll to proofs section
+    document.getElementById('all-proofs-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
+// Global function for viewing proof details
+window.viewProofDetails = function(did, timestamp) {
+    // Filter to show this specific proof
+    currentProofsFilters.did = did;
+    currentProofsFilters.offset = 0;
+    loadAllProofs(currentHashForProofs, currentProofsFilters);
+    
+    // Scroll to the proof
+    setTimeout(() => {
+        const proofItems = document.querySelectorAll('.proof-item');
+        proofItems.forEach(item => {
+            if (item.textContent.includes(did)) {
+                item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                item.style.border = '2px solid var(--accent-green)';
+                setTimeout(() => {
+                    item.style.border = '';
+                }, 2000);
+            }
+        });
+    }, 100);
+};
 
