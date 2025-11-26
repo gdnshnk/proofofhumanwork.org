@@ -138,6 +138,27 @@ class VerificationClient {
             return null;
         }
     }
+
+    /**
+     * Get reputation for a DID
+     * @param {string} did - DID identifier
+     * @returns {Promise<Object>} Reputation data
+     */
+    async getReputation(did) {
+        try {
+            const encodedDid = encodeURIComponent(did);
+            const response = await fetch(`${this.registryUrl}/pohw/reputation/${encodedDid}`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching reputation:', error);
+            return null;
+        }
+    }
 }
 
 // Export for use in other scripts
