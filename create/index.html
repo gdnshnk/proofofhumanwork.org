@@ -159,7 +159,29 @@
         </footer>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/index.js"></script>
+    <script>
+        // Load ed25519 library immediately (before other scripts)
+        (async function() {
+            try {
+                console.log('[PoHW] Loading Ed25519 library...');
+                const ed25519Module = await import('https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/index.js');
+                window.ed25519 = ed25519Module;
+                console.log('[PoHW] ✅ Ed25519 library loaded successfully');
+            } catch (error) {
+                console.error('[PoHW] ❌ Failed to load Ed25519 from CDN:', error);
+                // Fallback: try unpkg
+                try {
+                    console.log('[PoHW] Trying fallback (unpkg)...');
+                    const ed25519Module = await import('https://unpkg.com/@noble/ed25519@1.7.3/index.js');
+                    window.ed25519 = ed25519Module;
+                    console.log('[PoHW] ✅ Ed25519 library loaded from fallback');
+                } catch (error2) {
+                    console.error('[PoHW] ❌ All Ed25519 loading attempts failed:', error2);
+                    window.ed25519 = null;
+                }
+            }
+        })();
+    </script>
     <script src="../verify/crypto-utils.js"></script>
     <script src="../verify/registry-discovery.js"></script>
     <script src="key-manager.js"></script>
