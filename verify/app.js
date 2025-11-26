@@ -210,8 +210,19 @@ async function performVerification() {
         // Get PAV claim (PAV Ontology Extension)
         const pavClaim = await verificationClient.getPAVClaim(hash);
         
+        // Get reputation for the signer DID
+        let reputation = null;
+        if (result.signer || result.did) {
+            try {
+                const did = result.signer || result.did;
+                reputation = await verificationClient.getReputation(did);
+            } catch (error) {
+                console.warn('Could not fetch reputation:', error);
+            }
+        }
+        
         // Display results
-        displayResults(result, hash, proofDetails, anchors, pavClaim);
+        displayResults(result, hash, proofDetails, anchors, pavClaim, reputation);
         
     } catch (error) {
         console.error('Verification error:', error);
@@ -287,7 +298,7 @@ function determineVerdict(result, pavClaim) {
 /**
  * Display verification results
  */
-function displayResults(result, hash, proofDetails, anchors, pavClaim) {
+function displayResults(result, hash, proofDetails, anchors, pavClaim, reputation) {
     resultsSection.classList.remove('hidden');
     
     // Determine verdict (Whitepaper requirement)
@@ -426,6 +437,45 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim) {
         document.getElementById('pav-entropy').textContent = '—';
         document.getElementById('pav-coherence').textContent = '—';
         document.getElementById('pav-compound-hash').textContent = '—';
+    }
+    
+    // Additional PAV fields (Verification & Compliance)
+    document.getElementById('pav-assistance').textContent = pavClaim?.['pav:assistanceProfile'] || '—';
+    document.getElementById('pav-tier').textContent = pavClaim?.['pav:verificationTier'] || '—';
+    document.getElementById('pav-revocation').textContent = pavClaim?.['pav:revocationState'] || '—';
+    
+    // Registry Anchor (can be a link)
+    const registryAnchor = pavClaim?.['pav:registryAnchor'];
+    if (registryAnchor) {
+        const anchorEl = document.getElementById('pav-registry-anchor');
+        anchorEl.innerHTML = `<a href="${registryAnchor}" target="_blank" class="anchor-link">${registryAnchor}</a>`;
+    } else {
+        document.getElementById('pav-registry-anchor').textContent = '—';
+    }
+    
+    // Compliance Profile (can be a link)
+    const complianceProfile = pavClaim?.['pav:complianceProfile'];
+    if (complianceProfile) {
+        const complianceEl = document.getElementById('pav-compliance');
+        complianceEl.innerHTML = `<a href="${complianceProfile}" target="_blank" class="anchor-link">${complianceProfile}</a>`;
+    } else {
+        document.getElementById('pav-compliance').textContent = '—';
+    }
+    
+    // Reputation Section
+    const reputationSection = document.getElementById('reputation-section');
+    if (reputation && reputation.reputation) {
+        reputationSection.classList.remove('hidden');
+        const rep = reputation.reputation;
+        document.getElementById('reputation-score').textContent = rep.score ? Math.floor(rep.score) : '—';
+        const tier = rep.tier ? rep.tier.toUpperCase() : '—';
+        document.getElementById('reputation-tier').textContent = tier;
+        document.getElementById('reputation-tier').className = `result-value reputation-tier tier-${rep.tier || 'unknown'}`;
+        document.getElementById('reputation-trust').textContent = rep.trustLevel ? (rep.trustLevel * 100).toFixed(1) + '%' : '—';
+        document.getElementById('reputation-proofs').textContent = rep.successfulProofs || 0;
+        document.getElementById('reputation-anomalies').textContent = rep.anomalies || 0;
+    } else {
+        reputationSection.classList.add('hidden');
     }
     
     // Error section
