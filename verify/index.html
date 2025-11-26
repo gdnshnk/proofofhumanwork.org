@@ -63,11 +63,18 @@
 
                 <div class="registry-selector">
                     <label for="registry-select">Registry Node</label>
-                    <select id="registry-select" class="registry-select">
-                        <option value="http://localhost:3000" id="local-option">Local Development</option>
-                        <option value="https://pohw-registry-node-production.up.railway.app" id="prod-option" selected>Production (Railway)</option>
-                        <option value="https://gdn.sh">gdn.sh</option>
-                    </select>
+                    <div class="registry-select-wrapper">
+                        <select id="registry-select" class="registry-select">
+                            <option value="">Loading nodes...</option>
+                        </select>
+                        <button id="add-custom-registry" class="add-registry-btn" title="Add custom registry">+</button>
+                    </div>
+                    <div id="custom-registry-input" class="custom-registry-input hidden">
+                        <input type="text" id="custom-registry-url" placeholder="https://your-registry-node.com" class="custom-registry-url">
+                        <button id="add-custom-btn" class="add-custom-btn">Add</button>
+                        <button id="cancel-custom-btn" class="cancel-custom-btn">Cancel</button>
+                    </div>
+                    <div id="node-status" class="node-status"></div>
                 </div>
 
                 <button id="verify-button" class="verify-button">
@@ -239,6 +246,49 @@
                         </div>
                     </div>
 
+                    <!-- All Proofs Section -->
+                    <div id="all-proofs-section" class="all-proofs-section hidden">
+                        <div class="proofs-header">
+                            <h4>All Proofs for This Hash</h4>
+                            <div class="proofs-count" id="proofs-count">0 proofs found</div>
+                        </div>
+                        
+                        <!-- Search and Filter -->
+                        <div class="proofs-search-filter">
+                            <div class="search-row">
+                                <input type="text" id="proof-search-did" class="proof-search-input" placeholder="Search by DID...">
+                                <select id="proof-filter-tier" class="proof-filter-select">
+                                    <option value="all">All Tiers</option>
+                                    <option value="green">Green</option>
+                                    <option value="blue">Blue</option>
+                                    <option value="purple">Purple</option>
+                                    <option value="grey">Grey</option>
+                                </select>
+                                <select id="proof-sort" class="proof-filter-select">
+                                    <option value="newest">Newest First</option>
+                                    <option value="oldest">Oldest First</option>
+                                    <option value="tier">By Tier</option>
+                                    <option value="did">By DID</option>
+                                </select>
+                                <label class="verified-only-label">
+                                    <input type="checkbox" id="proof-filter-verified" class="proof-checkbox">
+                                    Verified Only
+                                </label>
+                            </div>
+                            <div class="date-filter-row">
+                                <label>From: <input type="date" id="proof-filter-from" class="date-input"></label>
+                                <label>To: <input type="date" id="proof-filter-to" class="date-input"></label>
+                                <button id="clear-filters-btn" class="clear-filters-btn">Clear Filters</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Proofs List -->
+                        <div id="proofs-list" class="proofs-list"></div>
+                        
+                        <!-- Pagination -->
+                        <div id="proofs-pagination" class="proofs-pagination hidden"></div>
+                    </div>
+
                     <!-- Reputation Section -->
                     <div id="reputation-section" class="reputation-section hidden">
                         <h4>REPUTATION & TRUST</h4>
@@ -318,6 +368,7 @@
 
     <script src="crypto-utils.js"></script>
     <script src="verification.js"></script>
+    <script src="registry-discovery.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
