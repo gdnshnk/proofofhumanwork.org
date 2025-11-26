@@ -8,7 +8,6 @@ let keyManager = new PoHWKeyManager();
 let registryClient = new RegistryClient();
 let registryDiscovery = new RegistryDiscovery();
 let processTracker = new BrowserProcessTracker();
-let processTracker = new BrowserProcessTracker();
 
 // DOM Elements
 const generateKeysBtn = document.getElementById('generate-keys-btn');
@@ -329,49 +328,79 @@ function updateNodeStatus(status) {
  * Setup process tracking
  */
 function setupProcessTracking() {
+    // Only set up if elements exist
+    if (!contentTextarea || !fileInput) {
+        console.warn('[ProcessTracker] Content elements not found, skipping setup');
+        return;
+    }
+    
     // Start tracking immediately when page loads (for any interaction)
-    processTracker.startSession();
+    try {
+        processTracker.startSession();
+    } catch (error) {
+        console.warn('[ProcessTracker] Failed to start session:', error);
+    }
     
     // Start tracking when user interacts with content input
     contentTextarea.addEventListener('focus', () => {
-        if (!processTracker.isTracking) {
-            processTracker.startSession();
+        try {
+            if (!processTracker.isTracking) {
+                processTracker.startSession();
+            }
+            updateProcessStatus();
+        } catch (error) {
+            console.warn('[ProcessTracker] Focus handler error:', error);
         }
-        updateProcessStatus();
     });
     
     // Track typing in textarea
     contentTextarea.addEventListener('input', () => {
-        if (!processTracker.isTracking) {
-            processTracker.startSession();
+        try {
+            if (!processTracker.isTracking) {
+                processTracker.startSession();
+            }
+            processTracker.recordInput('typing');
+            updateProcessStatus();
+        } catch (error) {
+            console.warn('[ProcessTracker] Input handler error:', error);
         }
-        processTracker.recordInput('typing');
-        updateProcessStatus();
     });
     
     // Track any keypress in textarea (even if no input event)
     contentTextarea.addEventListener('keydown', () => {
-        if (!processTracker.isTracking) {
-            processTracker.startSession();
+        try {
+            if (!processTracker.isTracking) {
+                processTracker.startSession();
+            }
+            processTracker.recordInput('keydown');
+        } catch (error) {
+            console.warn('[ProcessTracker] Keydown handler error:', error);
         }
-        processTracker.recordInput('keydown');
     });
     
     // Track file selection
     fileInput.addEventListener('change', () => {
-        if (fileInput.files.length > 0) {
-            if (!processTracker.isTracking) {
-                processTracker.startSession();
+        try {
+            if (fileInput.files.length > 0) {
+                if (!processTracker.isTracking) {
+                    processTracker.startSession();
+                }
+                processTracker.recordInput('file-select');
+                updateProcessStatus();
             }
-            processTracker.recordInput('file-select');
-            updateProcessStatus();
+        } catch (error) {
+            console.warn('[ProcessTracker] File change handler error:', error);
         }
     });
     
     // Update status periodically
     setInterval(() => {
-        if (processTracker.isTracking) {
-            updateProcessStatus();
+        try {
+            if (processTracker.isTracking) {
+                updateProcessStatus();
+            }
+        } catch (error) {
+            // Silently ignore interval errors
         }
     }, 2000);
 }
