@@ -329,22 +329,40 @@ function updateNodeStatus(status) {
  * Setup process tracking
  */
 function setupProcessTracking() {
+    // Start tracking immediately when page loads (for any interaction)
+    processTracker.startSession();
+    
     // Start tracking when user interacts with content input
     contentTextarea.addEventListener('focus', () => {
-        processTracker.startSession();
+        if (!processTracker.isTracking) {
+            processTracker.startSession();
+        }
         updateProcessStatus();
     });
     
     // Track typing in textarea
     contentTextarea.addEventListener('input', () => {
+        if (!processTracker.isTracking) {
+            processTracker.startSession();
+        }
         processTracker.recordInput('typing');
         updateProcessStatus();
+    });
+    
+    // Track any keypress in textarea (even if no input event)
+    contentTextarea.addEventListener('keydown', () => {
+        if (!processTracker.isTracking) {
+            processTracker.startSession();
+        }
+        processTracker.recordInput('keydown');
     });
     
     // Track file selection
     fileInput.addEventListener('change', () => {
         if (fileInput.files.length > 0) {
-            processTracker.startSession();
+            if (!processTracker.isTracking) {
+                processTracker.startSession();
+            }
             processTracker.recordInput('file-select');
             updateProcessStatus();
         }
@@ -434,6 +452,11 @@ async function createProof() {
         // Get DID
         const did = keyManager.getDID();
         
+        // Always start tracking if not already started (for file uploads)
+        if (!processTracker.isTracking) {
+            processTracker.startSession();
+        }
+        
         // Generate process digest if tracking
         let processDigest = null;
         let processMetrics = null;
@@ -441,9 +464,10 @@ async function createProof() {
         let entropyProof = null;
         let temporalCoherence = null;
         
-        if (processTracker.isTracking && processTracker.getInputEventCount() > 0) {
+        // Always try to generate process digest, even with minimal data
+        if (processTracker.getInputEventCount() > 0 || processTracker.isTracking) {
             const digestResult = await processTracker.generateDigest();
-            if (digestResult) {
+            if (digestResult && digestResult.digest) {
                 processDigest = digestResult.digest;
                 processMetrics = {
                     duration: digestResult.metrics.duration,
@@ -465,7 +489,7 @@ async function createProof() {
             }
         }
         
-        // Detect environment
+        // Always detect and send environment (not conditional)
         const environment = processTracker.detectEnvironment();
         const platform = navigator.platform;
         const screenInfo = `${screen.width}x${screen.height}`;
@@ -498,19 +522,29 @@ async function createProof() {
         const canonicalClaim = JSON.stringify(claim, Object.keys(claim).sort());
         const signature = await keyManager.sign(canonicalClaim);
         
-        // Prepare attestation request
+        // Prepare attestation request (always include environment, conditionally include process data)
         const attestation = {
             hash: hash,
             signature: signature,
             did: did,
             timestamp: timestamp,
-            processDigest: processDigest,
-            compoundHash: compoundHash,
-            processMetrics: processMetrics,
-            assistanceProfile: processMetrics && processMetrics.meetsThresholds ? 'human-only' : undefined,
+            // Always include environment attestation
             authoredOnDevice: authoredOnDevice,
-            environmentAttestation: environmentAttestation
+            environmentAttestation: environmentAttestation,
+            // Include process data if available
+            ...(processDigest && {
+                processDigest: processDigest,
+                compoundHash: compoundHash,
+                processMetrics: processMetrics,
+                assistanceProfile: processMetrics && processMetrics.meetsThresholds ? 'human-only' : undefined
+            })
         };
+        
+        console.log('[App] Attestation data:', {
+            hasProcessDigest: !!processDigest,
+            hasEnvironment: !!authoredOnDevice,
+            processMetrics: processMetrics
+        });
         
         // Submit to registry
         const currentRegistry = registrySelect.value;
