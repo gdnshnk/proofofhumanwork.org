@@ -90,19 +90,6 @@
                         <h3>VERIFICATION RESULT</h3>
                         <div class="status-badge" id="status-badge"></div>
                     </div>
-                    
-                    <!-- Challenge/Dispute Actions -->
-                    <div id="challenge-actions" class="challenge-actions hidden" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                        <button id="challenge-proof-btn" class="action-btn" style="background: var(--error-color); color: white;">
-                            ⚠️ Challenge Proof
-                        </button>
-                        <button id="view-challenges-btn" class="action-btn" style="background: var(--bg-tertiary);">
-                            View Challenges
-                        </button>
-                        <button id="view-transparency-log-btn" class="action-btn" style="background: var(--bg-tertiary);">
-                            Transparency Log
-                        </button>
-                    </div>
 
                     <div class="result-content">
                         <div class="result-item">
@@ -351,6 +338,53 @@
                         </div>
                     </div>
 
+                    <!-- Challenge/Dispute Section -->
+                    <div id="challenge-section" class="challenge-section hidden">
+                        <h4>DISPUTE RESOLUTION</h4>
+                        <div class="result-content">
+                            <div class="result-item">
+                                <span class="result-label">Challenges</span>
+                                <span class="result-value" id="challenge-count">—</span>
+                            </div>
+                            <div class="result-item" id="challenge-list-item" style="display: none;">
+                                <span class="result-label">Active Challenges</span>
+                                <div class="challenge-list" id="challenge-list"></div>
+                            </div>
+                            <div class="challenge-actions">
+                                <button id="submit-challenge-btn" class="challenge-btn">Submit Challenge</button>
+                                <button id="view-challenges-btn" class="challenge-btn secondary">View Challenges</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Challenge Form (hidden by default) -->
+                        <div id="challenge-form" class="challenge-form hidden">
+                            <div class="input-group">
+                                <label for="challenger-did">Your DID</label>
+                                <input type="text" id="challenger-did" class="challenge-input" placeholder="did:pohw:...">
+                            </div>
+                            <div class="input-group">
+                                <label for="challenge-reason">Reason</label>
+                                <select id="challenge-reason" class="challenge-select">
+                                    <option value="suspected_ai_generated">Suspected AI-Generated</option>
+                                    <option value="suspected_plagiarism">Suspected Plagiarism</option>
+                                    <option value="suspected_fraud">Suspected Fraud</option>
+                                    <option value="entropy_discrepancy">Entropy Discrepancy</option>
+                                    <option value="rate_limit_anomaly">Rate Limit Anomaly</option>
+                                    <option value="process_metrics_inconsistent">Process Metrics Inconsistent</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="challenge-description">Description</label>
+                                <textarea id="challenge-description" class="challenge-textarea" rows="4" placeholder="Describe why you are challenging this proof..."></textarea>
+                            </div>
+                            <div class="challenge-form-actions">
+                                <button id="submit-challenge-submit" class="challenge-btn primary">Submit Challenge</button>
+                                <button id="cancel-challenge-btn" class="challenge-btn secondary">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Blockchain Anchors Section -->
                     <div id="anchors-section" class="anchors-section hidden">
                         <h4>BLOCKCHAIN ANCHORS</h4>
@@ -360,78 +394,6 @@
                     <!-- Error Section -->
                     <div id="error-section" class="error-section hidden">
                         <div class="error-message" id="error-message"></div>
-                    </div>
-                </div>
-                
-                <!-- Challenges Section -->
-                <div id="challenges-section" class="result-card hidden" style="margin-top: 2rem;">
-                    <div class="result-header">
-                        <h3>CHALLENGES & DISPUTES</h3>
-                    </div>
-                    <div id="challenges-list" class="result-content"></div>
-                </div>
-            </div>
-            
-            <!-- Challenge Modal -->
-            <div id="challenge-modal" class="modal hidden">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>CHALLENGE PROOF</h3>
-                        <button id="close-challenge-modal" class="modal-close">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="input-hint" style="margin-bottom: 1rem;">
-                            Submit a cryptographic challenge if you suspect fraud, AI-generated content, or other issues. 
-                            The author will be notified and can respond with evidence.
-                        </p>
-                        <div class="input-group">
-                            <label for="challenger-did">Your DID (Required)</label>
-                            <input type="text" id="challenger-did" placeholder="did:pohw:..." class="hash-input">
-                            <p class="input-hint">Your decentralized identifier</p>
-                        </div>
-                        <div class="input-group">
-                            <label for="challenge-reason">Reason</label>
-                            <select id="challenge-reason" class="registry-select">
-                                <option value="suspected_ai_generated">Suspected AI-Generated Content</option>
-                                <option value="suspected_plagiarism">Suspected Plagiarism</option>
-                                <option value="entropy_discrepancy">Entropy Discrepancy</option>
-                                <option value="rate_limit_anomaly">Rate Limit Anomaly</option>
-                                <option value="process_metrics_inconsistent">Process Metrics Inconsistent</option>
-                                <option value="suspected_fraud">Suspected Fraud</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="challenge-description">Description</label>
-                            <textarea id="challenge-description" rows="4" class="content-textarea" placeholder="Explain why you're challenging this proof..."></textarea>
-                        </div>
-                        <div class="input-group">
-                            <label for="challenge-evidence">Evidence (Optional)</label>
-                            <textarea id="challenge-evidence" rows="3" class="content-textarea" placeholder='Optional: JSON evidence, links, or other supporting information'></textarea>
-                        </div>
-                        <div class="modal-actions">
-                            <button id="submit-challenge-btn" class="action-btn" style="background: var(--error-color); color: white;">
-                                Submit Challenge
-                            </button>
-                            <button id="cancel-challenge-btn" class="action-btn secondary">Cancel</button>
-                        </div>
-                        <div id="challenge-status" class="challenge-status hidden"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Transparency Log Modal -->
-            <div id="transparency-modal" class="modal hidden">
-                <div class="modal-content" style="max-width: 800px;">
-                    <div class="modal-header">
-                        <h3>TRANSPARENCY LOG</h3>
-                        <button id="close-transparency-modal" class="modal-close">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="input-hint" style="margin-bottom: 1rem;">
-                            Public log of all dispute outcomes and challenge resolutions.
-                        </p>
-                        <div id="transparency-log-content" class="transparency-log-content"></div>
                     </div>
                 </div>
             </div>
