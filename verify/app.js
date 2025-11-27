@@ -672,13 +672,44 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
     
     if (pavClaim) {
         
-        const derivedFrom = pavClaim['pav:derivedFrom'];
-        if (derivedFrom) {
-            const derivedValue = Array.isArray(derivedFrom) ? derivedFrom.join(', ') : derivedFrom;
-            document.getElementById('pav-derived-from').textContent = derivedValue;
+        // Handle derivedFrom - check if it's structured (from proof record) or simple (from PAV claim)
+        const proofRecord = result.proof;
+        let derivedFromDisplay = '—';
+        
+        if (proofRecord && proofRecord.derived_from) {
+            try {
+                const derivedFrom = typeof proofRecord.derived_from === 'string' 
+                    ? JSON.parse(proofRecord.derived_from)
+                    : proofRecord.derived_from;
+                
+                // Check if structured format
+                if (Array.isArray(derivedFrom) && derivedFrom.length > 0 && typeof derivedFrom[0] === 'object') {
+                    // Structured format - show with text previews
+                    const mappings = derivedFrom.map((m, i) => {
+                        const textPreview = m.text.length > 30 ? m.text.substring(0, 30) + '...' : m.text;
+                        return `${i + 1}. "${textPreview}" → ${m.source} (${m.sourceType})`;
+                    });
+                    derivedFromDisplay = mappings.join('\n');
+                } else {
+                    // Simple format
+                    derivedFromDisplay = Array.isArray(derivedFrom) ? derivedFrom.join(', ') : derivedFrom;
+                }
+            } catch (e) {
+                // Fallback to PAV claim value
+                const derivedFrom = pavClaim['pav:derivedFrom'];
+                if (derivedFrom) {
+                    derivedFromDisplay = Array.isArray(derivedFrom) ? derivedFrom.join(', ') : derivedFrom;
+                }
+            }
         } else {
-            document.getElementById('pav-derived-from').textContent = '—';
+            // Fallback to PAV claim value
+            const derivedFrom = pavClaim['pav:derivedFrom'];
+            if (derivedFrom) {
+                derivedFromDisplay = Array.isArray(derivedFrom) ? derivedFrom.join(', ') : derivedFrom;
+            }
         }
+        
+        document.getElementById('pav-derived-from').textContent = derivedFromDisplay;
         
         // Environment Attestations
         document.getElementById('pav-device').textContent = pavClaim['pav:authoredOnDevice'] || '—';
