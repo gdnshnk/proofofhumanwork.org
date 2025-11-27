@@ -23,6 +23,20 @@ const didDisplay = document.getElementById('did-display');
 const didValue = document.getElementById('did-value');
 
 const contentTextarea = document.getElementById('content-textarea');
+const linkSourceBtn = document.getElementById('link-source-btn');
+const sourceMappingsList = document.getElementById('source-mappings-list');
+const sourceMappingsItems = document.getElementById('source-mappings-items');
+const sourceLinkModal = document.getElementById('source-link-modal');
+const modalCloseBtn = document.getElementById('modal-close-btn');
+const cancelSourceBtn = document.getElementById('cancel-source-btn');
+const saveSourceBtn = document.getElementById('save-source-btn');
+const sourceTypeSelect = document.getElementById('source-type');
+const sourceValueInput = document.getElementById('source-value');
+const selectedTextPreview = document.getElementById('selected-text-preview');
+
+// Store source mappings
+let sourceMappings = [];
+let currentSelection = null;
 
 const registrySelect = document.getElementById('registry-select');
 const createButton = document.getElementById('create-button');
@@ -33,6 +47,7 @@ const errorSection = document.getElementById('error-section');
 document.addEventListener('DOMContentLoaded', async () => {
     setupKeyManagement();
     setupProcessTracking();
+    setupSourceMapping();
     await setupRegistrySelector();
     setupCreateButton();
     await loadExistingKeys();
@@ -327,6 +342,230 @@ function updateProcessStatus() {
 }
 
 /**
+ * Setup source mapping
+ */
+function setupSourceMapping() {
+    // Track text selection in textarea
+    if (contentTextarea) {
+        contentTextarea.addEventListener('mouseup', handleTextSelection);
+        contentTextarea.addEventListener('keyup', handleTextSelection);
+    }
+    
+    // Show/hide link button based on selection
+    if (linkSourceBtn) {
+        linkSourceBtn.addEventListener('click', showSourceLinkModal);
+    }
+    
+    if (saveSourceBtn) {
+        saveSourceBtn.addEventListener('click', saveSourceMapping);
+    }
+    
+    if (cancelSourceBtn) {
+        cancelSourceBtn.addEventListener('click', hideSourceLinkModal);
+    }
+    
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', hideSourceLinkModal);
+    }
+    
+    // Update source type hint
+    if (sourceTypeSelect) {
+        sourceTypeSelect.addEventListener('change', updateSourceHint);
+    }
+    
+    // Close modal on outside click
+    if (sourceLinkModal) {
+        sourceLinkModal.addEventListener('click', (e) => {
+            if (e.target === sourceLinkModal) {
+                hideSourceLinkModal();
+            }
+        });
+    }
+}
+
+/**
+ * Handle text selection in textarea
+ */
+function handleTextSelection() {
+    if (!contentTextarea) return;
+    
+    const start = contentTextarea.selectionStart;
+    const end = contentTextarea.selectionEnd;
+    const selectedText = contentTextarea.value.substring(start, end);
+    
+    if (selectedText.length > 0 && start !== end) {
+        currentSelection = {
+            text: selectedText,
+            start: start,
+            end: end
+        };
+        if (linkSourceBtn) {
+            linkSourceBtn.style.display = 'inline-block';
+        }
+    } else {
+        currentSelection = null;
+        if (linkSourceBtn) {
+            linkSourceBtn.style.display = 'none';
+        }
+    }
+}
+
+/**
+ * Show source link modal
+ */
+function showSourceLinkModal() {
+    if (!currentSelection || !selectedTextPreview || !sourceValueInput || !sourceTypeSelect) return;
+    
+    selectedTextPreview.textContent = `"${currentSelection.text}"`;
+    selectedTextPreview.style.maxHeight = '100px';
+    selectedTextPreview.style.overflow = 'auto';
+    sourceValueInput.value = '';
+    sourceTypeSelect.value = 'pohw-hash';
+    updateSourceHint();
+    
+    if (sourceLinkModal) {
+        sourceLinkModal.classList.remove('hidden');
+        sourceValueInput.focus();
+    }
+}
+
+/**
+ * Hide source link modal
+ */
+function hideSourceLinkModal() {
+    if (sourceLinkModal) {
+        sourceLinkModal.classList.add('hidden');
+    }
+    currentSelection = null;
+    if (contentTextarea) {
+        contentTextarea.focus();
+    }
+}
+
+/**
+ * Update source type hint
+ */
+function updateSourceHint() {
+    const hint = document.getElementById('source-hint');
+    if (!hint || !sourceTypeSelect) return;
+    
+    const type = sourceTypeSelect.value;
+    
+    switch(type) {
+        case 'pohw-hash':
+            hint.textContent = 'For PoHW proofs, enter the hash starting with 0x';
+            break;
+        case 'url':
+            hint.textContent = 'Enter the full URL (e.g., https://example.com/article)';
+            break;
+        case 'doi':
+            hint.textContent = 'Enter DOI (e.g., doi:10.1234/example or 10.1234/example)';
+            break;
+        case 'other':
+            hint.textContent = 'Enter any identifier (ISBN, ISBN-13, etc.)';
+            break;
+    }
+}
+
+/**
+ * Save source mapping
+ */
+function saveSourceMapping() {
+    if (!currentSelection || !sourceTypeSelect || !sourceValueInput) return;
+    
+    const sourceType = sourceTypeSelect.value;
+    let sourceValue = sourceValueInput.value.trim();
+    
+    if (!sourceValue) {
+        alert('Please enter a source value');
+        return;
+    }
+    
+    // Validate based on type
+    if (sourceType === 'pohw-hash' && !sourceValue.startsWith('0x')) {
+        if (confirm('PoHW hashes should start with 0x. Use this value anyway?')) {
+            // User confirmed, continue
+        } else {
+            return;
+        }
+    }
+    
+    if (sourceType === 'doi' && !sourceValue.startsWith('doi:')) {
+        if (sourceValue.match(/^10\./)) {
+            sourceValue = 'doi:' + sourceValue;
+        } else if (!sourceValue.startsWith('doi:')) {
+            sourceValue = 'doi:' + sourceValue;
+        }
+    }
+    
+    // Check if this text range already has a mapping
+    const existingIndex = sourceMappings.findIndex(m => 
+        m.start === currentSelection.start && m.end === currentSelection.end
+    );
+    
+    const mapping = {
+        text: currentSelection.text,
+        source: sourceValue,
+        sourceType: sourceType,
+        start: currentSelection.start,
+        end: currentSelection.end
+    };
+    
+    if (existingIndex >= 0) {
+        sourceMappings[existingIndex] = mapping;
+    } else {
+        sourceMappings.push(mapping);
+    }
+    
+    updateSourceMappingsDisplay();
+    hideSourceLinkModal();
+    
+    // Clear selection
+    if (contentTextarea) {
+        contentTextarea.setSelectionRange(0, 0);
+        handleTextSelection();
+    }
+}
+
+/**
+ * Update source mappings display
+ */
+function updateSourceMappingsDisplay() {
+    if (!sourceMappingsList || !sourceMappingsItems) return;
+    
+    if (sourceMappings.length === 0) {
+        sourceMappingsList.style.display = 'none';
+        return;
+    }
+    
+    sourceMappingsList.style.display = 'block';
+    sourceMappingsItems.innerHTML = '';
+    
+    sourceMappings.forEach((mapping, index) => {
+        const item = document.createElement('div');
+        item.className = 'source-mapping-item';
+        item.innerHTML = `
+            <div class="source-mapping-text">
+                <span class="source-text-preview">"${mapping.text.length > 50 ? mapping.text.substring(0, 50) + '...' : mapping.text}"</span>
+                <span class="source-link">→ ${mapping.source}</span>
+                <span class="source-type-badge">${mapping.sourceType}</span>
+            </div>
+            <button type="button" class="remove-source-btn" data-index="${index}">Remove</button>
+        `;
+        sourceMappingsItems.appendChild(item);
+    });
+    
+    // Add remove handlers
+    sourceMappingsItems.querySelectorAll('.remove-source-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            sourceMappings.splice(index, 1);
+            updateSourceMappingsDisplay();
+        });
+    });
+}
+
+/**
  * Setup create button
  */
 function setupCreateButton() {
@@ -522,18 +761,18 @@ async function createProof() {
             })
         };
         
-        // Add derivedFrom (source hashes for citations/quotes) if provided
-        const derivedFromInput = document.getElementById('derived-from');
-        if (derivedFromInput && derivedFromInput.value.trim()) {
-            // Parse source hashes (one per line, remove empty lines)
-            const sourceHashes = derivedFromInput.value.trim()
-                .split('\n')
-                .map(line => line.trim())
-                .filter(line => line.length > 0 && line.startsWith('0x'));
-            
-            if (sourceHashes.length > 0) {
-                attestation.derivedFrom = sourceHashes.length === 1 ? sourceHashes[0] : sourceHashes;
-            }
+        // Add derivedFrom (source mappings for citations/quotes) if provided
+        if (sourceMappings.length > 0) {
+            // Send structured source mappings
+            attestation.derivedFrom = sourceMappings.map(m => ({
+                text: m.text,
+                source: m.source,
+                sourceType: m.sourceType,
+                position: {
+                    start: m.start,
+                    end: m.end
+                }
+            }));
         }
         
         if (processMetrics && !processMetrics.meetsThresholds) {
