@@ -239,14 +239,15 @@ class BrowserProcessTracker {
         const sessionStart = this.sessionStart || now;
         const duration = Math.max(now - sessionStart, 100); // At least 100ms
         
-        // Calculate metrics (will return 0 if no events, but that's okay)
+        // Calculate metrics (will return 0 if insufficient events - this is accurate!)
         let entropy = this.calculateEntropy();
         let temporalCoherence = this.calculateTemporalCoherence();
-        let inputEvents = Math.max(this.inputEvents.length, 1); // At least 1 event
+        let inputEvents = this.inputEvents.length; // Actual event count (can be 0)
         
-        // Ensure minimum values
-        if (entropy === 0) entropy = 0.1;
-        if (temporalCoherence === 0) temporalCoherence = 0.1;
+        // Only set minimum if we have events but calculation returned 0 due to insufficient data
+        // This ensures accuracy: 0 events = 0 entropy (correct), not artificially inflated
+        // Note: calculateEntropy() and calculateTemporalCoherence() return 0 if < 2 events
+        // This is correct behavior - we should not artificially inflate these values
         
         // Calculate timing statistics
         let timingVariance = 0;
