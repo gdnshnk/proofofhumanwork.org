@@ -505,8 +505,14 @@ async function createProof() {
                     inputEvents: digestResult.metrics.inputEvents,
                     meetsThresholds: digestResult.meetsThresholds
                 };
-                entropyProof = digestResult.metrics.entropy >= 0.3 ? 'entropy-verified' : null;
-                temporalCoherence = digestResult.metrics.temporalCoherence.toString();
+                // Always format entropy and temporal coherence according to whitepaper format
+                // Format: zkp:entropy>X and zkp:coherence>X (even if low values)
+                entropyProof = digestResult.metrics.entropy !== undefined 
+                    ? `zkp:entropy>${digestResult.metrics.entropy.toFixed(3)}` 
+                    : null;
+                temporalCoherence = digestResult.metrics.temporalCoherence !== undefined
+                    ? `zkp:coherence>${digestResult.metrics.temporalCoherence.toFixed(3)}`
+                    : null;
                 
                 // Generate compound hash (content + process)
                 const compoundData = hash + processDigest;
@@ -587,10 +593,9 @@ async function createProof() {
             userSelection: document.getElementById('assistance-profile')?.value
         });
         
-        // WORKAROUND for production server: If processMetrics don't meet thresholds,
-        // don't send processMetrics (production server rejects them)
-        // But still send processDigest and compoundHash for verification
-        const shouldSendProcessMetrics = processMetrics && processMetrics.meetsThresholds;
+        // Always send processMetrics if available (server should accept them regardless of thresholds)
+        // This ensures entropy and temporal coherence are always displayed
+        const shouldSendProcessMetrics = !!processMetrics;
         
         // Prepare attestation request (always include environment, conditionally include process data)
         // IMPORTANT: Always send assistanceProfile to work with production server
@@ -610,14 +615,28 @@ async function createProof() {
                 processDigest: processDigest,
                 compoundHash: compoundHash
             }),
-            // Only send processMetrics if they meet thresholds (production server rejects otherwise)
+            // Always send processMetrics if available (server accepts them regardless of thresholds)
             ...(shouldSendProcessMetrics && {
                 processMetrics: processMetrics
             })
         };
         
+        // Add derivedFrom (source hashes for citations/quotes) if provided
+        const derivedFromInput = document.getElementById('derived-from');
+        if (derivedFromInput && derivedFromInput.value.trim()) {
+            // Parse source hashes (one per line, remove empty lines)
+            const sourceHashes = derivedFromInput.value.trim()
+                .split('\n')
+                .map(line => line.trim())
+                .filter(line => line.length > 0 && line.startsWith('0x'));
+            
+            if (sourceHashes.length > 0) {
+                attestation.derivedFrom = sourceHashes.length === 1 ? sourceHashes[0] : sourceHashes;
+            }
+        }
+        
         if (processMetrics && !processMetrics.meetsThresholds) {
-            console.warn('[App] Process metrics do not meet thresholds. Omitting processMetrics from request to avoid production server rejection. Assistance profile set to:', assistanceProfile);
+            console.log('[App] Process metrics do not meet thresholds. Metrics will still be sent and displayed. Assistance profile:', assistanceProfile);
         }
         
         console.log('[App] Attestation data:', {
