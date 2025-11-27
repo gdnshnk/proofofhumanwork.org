@@ -53,12 +53,21 @@ const errorSection = document.getElementById('error-section');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('[App] Initializing...');
+    
+    // Load keys first (synchronous check)
+    await loadExistingKeys();
+    
+    // Setup UI components
     setupKeyManagement();
     setupProcessTracking();
     setupSourceMapping();
-    await setupRegistrySelector();
     setupCreateButton();
-    await loadExistingKeys();
+    
+    // Setup registry selector (async, can fail gracefully)
+    setupRegistrySelector().catch(err => {
+        console.error('[App] Failed to setup registry selector:', err);
+    });
 });
 
 
@@ -188,18 +197,43 @@ function updateKeyStatus(hasKeys, did = null) {
  */
 async function loadExistingKeys() {
     try {
+        console.log('[App] Loading existing keys...');
+        
+        // Check if keys exist in storage first
+        const hasKeys = await keyManager.hasKeys();
+        if (!hasKeys) {
+            console.log('[App] No keys found in storage');
+            updateKeyStatus(false);
+            return;
+        }
+        
+        // Load keys
         const keys = await keyManager.loadKeys();
+        console.log('[App] Keys loaded:', keys ? 'Yes' : 'No');
+        
         if (keys && keys.did) {
+            console.log('[App] DID loaded:', keys.did);
             updateKeyStatus(true, keys.did);
-        } else if (keyManager.getDID()) {
-            // Fallback: try to get DID directly
-            updateKeyStatus(true, keyManager.getDID());
+        } else {
+            // Try to get DID directly from keyManager
+            const did = keyManager.getDID();
+            if (did) {
+                console.log('[App] DID retrieved directly:', did);
+                updateKeyStatus(true, did);
+            } else {
+                console.log('[App] No DID available');
+                updateKeyStatus(false);
+            }
         }
     } catch (error) {
-        console.warn('Could not load existing keys:', error);
+        console.error('[App] Error loading keys:', error);
         // Try fallback
-        if (keyManager.getDID()) {
-            updateKeyStatus(true, keyManager.getDID());
+        const did = keyManager.getDID();
+        if (did) {
+            console.log('[App] Using fallback DID:', did);
+            updateKeyStatus(true, did);
+        } else {
+            updateKeyStatus(false);
         }
     }
 }
@@ -209,14 +243,34 @@ async function loadExistingKeys() {
  */
 async function setupRegistrySelector() {
     try {
+        console.log('[App] Setting up registry selector...');
+        
         // Show loading state
-        registrySelect.innerHTML = '<option value="">Loading nodes...</option>';
-        registrySelect.disabled = true;
+        if (registrySelect) {
+            registrySelect.innerHTML = '<option value="">Loading nodes...</option>';
+            registrySelect.disabled = true;
+        }
+        
+        // Check if registryDiscovery is available
+        if (typeof registryDiscovery === 'undefined') {
+            throw new Error('RegistryDiscovery not available');
+        }
         
         const nodes = await registryDiscovery.discoverNodes();
-        console.log('[App] Discovered', nodes.length, 'registry nodes');
+        console.log('[App] Discovered', nodes.length, 'registry nodes:', nodes);
+        
+        if (!registrySelect) {
+            console.error('[App] Registry select element not found');
+            return;
+        }
         
         registrySelect.innerHTML = '';
+        
+        if (nodes.length === 0) {
+            console.warn('[App] No nodes discovered, using defaults');
+            throw new Error('No nodes discovered');
+        }
+        
         nodes.forEach(node => {
             const option = document.createElement('option');
             option.value = node.url;
@@ -234,6 +288,7 @@ async function setupRegistrySelector() {
         }
         
         registrySelect.disabled = false;
+        console.log('[App] Registry selector setup complete, selected:', registrySelect.value);
         
         // Check node status
         if (registryClient) {
@@ -248,20 +303,35 @@ async function setupRegistrySelector() {
         
     } catch (error) {
         console.error('[App] Registry discovery failed:', error);
-        registrySelect.innerHTML = '';
-        registrySelect.innerHTML = `
-            <option value="https://gdn.sh">gdn.sh (Primary)</option>
-            <option value="https://pohw-registry-node-production.up.railway.app">Production (Railway)</option>
-        `;
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            const localOption = document.createElement('option');
-            localOption.value = 'http://localhost:3000';
-            localOption.textContent = 'Local Development';
-            registrySelect.insertBefore(localOption, registrySelect.firstChild);
+        
+        if (!registrySelect) {
+            console.error('[App] Cannot setup registry selector - element not found');
+            return;
         }
-        registrySelect.value = registrySelect.options[0].value;
-        registryClient = new RegistryClient(registrySelect.value);
+        
+        // Fallback to default nodes
+        registrySelect.innerHTML = '';
+        const defaultNodes = [
+            { url: 'https://gdn.sh', name: 'gdn.sh (Primary)' },
+            { url: 'https://pohw-registry-node-production.up.railway.app', name: 'Production (Railway)' }
+        ];
+        
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            defaultNodes.unshift({ url: 'http://localhost:3000', name: 'Local Development' });
+        }
+        
+        defaultNodes.forEach(node => {
+            const option = document.createElement('option');
+            option.value = node.url;
+            option.textContent = node.name;
+            registrySelect.appendChild(option);
+        });
+        
+        registrySelect.value = defaultNodes[0].url;
+        registryClient = new RegistryClient(defaultNodes[0].url);
         registrySelect.disabled = false;
+        
+        console.log('[App] Using fallback nodes');
         
         // Try to check status
         try {
@@ -272,18 +342,22 @@ async function setupRegistrySelector() {
         }
     }
     
-    registrySelect.addEventListener('change', async (e) => {
-        const selectedUrl = e.target.value;
-        if (selectedUrl) {
-            registryClient.setRegistryUrl(selectedUrl);
-            try {
-                const status = await registryClient.checkNodeStatus();
-                updateNodeStatus(status);
-            } catch (statusError) {
-                updateNodeStatus({ online: false });
+    // Setup change handler (only once)
+    if (registrySelect && !registrySelect.hasAttribute('data-handler-attached')) {
+        registrySelect.setAttribute('data-handler-attached', 'true');
+        registrySelect.addEventListener('change', async (e) => {
+            const selectedUrl = e.target.value;
+            if (selectedUrl) {
+                registryClient.setRegistryUrl(selectedUrl);
+                try {
+                    const status = await registryClient.checkNodeStatus();
+                    updateNodeStatus(status);
+                } catch (statusError) {
+                    updateNodeStatus({ online: false });
+                }
             }
-        }
-    });
+        });
+    }
 }
 
 /**
