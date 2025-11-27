@@ -345,10 +345,17 @@ function updateProcessStatus() {
  * Setup source mapping
  */
 function setupSourceMapping() {
-    // Track text selection in textarea
+    // Track text selection in textarea - use multiple events for faster response
     if (contentTextarea) {
+        // Use selectionchange for immediate feedback
+        document.addEventListener('selectionchange', () => {
+            if (document.activeElement === contentTextarea) {
+                handleTextSelection();
+            }
+        });
         contentTextarea.addEventListener('mouseup', handleTextSelection);
         contentTextarea.addEventListener('keyup', handleTextSelection);
+        contentTextarea.addEventListener('select', handleTextSelection);
     }
     
     // Show/hide link button based on selection
@@ -393,14 +400,30 @@ function handleTextSelection() {
     const end = contentTextarea.selectionEnd;
     const selectedText = contentTextarea.value.substring(start, end);
     
+    // Only update if selection actually changed
     if (selectedText.length > 0 && start !== end) {
-        currentSelection = {
-            text: selectedText,
-            start: start,
-            end: end
-        };
-        if (linkSourceBtn) {
-            linkSourceBtn.style.display = 'inline-block';
+        // Check if this is a new selection (different from current)
+        const isNewSelection = !currentSelection || 
+            currentSelection.start !== start || 
+            currentSelection.end !== end;
+        
+        if (isNewSelection) {
+            currentSelection = {
+                text: selectedText,
+                start: start,
+                end: end
+            };
+            if (linkSourceBtn) {
+                linkSourceBtn.style.display = 'inline-block';
+                // Add a subtle animation to draw attention
+                linkSourceBtn.style.opacity = '0';
+                requestAnimationFrame(() => {
+                    if (linkSourceBtn) {
+                        linkSourceBtn.style.transition = 'opacity 0.2s';
+                        linkSourceBtn.style.opacity = '1';
+                    }
+                });
+            }
         }
     } else {
         currentSelection = null;
@@ -425,7 +448,10 @@ function showSourceLinkModal() {
     
     if (sourceLinkModal) {
         sourceLinkModal.classList.remove('hidden');
-        sourceValueInput.focus();
+        // Small delay to ensure modal is visible before focusing
+        setTimeout(() => {
+            sourceValueInput.focus();
+        }, 100);
     }
 }
 
@@ -443,27 +469,42 @@ function hideSourceLinkModal() {
 }
 
 /**
- * Update source type hint
+ * Update source type hint and placeholder
  */
 function updateSourceHint() {
     const hint = document.getElementById('source-hint');
-    if (!hint || !sourceTypeSelect) return;
+    const otherExplanation = document.getElementById('other-explanation');
+    if (!hint || !sourceTypeSelect || !sourceValueInput) return;
     
     const type = sourceTypeSelect.value;
     
+    // Update placeholder text based on source type
     switch(type) {
         case 'pohw-hash':
+            sourceValueInput.placeholder = 'Enter PoHW proof hash (e.g., 0x6bf8a1...)';
             hint.textContent = 'For PoHW proofs, enter the hash starting with 0x';
             break;
         case 'url':
-            hint.textContent = 'Enter the full URL (e.g., https://example.com/article)';
+            sourceValueInput.placeholder = 'Enter website URL (e.g., https://example.com/article)';
+            hint.textContent = 'Enter the full URL including https://';
             break;
         case 'doi':
-            hint.textContent = 'Enter DOI (e.g., doi:10.1234/example or 10.1234/example)';
+            sourceValueInput.placeholder = 'Enter DOI (e.g., doi:10.1234/example or 10.1234/example)';
+            hint.textContent = 'Enter DOI with or without doi: prefix';
             break;
         case 'other':
-            hint.textContent = 'Enter any identifier (ISBN, ISBN-13, etc.)';
+            sourceValueInput.placeholder = 'Enter identifier (e.g., ISBN:978-0-123456-78-9)';
+            hint.textContent = 'Enter any identifier (ISBN, ISBN-13, arXiv ID, GitHub commit, etc.)';
             break;
+    }
+    
+    // Show/hide "Other" explanation
+    if (otherExplanation) {
+        if (type === 'other') {
+            otherExplanation.style.display = 'block';
+        } else {
+            otherExplanation.style.display = 'none';
+        }
     }
 }
 
