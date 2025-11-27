@@ -71,13 +71,23 @@
                         </p>
                     </div>
                     
-                    <!-- Derived From (Citations/Quotes) -->
+                    <!-- Source Mapping (Citations/Quotes) -->
                     <div class="registry-selector" style="margin-top: 1.25rem;">
-                        <label for="derived-from">Source Hashes (Citations/Quotes)</label>
-                        <textarea id="derived-from" class="registry-select" rows="3" placeholder="Enter source hashes (one per line)&#10;Example: 0x6bf8a1...&#10;For legitimate citations, quotes, or derived content"></textarea>
-                        <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
-                            Optional: Add source hashes if this content includes citations, quotes, or is derived from other sources. This helps distinguish legitimate citations from AI-generated content.
-                        </p>
+                        <label>Source Citations</label>
+                        <div class="source-mapping-controls">
+                            <button type="button" id="link-source-btn" class="action-btn" style="display: none;">
+                                Link Selected Text to Source
+                            </button>
+                            <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                                Select text in the content area above, then click "Link Selected Text to Source" to cite it.
+                            </p>
+                        </div>
+                        <div id="source-mappings-list" class="source-mappings-list" style="margin-top: 1rem; display: none;">
+                            <div class="source-mappings-header">
+                                <strong style="color: var(--text-primary); font-size: 0.85rem;">Linked Sources:</strong>
+                            </div>
+                            <div id="source-mappings-items"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -151,6 +161,42 @@
                 <strong>PRIVACY:</strong> Your content is hashed locally. Only the hash and signature are sent to the registry. Your original content never leaves your browser.
             </div>
         </main>
+
+        <!-- Source Link Modal -->
+        <div id="source-link-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Link Text to Source</h3>
+                    <button type="button" class="modal-close" id="modal-close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <label>Selected Text:</label>
+                        <div id="selected-text-preview" class="selected-text-preview"></div>
+                    </div>
+                    <div class="modal-section">
+                        <label for="source-type">Source Type:</label>
+                        <select id="source-type" class="registry-select">
+                            <option value="pohw-hash">PoHW Proof Hash</option>
+                            <option value="url">Website URL</option>
+                            <option value="doi">DOI (Digital Object Identifier)</option>
+                            <option value="other">Other Identifier</option>
+                        </select>
+                    </div>
+                    <div class="modal-section">
+                        <label for="source-value">Source:</label>
+                        <input type="text" id="source-value" class="registry-select" placeholder="Enter source (e.g., 0x6bf8a1..., https://example.com, doi:10.1234/example)">
+                        <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                            <span id="source-hint">For PoHW proofs, enter the hash starting with 0x</span>
+                        </p>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="save-source-btn" class="action-btn primary">Link Source</button>
+                        <button type="button" id="cancel-source-btn" class="action-btn secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <footer>
             <p>Protocol: Proof of Human Work v1.0.0</p>
