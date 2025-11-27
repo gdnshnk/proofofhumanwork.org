@@ -189,11 +189,18 @@ function updateKeyStatus(hasKeys, did = null) {
 async function loadExistingKeys() {
     try {
         const keys = await keyManager.loadKeys();
-        if (keys) {
+        if (keys && keys.did) {
             updateKeyStatus(true, keys.did);
+        } else if (keyManager.getDID()) {
+            // Fallback: try to get DID directly
+            updateKeyStatus(true, keyManager.getDID());
         }
     } catch (error) {
         console.warn('Could not load existing keys:', error);
+        // Try fallback
+        if (keyManager.getDID()) {
+            updateKeyStatus(true, keyManager.getDID());
+        }
     }
 }
 
@@ -202,6 +209,10 @@ async function loadExistingKeys() {
  */
 async function setupRegistrySelector() {
     try {
+        // Show loading state
+        registrySelect.innerHTML = '<option value="">Loading nodes...</option>';
+        registrySelect.disabled = true;
+        
         const nodes = await registryDiscovery.discoverNodes();
         console.log('[App] Discovered', nodes.length, 'registry nodes');
         
@@ -214,15 +225,30 @@ async function setupRegistrySelector() {
         });
         
         const defaultUrl = registryDiscovery.getDefaultRegistry();
-        registrySelect.value = defaultUrl;
-        registryClient = new RegistryClient(defaultUrl);
+        if (defaultUrl) {
+            registrySelect.value = defaultUrl;
+            registryClient = new RegistryClient(defaultUrl);
+        } else if (nodes.length > 0) {
+            registrySelect.value = nodes[0].url;
+            registryClient = new RegistryClient(nodes[0].url);
+        }
+        
+        registrySelect.disabled = false;
         
         // Check node status
-        const status = await registryClient.checkNodeStatus();
-        updateNodeStatus(status);
+        if (registryClient) {
+            try {
+                const status = await registryClient.checkNodeStatus();
+                updateNodeStatus(status);
+            } catch (statusError) {
+                console.warn('[App] Node status check failed:', statusError);
+                updateNodeStatus({ online: false });
+            }
+        }
         
     } catch (error) {
         console.error('[App] Registry discovery failed:', error);
+        registrySelect.innerHTML = '';
         registrySelect.innerHTML = `
             <option value="https://gdn.sh">gdn.sh (Primary)</option>
             <option value="https://pohw-registry-node-production.up.railway.app">Production (Railway)</option>
@@ -235,13 +261,28 @@ async function setupRegistrySelector() {
         }
         registrySelect.value = registrySelect.options[0].value;
         registryClient = new RegistryClient(registrySelect.value);
+        registrySelect.disabled = false;
+        
+        // Try to check status
+        try {
+            const status = await registryClient.checkNodeStatus();
+            updateNodeStatus(status);
+        } catch (statusError) {
+            updateNodeStatus({ online: false });
+        }
     }
     
     registrySelect.addEventListener('change', async (e) => {
         const selectedUrl = e.target.value;
-        registryClient.setRegistryUrl(selectedUrl);
-        const status = await registryClient.checkNodeStatus();
-        updateNodeStatus(status);
+        if (selectedUrl) {
+            registryClient.setRegistryUrl(selectedUrl);
+            try {
+                const status = await registryClient.checkNodeStatus();
+                updateNodeStatus(status);
+            } catch (statusError) {
+                updateNodeStatus({ online: false });
+            }
+        }
     });
 }
 
@@ -963,7 +1004,7 @@ async function createProof() {
                     mapping.otherType = m.otherType;
                 }
                 
-                // Include contentAddress if present (per whitepaper Section 7.3)
+                // Include contentAddress if present
                 if (m.contentAddress) {
                     mapping.contentAddress = m.contentAddress;
                 }
