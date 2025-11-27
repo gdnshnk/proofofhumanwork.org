@@ -675,6 +675,7 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
         // Handle derivedFrom - check if it's structured (from proof record) or simple (from PAV claim)
         const proofRecord = result.proof;
         let derivedFromDisplay = '—';
+        let derivedFromElement = document.getElementById('pav-derived-from');
         
         if (proofRecord && proofRecord.derived_from) {
             try {
@@ -684,21 +685,53 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
                 
                 // Check if structured format
                 if (Array.isArray(derivedFrom) && derivedFrom.length > 0 && typeof derivedFrom[0] === 'object') {
-                    // Structured format - show with text previews
-                    const mappings = derivedFrom.map((m, i) => {
+                    // Structured format - create HTML with content addresses
+                    let html = '';
+                    derivedFrom.forEach((m, i) => {
                         const textPreview = m.text.length > 30 ? m.text.substring(0, 30) + '...' : m.text;
-                        return `${i + 1}. "${textPreview}" → ${m.source} (${m.sourceType})`;
+                        const typeLabel = m.sourceType === 'other' && m.otherType 
+                            ? `${m.sourceType} (${m.otherType})` 
+                            : m.sourceType;
+                        
+                        html += `<div style="margin-bottom: 0.5rem;">`;
+                        html += `<div style="font-size: 0.85rem; color: var(--text-primary);">${i + 1}. "${textPreview}"</div>`;
+                        html += `<div style="font-size: 0.8rem; color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; margin-left: 1rem;">→ ${m.source}</div>`;
+                        html += `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 1rem;">Type: ${typeLabel}</div>`;
+                        
+                        // Add content address if available (per whitepaper Section 7.3)
+                        if (m.contentAddress) {
+                            const addressType = m.contentAddress.type === 'ipfs' ? 'IPFS' : 'Arweave';
+                            html += `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 1rem; margin-top: 0.25rem;">`;
+                            html += `<span>${addressType}: </span>`;
+                            html += `<a href="${m.contentAddress.url}" target="_blank" style="color: var(--accent-green); text-decoration: none; font-family: 'IBM Plex Mono', monospace;">`;
+                            html += `${m.contentAddress.value.length > 40 ? m.contentAddress.value.substring(0, 40) + '...' : m.contentAddress.value}`;
+                            html += `</a>`;
+                            html += `</div>`;
+                        }
+                        
+                        html += `</div>`;
                     });
-                    derivedFromDisplay = mappings.join('\n');
+                    derivedFromDisplay = html;
+                    if (derivedFromElement) {
+                        derivedFromElement.innerHTML = derivedFromDisplay;
+                    }
                 } else {
                     // Simple format
                     derivedFromDisplay = Array.isArray(derivedFrom) ? derivedFrom.join(', ') : derivedFrom;
+                    if (derivedFromElement) {
+                        derivedFromElement.textContent = derivedFromDisplay;
+                    }
                 }
             } catch (e) {
                 // Fallback to PAV claim value
                 const derivedFrom = pavClaim['pav:derivedFrom'];
                 if (derivedFrom) {
                     derivedFromDisplay = Array.isArray(derivedFrom) ? derivedFrom.join(', ') : derivedFrom;
+                    if (derivedFromElement) {
+                        derivedFromElement.textContent = derivedFromDisplay;
+                    }
+                } else if (derivedFromElement) {
+                    derivedFromElement.textContent = '—';
                 }
             }
         } else {
@@ -706,10 +739,13 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
             const derivedFrom = pavClaim['pav:derivedFrom'];
             if (derivedFrom) {
                 derivedFromDisplay = Array.isArray(derivedFrom) ? derivedFrom.join(', ') : derivedFrom;
+                if (derivedFromElement) {
+                    derivedFromElement.textContent = derivedFromDisplay;
+                }
+            } else if (derivedFromElement) {
+                derivedFromElement.textContent = '—';
             }
         }
-        
-        document.getElementById('pav-derived-from').textContent = derivedFromDisplay;
         
         // Environment Attestations
         document.getElementById('pav-device').textContent = pavClaim['pav:authoredOnDevice'] || '—';
@@ -726,6 +762,28 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
         document.getElementById('pav-entropy').textContent = pavClaim['pav:entropyProof'] || '—';
         document.getElementById('pav-coherence').textContent = pavClaim['pav:temporalCoherence'] || '—';
         document.getElementById('pav-compound-hash').textContent = pavClaim['pohw:compoundHash'] || '—';
+        
+        // Content Address (pohw:claimURI) - per whitepaper Section 7.3
+        const claimURI = pavClaim['pohw:claimURI'];
+        const claimURIEl = document.getElementById('pav-claim-uri');
+        if (claimURI) {
+            // Create clickable link if it's a valid URI
+            if (claimURI.startsWith('ipfs://') || claimURI.startsWith('ar://')) {
+                let gatewayUrl = '';
+                if (claimURI.startsWith('ipfs://')) {
+                    const cid = claimURI.replace('ipfs://', '');
+                    gatewayUrl = `https://ipfs.io/ipfs/${cid}`;
+                } else if (claimURI.startsWith('ar://')) {
+                    const txId = claimURI.replace('ar://', '');
+                    gatewayUrl = `https://arweave.net/${txId}`;
+                }
+                claimURIEl.innerHTML = `<a href="${gatewayUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; text-decoration: none;">${claimURI}</a>`;
+            } else {
+                claimURIEl.textContent = claimURI;
+            }
+        } else {
+            claimURIEl.textContent = '—';
+        }
         
         // Cryptographic Attestations
         // Signature is only in PAV claim, not in result
@@ -755,6 +813,7 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
         document.getElementById('pav-entropy').textContent = '—';
         document.getElementById('pav-coherence').textContent = '—';
         document.getElementById('pav-compound-hash').textContent = '—';
+        document.getElementById('pav-claim-uri').textContent = '—';
     }
     
     // Additional PAV fields (Verification & Compliance)
