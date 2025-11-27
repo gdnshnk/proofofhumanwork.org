@@ -159,6 +159,75 @@
     gap: 0.5rem;
 }
 
+/* Registry Selector */
+.registry-selector {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+/* Custom Styled Dropdowns - Match Theme */
+.registry-select,
+select.registry-select,
+#registry-select,
+#assistance-profile,
+#content-archive-type,
+#source-type,
+#content-address-type {
+    width: 100%;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    border-radius: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.registry-select:hover,
+select.registry-select:hover {
+    border-color: var(--accent-green);
+    background: var(--bg-tertiary);
+}
+
+.registry-select:focus,
+select.registry-select:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 0 2px var(--accent-green-glow);
+}
+
+.registry-select:disabled,
+select.registry-select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Custom dropdown arrow */
+.registry-selector::after {
+    content: '▼';
+    position: absolute;
+    right: 0.75rem;
+    top: 2.5rem;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    z-index: 1;
+}
+
+/* Ensure dropdown options match theme */
+.registry-select option,
+select.registry-select option {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    padding: 0.5rem;
+}
+
 /* Source Mapping */
 .source-mapping-controls {
     margin-bottom: 0.5rem;
