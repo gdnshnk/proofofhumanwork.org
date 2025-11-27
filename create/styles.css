@@ -25,10 +25,23 @@
 
 /* Key Management Section */
 .key-section {
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     padding: 1.5rem;
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
+}
+
+/* Input Section */
+.input-section {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+}
+
+.input-section h3 {
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
 }
 
 .key-section h3 {
