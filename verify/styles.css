@@ -762,7 +762,6 @@ header {
 }
 
 .challenge-input,
-.challenge-select,
 .challenge-textarea {
     width: 100%;
     padding: 0.75rem;
@@ -771,6 +770,77 @@ header {
     color: var(--text-primary);
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.85rem;
+}
+
+.challenge-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0;
+    font-size: 0.9rem;
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--bg-tertiary);
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    transition: all 0.2s;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237ef9a9' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: 2.5rem;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    text-shadow: none;
+    -webkit-text-shadow: none;
+    -moz-text-shadow: none;
+    filter: none;
+    -webkit-filter: none;
+    -moz-filter: none;
+}
+
+.challenge-select::-webkit-appearance {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.challenge-select::-moz-appearance {
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.challenge-select:focus {
+    outline: none;
+    border-color: var(--accent-green);
+    box-shadow: 0 0 5px var(--accent-green-glow);
+    background-color: var(--bg-secondary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237ef9a9' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    -webkit-box-shadow: 0 0 5px var(--accent-green-glow);
+    -moz-box-shadow: 0 0 5px var(--accent-green-glow);
+}
+
+.challenge-select:hover {
+    border-color: var(--accent-green);
+    background-color: var(--bg-secondary);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237ef9a9' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+}
+
+.challenge-select option {
+    background: var(--bg-tertiary);
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+    padding: 0.5rem;
+    border: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
 }
 
 .challenge-textarea {
