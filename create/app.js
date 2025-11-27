@@ -32,6 +32,8 @@ const cancelSourceBtn = document.getElementById('cancel-source-btn');
 const saveSourceBtn = document.getElementById('save-source-btn');
 const sourceTypeSelect = document.getElementById('source-type');
 const sourceValueInput = document.getElementById('source-value');
+const otherTypeInput = document.getElementById('other-identifier-type');
+const otherTypeInputContainer = document.getElementById('other-type-input');
 const selectedTextPreview = document.getElementById('selected-text-preview');
 
 // Store source mappings
@@ -443,6 +445,9 @@ function showSourceLinkModal() {
     selectedTextPreview.style.maxHeight = '100px';
     selectedTextPreview.style.overflow = 'auto';
     sourceValueInput.value = '';
+    if (otherTypeInput) {
+        otherTypeInput.value = '';
+    }
     sourceTypeSelect.value = 'pohw-hash';
     updateSourceHint();
     
@@ -473,7 +478,6 @@ function hideSourceLinkModal() {
  */
 function updateSourceHint() {
     const hint = document.getElementById('source-hint');
-    const otherExplanation = document.getElementById('other-explanation');
     if (!hint || !sourceTypeSelect || !sourceValueInput) return;
     
     const type = sourceTypeSelect.value;
@@ -493,17 +497,19 @@ function updateSourceHint() {
             hint.textContent = 'Enter DOI with or without doi: prefix';
             break;
         case 'other':
-            sourceValueInput.placeholder = 'Enter identifier (e.g., ISBN:978-0-123456-78-9)';
-            hint.textContent = 'Enter any identifier (ISBN, ISBN-13, arXiv ID, GitHub commit, etc.)';
+            sourceValueInput.placeholder = 'Enter identifier value';
+            hint.textContent = 'Enter the identifier value, then specify the type below';
             break;
     }
     
-    // Show/hide "Other" explanation
-    if (otherExplanation) {
+    // Show/hide "Other" identifier type input
+    if (otherTypeInputContainer && otherTypeInput) {
         if (type === 'other') {
-            otherExplanation.style.display = 'block';
+            otherTypeInputContainer.style.display = 'block';
+            otherTypeInput.value = ''; // Clear when switching to other
         } else {
-            otherExplanation.style.display = 'none';
+            otherTypeInputContainer.style.display = 'none';
+            otherTypeInput.value = ''; // Clear when switching away
         }
     }
 }
@@ -520,6 +526,20 @@ function saveSourceMapping() {
     if (!sourceValue) {
         alert('Please enter a source value');
         return;
+    }
+    
+    // For "Other" type, require identifier type specification
+    if (sourceType === 'other') {
+        const otherType = otherTypeInput ? otherTypeInput.value.trim() : '';
+        if (!otherType) {
+            alert('Please specify the identifier type (e.g., ISBN, arXiv, GitHub commit)');
+            if (otherTypeInput) {
+                otherTypeInput.focus();
+            }
+            return;
+        }
+        // Store the identifier type with the source
+        sourceValue = `${otherType}:${sourceValue}`;
     }
     
     // Validate based on type
@@ -551,6 +571,11 @@ function saveSourceMapping() {
         start: currentSelection.start,
         end: currentSelection.end
     };
+    
+    // Store the other identifier type if specified
+    if (sourceType === 'other' && otherTypeInput) {
+        mapping.otherType = otherTypeInput.value.trim();
+    }
     
     if (existingIndex >= 0) {
         sourceMappings[existingIndex] = mapping;
@@ -585,11 +610,17 @@ function updateSourceMappingsDisplay() {
     sourceMappings.forEach((mapping, index) => {
         const item = document.createElement('div');
         item.className = 'source-mapping-item';
+        
+        // For "other" type, show the identifier type if available
+        const typeLabel = mapping.sourceType === 'other' && mapping.otherType 
+            ? `${mapping.sourceType} (${mapping.otherType})` 
+            : mapping.sourceType;
+        
         item.innerHTML = `
             <div class="source-mapping-text">
                 <span class="source-text-preview">"${mapping.text.length > 50 ? mapping.text.substring(0, 50) + '...' : mapping.text}"</span>
                 <span class="source-link">→ ${mapping.source}</span>
-                <span class="source-type-badge">${mapping.sourceType}</span>
+                <span class="source-type-badge">${typeLabel}</span>
             </div>
             <button type="button" class="remove-source-btn" data-index="${index}">Remove</button>
         `;
