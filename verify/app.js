@@ -698,7 +698,7 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
                         html += `<div style="font-size: 0.8rem; color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; margin-left: 1rem;">→ ${m.source}</div>`;
                         html += `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 1rem;">Type: ${typeLabel}</div>`;
                         
-                        // Add content address if available (per whitepaper Section 7.3)
+                        // Add content address if available
                         if (m.contentAddress) {
                             const addressType = m.contentAddress.type === 'ipfs' ? 'IPFS' : 'Arweave';
                             html += `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 1rem; margin-top: 0.25rem;">`;
@@ -763,7 +763,7 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
         document.getElementById('pav-coherence').textContent = pavClaim['pav:temporalCoherence'] || '—';
         document.getElementById('pav-compound-hash').textContent = pavClaim['pohw:compoundHash'] || '—';
         
-        // Content Address (pohw:claimURI) - per whitepaper Section 7.3
+        // Content Address (pohw:claimURI)
         const claimURI = pavClaim['pohw:claimURI'];
         const claimURIEl = document.getElementById('pav-claim-uri');
         if (claimURI) {
