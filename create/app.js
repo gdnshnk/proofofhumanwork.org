@@ -34,6 +34,12 @@ const sourceTypeSelect = document.getElementById('source-type');
 const sourceValueInput = document.getElementById('source-value');
 const otherTypeInput = document.getElementById('other-identifier-type');
 const otherTypeInputContainer = document.getElementById('other-type-input');
+const contentAddressSection = document.getElementById('content-address-section');
+const contentAddressType = document.getElementById('content-address-type');
+const contentAddressValue = document.getElementById('content-address-value');
+const contentAddressHint = document.getElementById('content-address-hint');
+const contentArchiveType = document.getElementById('content-archive-type');
+const contentArchiveValue = document.getElementById('content-archive-value');
 const selectedTextPreview = document.getElementById('selected-text-preview');
 
 // Store source mappings
@@ -382,6 +388,16 @@ function setupSourceMapping() {
         sourceTypeSelect.addEventListener('change', updateSourceHint);
     }
     
+    // Update content address section visibility
+    if (contentAddressType) {
+        contentAddressType.addEventListener('change', updateContentAddressSection);
+    }
+    
+    // Update content archiving section visibility
+    if (contentArchiveType) {
+        contentArchiveType.addEventListener('change', updateContentArchiveSection);
+    }
+    
     // Close modal on outside click
     if (sourceLinkModal) {
         sourceLinkModal.addEventListener('click', (e) => {
@@ -448,6 +464,12 @@ function showSourceLinkModal() {
     if (otherTypeInput) {
         otherTypeInput.value = '';
     }
+    if (contentAddressType) {
+        contentAddressType.value = '';
+    }
+    if (contentAddressValue) {
+        contentAddressValue.value = '';
+    }
     sourceTypeSelect.value = 'pohw-hash';
     updateSourceHint();
     
@@ -512,6 +534,45 @@ function updateSourceHint() {
             otherTypeInput.value = ''; // Clear when switching away
         }
     }
+    
+    // Show/hide content address section (only for PoHW hashes)
+    updateContentAddressSection();
+}
+
+/**
+ * Update content address section visibility and hints
+ */
+function updateContentAddressSection() {
+    if (!contentAddressSection || !contentAddressType || !contentAddressValue || !contentAddressHint) return;
+    
+    const sourceType = sourceTypeSelect ? sourceTypeSelect.value : '';
+    const addressType = contentAddressType.value;
+    
+    // Only show for PoHW hashes
+    if (sourceType === 'pohw-hash') {
+        contentAddressSection.style.display = 'block';
+        
+        // Show/hide input based on selection
+        if (addressType === 'ipfs' || addressType === 'arweave') {
+            contentAddressValue.style.display = 'block';
+            
+            if (addressType === 'ipfs') {
+                contentAddressValue.placeholder = 'Enter IPFS CID (e.g., QmXxx... or ipfs://QmXxx...)';
+                contentAddressHint.textContent = 'Optional: IPFS CID allows verifiers to retrieve the archived content. Format: QmXxx... or ipfs://QmXxx...';
+            } else if (addressType === 'arweave') {
+                contentAddressValue.placeholder = 'Enter Arweave Transaction ID (e.g., xxx... or ar://xxx...)';
+                contentAddressHint.textContent = 'Optional: Arweave ID provides permanent content storage. Format: Transaction ID or ar://xxx...';
+            }
+        } else {
+            contentAddressValue.style.display = 'none';
+            contentAddressValue.value = '';
+            contentAddressHint.textContent = 'Optional: If the cited author archived their content, add the IPFS CID or Arweave ID to enable content retrieval';
+        }
+    } else {
+        contentAddressSection.style.display = 'none';
+        contentAddressType.value = '';
+        contentAddressValue.value = '';
+    }
 }
 
 /**
@@ -559,6 +620,36 @@ function saveSourceMapping() {
         }
     }
     
+    // Get content address if provided (for PoHW hashes only)
+    let contentAddress = null;
+    if (sourceType === 'pohw-hash' && contentAddressType && contentAddressValue) {
+        const addressType = contentAddressType.value;
+        const addressValue = contentAddressValue.value.trim();
+        
+        if (addressType && addressValue) {
+            // Normalize the address format
+            let normalizedAddress = addressValue;
+            
+            if (addressType === 'ipfs') {
+                // Remove ipfs:// prefix if present, keep CID
+                normalizedAddress = addressValue.replace(/^ipfs:\/\//, '');
+                contentAddress = {
+                    type: 'ipfs',
+                    value: normalizedAddress,
+                    url: `https://ipfs.io/ipfs/${normalizedAddress}`
+                };
+            } else if (addressType === 'arweave') {
+                // Remove ar:// prefix if present, keep transaction ID
+                normalizedAddress = addressValue.replace(/^ar:\/\//, '');
+                contentAddress = {
+                    type: 'arweave',
+                    value: normalizedAddress,
+                    url: `https://arweave.net/${normalizedAddress}`
+                };
+            }
+        }
+    }
+    
     // Check if this text range already has a mapping
     const existingIndex = sourceMappings.findIndex(m => 
         m.start === currentSelection.start && m.end === currentSelection.end
@@ -575,6 +666,11 @@ function saveSourceMapping() {
     // Store the other identifier type if specified
     if (sourceType === 'other' && otherTypeInput) {
         mapping.otherType = otherTypeInput.value.trim();
+    }
+    
+    // Store content address if provided (for PoHW hashes)
+    if (contentAddress) {
+        mapping.contentAddress = contentAddress;
     }
     
     if (existingIndex >= 0) {
@@ -616,11 +712,26 @@ function updateSourceMappingsDisplay() {
             ? `${mapping.sourceType} (${mapping.otherType})` 
             : mapping.sourceType;
         
+        // Build content address display if available
+        let contentAddressDisplay = '';
+        if (mapping.contentAddress) {
+            const addressType = mapping.contentAddress.type === 'ipfs' ? 'IPFS' : 'Arweave';
+            contentAddressDisplay = `
+                <div class="content-address-display" style="margin-top: 0.5rem;">
+                    <span class="content-address-label" style="font-size: 0.75rem; color: var(--text-secondary);">${addressType}:</span>
+                    <a href="${mapping.contentAddress.url}" target="_blank" class="content-address-link" style="color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; text-decoration: none; margin-left: 0.25rem;">
+                        ${mapping.contentAddress.value.length > 30 ? mapping.contentAddress.value.substring(0, 30) + '...' : mapping.contentAddress.value}
+                    </a>
+                </div>
+            `;
+        }
+        
         item.innerHTML = `
             <div class="source-mapping-text">
                 <span class="source-text-preview">"${mapping.text.length > 50 ? mapping.text.substring(0, 50) + '...' : mapping.text}"</span>
                 <span class="source-link">→ ${mapping.source}</span>
                 <span class="source-type-badge">${typeLabel}</span>
+                ${contentAddressDisplay}
             </div>
             <button type="button" class="remove-source-btn" data-index="${index}">Remove</button>
         `;
@@ -836,15 +947,54 @@ async function createProof() {
         // Add derivedFrom (source mappings for citations/quotes) if provided
         if (sourceMappings.length > 0) {
             // Send structured source mappings
-            attestation.derivedFrom = sourceMappings.map(m => ({
-                text: m.text,
-                source: m.source,
-                sourceType: m.sourceType,
-                position: {
-                    start: m.start,
-                    end: m.end
+            attestation.derivedFrom = sourceMappings.map(m => {
+                const mapping = {
+                    text: m.text,
+                    source: m.source,
+                    sourceType: m.sourceType,
+                    position: {
+                        start: m.start,
+                        end: m.end
+                    }
+                };
+                
+                // Include otherType if present
+                if (m.otherType) {
+                    mapping.otherType = m.otherType;
                 }
-            }));
+                
+                // Include contentAddress if present (per whitepaper Section 7.3)
+                if (m.contentAddress) {
+                    mapping.contentAddress = m.contentAddress;
+                }
+                
+                return mapping;
+            });
+        }
+        
+        // Add content archiving URI (pohw:claimURI) if provided
+        if (contentArchiveType && contentArchiveValue) {
+            const archiveType = contentArchiveType.value;
+            const archiveValue = contentArchiveValue.value.trim();
+            
+            if (archiveType && archiveValue) {
+                // Normalize the URI format
+                let claimURI = archiveValue;
+                
+                if (archiveType === 'ipfs') {
+                    // Ensure ipfs:// prefix
+                    if (!claimURI.startsWith('ipfs://') && !claimURI.startsWith('http')) {
+                        claimURI = `ipfs://${claimURI.replace(/^ipfs:\/\//, '')}`;
+                    }
+                } else if (archiveType === 'arweave') {
+                    // Ensure ar:// prefix
+                    if (!claimURI.startsWith('ar://') && !claimURI.startsWith('http')) {
+                        claimURI = `ar://${claimURI.replace(/^ar:\/\//, '')}`;
+                    }
+                }
+                
+                attestation.claimURI = claimURI;
+            }
         }
         
         if (processMetrics && !processMetrics.meetsThresholds) {
