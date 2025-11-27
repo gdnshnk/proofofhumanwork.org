@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupFileUpload();
     setupVerifyButton();
     setupRegistrySelector();
+    setupChallengeUI();
 });
 
 /**
@@ -519,6 +520,9 @@ function determineVerdict(result, pavClaim) {
 function displayResults(result, hash, proofDetails, anchors, pavClaim, reputation, allProofsData = null) {
     resultsSection.classList.remove('hidden');
     
+    // Set current proof hash for challenge UI
+    currentProofHash = hash;
+    
     // Determine verdict (Whitepaper requirement)
     const verdict = determineVerdict(result, pavClaim);
     
@@ -538,6 +542,14 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
     document.getElementById('result-timestamp').textContent = result.timestamp ? formatTimestamp(result.timestamp) : '—';
     document.getElementById('result-hash').textContent = hash;
     document.getElementById('result-registry').textContent = result.registry || verificationClient.registryUrl;
+    
+    // Show challenge actions for valid proofs
+    const challengeActions = document.getElementById('challenge-actions');
+    if (result.valid && challengeActions) {
+        challengeActions.classList.remove('hidden');
+    } else if (challengeActions) {
+        challengeActions.classList.add('hidden');
+    }
     
     // Show "View All Proofs" section if multiple proofs exist
     const allProofsSection = document.getElementById('all-proofs-section');
@@ -1118,4 +1130,273 @@ window.viewProofDetails = function(did, timestamp) {
         });
     }, 100);
 };
+
+/**
+ * Challenge/Dispute UI Setup
+ */
+let currentProofHash = null;
+
+function setupChallengeUI() {
+    const challengeProofBtn = document.getElementById('challenge-proof-btn');
+    const viewChallengesBtn = document.getElementById('view-challenges-btn');
+    const viewTransparencyBtn = document.getElementById('view-transparency-log-btn');
+    const challengeModal = document.getElementById('challenge-modal');
+    const transparencyModal = document.getElementById('transparency-modal');
+    const closeChallengeModal = document.getElementById('close-challenge-modal');
+    const closeTransparencyModal = document.getElementById('close-transparency-modal');
+    const cancelChallengeBtn = document.getElementById('cancel-challenge-btn');
+    const submitChallengeBtn = document.getElementById('submit-challenge-btn');
+
+    // Show challenge modal
+    if (challengeProofBtn) {
+        challengeProofBtn.addEventListener('click', () => {
+            if (currentProofHash) {
+                challengeModal.classList.remove('hidden');
+            }
+        });
+    }
+
+    // View challenges
+    if (viewChallengesBtn) {
+        viewChallengesBtn.addEventListener('click', async () => {
+            if (currentProofHash) {
+                await loadChallenges(currentProofHash);
+            }
+        });
+    }
+
+    // View transparency log
+    if (viewTransparencyBtn) {
+        viewTransparencyBtn.addEventListener('click', async () => {
+            await loadTransparencyLog();
+            transparencyModal.classList.remove('hidden');
+        });
+    }
+
+    // Close modals
+    if (closeChallengeModal) {
+        closeChallengeModal.addEventListener('click', () => {
+            challengeModal.classList.add('hidden');
+        });
+    }
+    if (closeTransparencyModal) {
+        closeTransparencyModal.addEventListener('click', () => {
+            transparencyModal.classList.add('hidden');
+        });
+    }
+    if (cancelChallengeBtn) {
+        cancelChallengeBtn.addEventListener('click', () => {
+            challengeModal.classList.add('hidden');
+        });
+    }
+
+    // Submit challenge
+    if (submitChallengeBtn) {
+        submitChallengeBtn.addEventListener('click', async () => {
+            await submitChallenge();
+        });
+    }
+}
+
+/**
+ * Submit a challenge
+ */
+async function submitChallenge() {
+    const challengerDid = document.getElementById('challenger-did').value.trim();
+    const reason = document.getElementById('challenge-reason').value;
+    const description = document.getElementById('challenge-description').value.trim();
+    const evidenceText = document.getElementById('challenge-evidence').value.trim();
+    const statusDiv = document.getElementById('challenge-status');
+
+    if (!challengerDid || !description) {
+        statusDiv.className = 'challenge-status error';
+        statusDiv.textContent = 'Please fill in all required fields.';
+        statusDiv.classList.remove('hidden');
+        return;
+    }
+
+    if (!currentProofHash) {
+        statusDiv.className = 'challenge-status error';
+        statusDiv.textContent = 'No proof hash available.';
+        statusDiv.classList.remove('hidden');
+        return;
+    }
+
+    try {
+        statusDiv.className = 'challenge-status';
+        statusDiv.textContent = 'Submitting challenge...';
+        statusDiv.classList.remove('hidden');
+
+        const evidence = evidenceText ? JSON.parse(evidenceText) : undefined;
+
+        const response = await fetch(`${verificationClient.registryUrl}/pohw/proofs/${currentProofHash}/challenge`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                challenger_did: challengerDid,
+                reason: reason,
+                description: description,
+                evidence: evidence
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Failed to submit challenge');
+        }
+
+        const result = await response.json();
+        
+        statusDiv.className = 'challenge-status success';
+        statusDiv.textContent = `Challenge submitted successfully! Challenge ID: ${result.challenge_id}`;
+        
+        // Clear form
+        document.getElementById('challenger-did').value = '';
+        document.getElementById('challenge-description').value = '';
+        document.getElementById('challenge-evidence').value = '';
+        
+        // Close modal after 3 seconds
+        setTimeout(() => {
+            document.getElementById('challenge-modal').classList.add('hidden');
+            statusDiv.classList.add('hidden');
+        }, 3000);
+
+        // Reload challenges
+        await loadChallenges(currentProofHash);
+    } catch (error) {
+        statusDiv.className = 'challenge-status error';
+        statusDiv.textContent = `Error: ${error.message}`;
+    }
+}
+
+/**
+ * Load challenges for a proof
+ */
+async function loadChallenges(proofHash) {
+    const challengesSection = document.getElementById('challenges-section');
+    const challengesList = document.getElementById('challenges-list');
+
+    try {
+        const response = await fetch(`${verificationClient.registryUrl}/pohw/proofs/${proofHash}/challenges`);
+        if (!response.ok) {
+            throw new Error('Failed to load challenges');
+        }
+
+        const data = await response.json();
+        
+        if (data.challenges && data.challenges.length > 0) {
+            challengesList.innerHTML = data.challenges.map(challenge => {
+                const statusColor = challenge.status === 'resolved' 
+                    ? (challenge.resolution === 'exonerated' ? 'var(--accent-green)' : 'var(--error-color)')
+                    : 'var(--text-secondary)';
+                
+                return `
+                    <div class="result-item" style="border-bottom: 1px solid var(--border-color); padding: 1rem 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                            <div>
+                                <span class="result-label">Challenge ID:</span>
+                                <span class="result-value hash-value">${challenge.id}</span>
+                            </div>
+                            <span class="result-value" style="color: ${statusColor};">
+                                ${challenge.status.toUpperCase()}${challenge.resolution ? ` (${challenge.resolution})` : ''}
+                            </span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Reason:</span>
+                            <span class="result-value">${challenge.reason.replace(/_/g, ' ')}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Description:</span>
+                            <span class="result-value">${challenge.description}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Challenger:</span>
+                            <span class="result-value hash-value">${challenge.challenger_did}</span>
+                        </div>
+                        ${challenge.author_response ? `
+                            <div class="result-item">
+                                <span class="result-label">Author Response:</span>
+                                <span class="result-value">${challenge.author_response}</span>
+                            </div>
+                        ` : ''}
+                        ${challenge.resolution_notes ? `
+                            <div class="result-item">
+                                <span class="result-label">Resolution Notes:</span>
+                                <span class="result-value">${challenge.resolution_notes}</span>
+                            </div>
+                        ` : ''}
+                        <div class="result-item">
+                            <span class="result-label">Created:</span>
+                            <span class="result-value">${formatTimestamp(challenge.created_at)}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            challengesSection.classList.remove('hidden');
+        } else {
+            challengesList.innerHTML = '<div class="result-item"><span class="result-value">No challenges for this proof.</span></div>';
+            challengesSection.classList.remove('hidden');
+        }
+    } catch (error) {
+        challengesList.innerHTML = `<div class="result-item"><span class="result-value" style="color: var(--error-color);">Error loading challenges: ${error.message}</span></div>`;
+        challengesSection.classList.remove('hidden');
+    }
+}
+
+/**
+ * Load transparency log
+ */
+async function loadTransparencyLog() {
+    const logContent = document.getElementById('transparency-log-content');
+
+    try {
+        const response = await fetch(`${verificationClient.registryUrl}/pohw/transparency-log?limit=50`);
+        if (!response.ok) {
+            throw new Error('Failed to load transparency log');
+        }
+
+        const data = await response.json();
+        
+        if (data.entries && data.entries.length > 0) {
+            logContent.innerHTML = data.entries.map(entry => {
+                const typeColor = entry.type === 'challenge_resolved' 
+                    ? (entry.resolution === 'exonerated' ? 'var(--accent-green)' : 'var(--error-color)')
+                    : 'var(--text-secondary)';
+                
+                return `
+                    <div class="transparency-log-entry">
+                        <div class="entry-type" style="color: ${typeColor};">
+                            ${entry.type.replace(/_/g, ' ').toUpperCase()}
+                            ${entry.resolution ? ` - ${entry.resolution.toUpperCase()}` : ''}
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Challenge ID:</span>
+                            <span class="result-value hash-value">${entry.challenge_id}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Proof Hash:</span>
+                            <span class="result-value hash-value">${entry.proof_hash}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Timestamp:</span>
+                            <span class="result-value">${formatTimestamp(entry.timestamp)}</span>
+                        </div>
+                        ${entry.details ? `
+                            <div class="entry-details">
+                                ${JSON.stringify(entry.details, null, 2)}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        } else {
+            logContent.innerHTML = '<div class="result-item"><span class="result-value">No transparency log entries.</span></div>';
+        }
+    } catch (error) {
+        logContent.innerHTML = `<div class="result-item"><span class="result-value" style="color: var(--error-color);">Error loading transparency log: ${error.message}</span></div>`;
+    }
+}
 
