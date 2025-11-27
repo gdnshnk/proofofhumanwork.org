@@ -557,11 +557,20 @@ async function createProof() {
         const canonicalClaim = JSON.stringify(claim, Object.keys(claim).sort());
         const signature = await keyManager.sign(canonicalClaim);
         
-        // Determine assistance profile from ACTUAL DATA (process metrics), not just user selection
-        // User selection is only a hint - the actual data determines the profile
+        // Determine assistance profile - respect user's explicit declaration
+        // Per whitepaper Section 8.5: "AI-assist disclosure is treated as an ethical extension"
+        // User's explicit declaration takes precedence for transparency and ethical compliance
+        const assistanceProfileSelect = document.getElementById('assistance-profile');
+        const userSelectedProfile = assistanceProfileSelect ? assistanceProfileSelect.value : null;
+        
         let assistanceProfile = 'human-only'; // Default
         
-        if (processMetrics) {
+        // If user explicitly selected AI-assisted or AI-generated, respect that declaration
+        // This ensures transparency and ethical compliance (EU AI Act, etc.)
+        if (userSelectedProfile === 'AI-assisted' || userSelectedProfile === 'AI-generated') {
+            assistanceProfile = userSelectedProfile;
+        } else if (processMetrics) {
+            // Only auto-determine if user selected "human-only" or didn't select
             // Determine from actual process data
             if (processMetrics.meetsThresholds) {
                 // Meets human thresholds = human-only
@@ -581,16 +590,16 @@ async function createProof() {
                 }
             }
         } else {
-            // No process data - use user selection as hint
-            const assistanceProfileSelect = document.getElementById('assistance-profile');
-            assistanceProfile = assistanceProfileSelect ? assistanceProfileSelect.value : 'human-only';
+            // No process data - use user selection or default
+            assistanceProfile = userSelectedProfile || 'human-only';
         }
         
-        console.log('[App] Assistance profile determined from data:', {
+        console.log('[App] Assistance profile determined:', {
             assistanceProfile: assistanceProfile,
+            userSelection: userSelectedProfile,
             hasProcessMetrics: !!processMetrics,
             meetsThresholds: processMetrics?.meetsThresholds,
-            userSelection: document.getElementById('assistance-profile')?.value
+            respectsUserDeclaration: (userSelectedProfile === 'AI-assisted' || userSelectedProfile === 'AI-generated')
         });
         
         // Always send processMetrics if available (server should accept them regardless of thresholds)
