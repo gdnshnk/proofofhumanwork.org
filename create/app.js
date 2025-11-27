@@ -22,12 +22,7 @@ const keyStatusText = document.getElementById('key-status-text');
 const didDisplay = document.getElementById('did-display');
 const didValue = document.getElementById('did-value');
 
-const fileInput = document.getElementById('file-input');
-const uploadArea = document.getElementById('upload-area');
 const contentTextarea = document.getElementById('content-textarea');
-const fileList = document.getElementById('file-list');
-const tabButtons = document.querySelectorAll('.tab-button');
-const tabContents = document.querySelectorAll('.tab-content');
 
 const registrySelect = document.getElementById('registry-select');
 const createButton = document.getElementById('create-button');
@@ -36,8 +31,6 @@ const errorSection = document.getElementById('error-section');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-    setupTabs();
-    setupFileUpload();
     setupKeyManagement();
     setupProcessTracking();
     await setupRegistrySelector();
@@ -45,78 +38,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadExistingKeys();
 });
 
-/**
- * Setup tabs
- */
-function setupTabs() {
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tab = button.dataset.tab;
-            
-            // Update buttons
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            
-            // Update content
-            tabContents.forEach(content => content.classList.remove('active'));
-            document.getElementById(`${tab}-tab`).classList.add('active');
-        });
-    });
-}
-
-/**
- * Setup file upload
- */
-function setupFileUpload() {
-    uploadArea.addEventListener('click', () => fileInput.click());
-    uploadArea.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        uploadArea.classList.add('dragover');
-        processTracker.recordInput('file-drag');
-    });
-    uploadArea.addEventListener('dragleave', () => {
-        uploadArea.classList.remove('dragover');
-    });
-    uploadArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        uploadArea.classList.remove('dragover');
-        const files = Array.from(e.dataTransfer.files);
-        processTracker.recordInput('file-drop');
-        handleFiles(files);
-    });
-    fileInput.addEventListener('change', (e) => {
-        const files = Array.from(e.target.files);
-        processTracker.recordInput('file-select');
-        handleFiles(files);
-    });
-}
-
-/**
- * Handle file selection
- */
-function handleFiles(files) {
-    fileList.innerHTML = '';
-    files.forEach((file, index) => {
-        const fileItem = document.createElement('div');
-        fileItem.className = 'file-item';
-        fileItem.innerHTML = `
-            <span class="file-name">${file.name}</span>
-            <span class="file-size">${formatFileSize(file.size)}</span>
-        `;
-        fileList.appendChild(fileItem);
-    });
-}
-
-/**
- * Format file size
- */
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-}
 
 /**
  * Setup key management
@@ -329,7 +250,7 @@ function updateNodeStatus(status) {
  */
 function setupProcessTracking() {
     // Only set up if elements exist
-    if (!contentTextarea || !fileInput) {
+    if (!contentTextarea) {
         console.warn('[ProcessTracker] Content elements not found, skipping setup');
         return;
     }
@@ -378,20 +299,6 @@ function setupProcessTracking() {
         }
     });
     
-    // Track file selection
-    fileInput.addEventListener('change', () => {
-        try {
-            if (fileInput.files.length > 0) {
-                if (!processTracker.isTracking) {
-                    processTracker.startSession();
-                }
-                processTracker.recordInput('file-select');
-                updateProcessStatus();
-            }
-        } catch (error) {
-            console.warn('[ProcessTracker] File change handler error:', error);
-        }
-    });
     
     // Update status periodically
     setInterval(() => {
@@ -442,30 +349,15 @@ async function createProof() {
             return;
         }
         
-        // Get content based on active tab
-        const activeTab = document.querySelector('.tab-button.active').dataset.tab;
-        let content = null;
-        let hash = null;
-        
-        if (activeTab === 'file') {
-            if (!fileInput.files || fileInput.files.length === 0) {
-                showError('Please select a file');
-                setLoading(false);
-                return;
-            }
-            // For now, handle single file (can extend to multiple)
-            const file = fileInput.files[0];
-            const arrayBuffer = await file.arrayBuffer();
-            hash = await hashBinary(new Uint8Array(arrayBuffer));
-        } else if (activeTab === 'text') {
-            const text = contentTextarea.value.trim();
-            if (!text) {
-                showError('Please enter content');
-                setLoading(false);
-                return;
-            }
-            hash = await hashText(text);
+        // Get content from textarea
+        const text = contentTextarea.value.trim();
+        if (!text) {
+            showError('Please enter content');
+            setLoading(false);
+            return;
         }
+        
+        const hash = await hashText(text);
         
         if (!hash) {
             showError('Failed to generate hash');
@@ -481,7 +373,7 @@ async function createProof() {
         // Get DID
         const did = keyManager.getDID();
         
-        // Always start tracking if not already started (for file uploads)
+        // Ensure process tracking is started
         if (!processTracker.isTracking) {
             processTracker.startSession();
         }
