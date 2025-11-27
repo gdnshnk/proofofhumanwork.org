@@ -229,37 +229,16 @@
     background: #ff5252;
 }
 
-/* Other Explanation Box */
-.other-explanation {
+/* Other Type Input */
+.other-type-input {
     margin-top: 0.75rem;
-    padding: 0.75rem;
-    background: var(--bg-tertiary);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
 }
 
-.other-explanation strong {
+.other-type-input label {
+    display: block;
+    margin-bottom: 0.5rem;
     color: var(--text-primary);
-    font-size: 0.85rem;
-}
-
-.other-explanation p {
-    margin-top: 0.5rem;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-}
-
-.other-explanation ul {
-    margin-top: 0.5rem;
-    padding-left: 1.25rem;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
-.other-explanation li {
-    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
 }
 
 /* Modal */
