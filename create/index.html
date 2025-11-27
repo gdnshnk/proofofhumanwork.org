@@ -53,26 +53,9 @@
                 <!-- Content Input Section -->
                 <div class="input-section">
                     <h3>Content to Prove</h3>
-                    <div class="input-tabs">
-                        <button class="tab-button active" data-tab="file">File</button>
-                        <button class="tab-button" data-tab="text">Text</button>
-                    </div>
-
-                    <div class="tab-content active" id="file-tab">
-                        <div class="upload-area" id="upload-area">
-                            <input type="file" id="file-input" class="file-input" multiple>
-                            <div class="upload-placeholder">
-                                <span class="upload-icon">📄</span>
-                                <p>Drag and drop files here or click to browse</p>
-                                <p class="upload-hint">Supports any file type</p>
-                            </div>
-                        </div>
-                        <div id="file-list" class="file-list"></div>
-                    </div>
-
-                    <div class="tab-content" id="text-tab">
+                    <div class="tab-content active" id="text-tab">
                         <textarea id="content-textarea" class="content-textarea" placeholder="Paste or type your content here..."></textarea>
-                        <p class="input-hint">The content will be hashed and signed</p>
+                        <p class="input-hint">The content will be hashed and signed. Process metrics (entropy, temporal coherence) will be tracked as you type.</p>
                     </div>
                     
                     <!-- Assistance Profile Selection -->
