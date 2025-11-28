@@ -698,7 +698,7 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
                         html += `<div style="font-size: 0.8rem; color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; margin-left: 1rem;">→ ${m.source}</div>`;
                         html += `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 1rem;">Type: ${typeLabel}</div>`;
                         
-                        // Add content address if available
+                        // Add content address if available (per whitepaper Section 7.3)
                         if (m.contentAddress) {
                             const addressType = m.contentAddress.type === 'ipfs' ? 'IPFS' : 'Arweave';
                             html += `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 1rem; margin-top: 0.25rem;">`;
@@ -763,28 +763,6 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
         document.getElementById('pav-coherence').textContent = pavClaim['pav:temporalCoherence'] || '—';
         document.getElementById('pav-compound-hash').textContent = pavClaim['pohw:compoundHash'] || '—';
         
-        // Content Address (pohw:claimURI)
-        const claimURI = pavClaim['pohw:claimURI'];
-        const claimURIEl = document.getElementById('pav-claim-uri');
-        if (claimURI) {
-            // Create clickable link if it's a valid URI
-            if (claimURI.startsWith('ipfs://') || claimURI.startsWith('ar://')) {
-                let gatewayUrl = '';
-                if (claimURI.startsWith('ipfs://')) {
-                    const cid = claimURI.replace('ipfs://', '');
-                    gatewayUrl = `https://ipfs.io/ipfs/${cid}`;
-                } else if (claimURI.startsWith('ar://')) {
-                    const txId = claimURI.replace('ar://', '');
-                    gatewayUrl = `https://arweave.net/${txId}`;
-                }
-                claimURIEl.innerHTML = `<a href="${gatewayUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; text-decoration: none;">${claimURI}</a>`;
-            } else {
-                claimURIEl.textContent = claimURI;
-            }
-        } else {
-            claimURIEl.textContent = '—';
-        }
-        
         // Cryptographic Attestations
         // Signature is only in PAV claim, not in result
         document.getElementById('pav-signature').textContent = pavClaim['pav:signature'] || '—';
@@ -793,6 +771,44 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
         const merkleInclusion = pavClaim['pav:merkleInclusion'] || 
             (result.merkle_proof && result.merkle_proof.length > 0 ? result.merkle_proof.join(', ') : null);
         document.getElementById('pav-merkle-inclusion').textContent = merkleInclusion || '—';
+        
+        // Content Address (pohw:claimURI) - per whitepaper Section 7.3
+        const claimUri = pavClaim['pohw:claimURI'];
+        const claimUriEl = document.getElementById('pav-claim-uri');
+        if (claimUri) {
+            // Parse the URI to create a clickable link
+            let displayUri = claimUri;
+            let linkUrl = '';
+            
+            if (claimUri.startsWith('ipfs://')) {
+                const cid = claimUri.substring(7);
+                displayUri = `IPFS: ${cid}`;
+                linkUrl = `https://ipfs.io/ipfs/${cid}`;
+            } else if (claimUri.startsWith('ar://')) {
+                const txId = claimUri.substring(5);
+                displayUri = `Arweave: ${txId}`;
+                linkUrl = `https://arweave.net/${txId}`;
+            } else if (claimUri.startsWith('https://ipfs.io/ipfs/')) {
+                const cid = claimUri.substring(22);
+                displayUri = `IPFS: ${cid}`;
+                linkUrl = claimUri;
+            } else if (claimUri.startsWith('https://arweave.net/')) {
+                const txId = claimUri.substring(21);
+                displayUri = `Arweave: ${txId}`;
+                linkUrl = claimUri;
+            } else {
+                displayUri = claimUri;
+                linkUrl = claimUri;
+            }
+            
+            if (linkUrl) {
+                claimUriEl.innerHTML = `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; text-decoration: none;">${displayUri}</a>`;
+            } else {
+                claimUriEl.textContent = displayUri;
+            }
+        } else {
+            claimUriEl.textContent = '—';
+        }
     } else {
         // Show all fields as "—" if PAV claim not available, but try to use result data
         // Signature is only available in PAV claim
@@ -813,7 +829,6 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
         document.getElementById('pav-entropy').textContent = '—';
         document.getElementById('pav-coherence').textContent = '—';
         document.getElementById('pav-compound-hash').textContent = '—';
-        document.getElementById('pav-claim-uri').textContent = '—';
     }
     
     // Additional PAV fields (Verification & Compliance)
