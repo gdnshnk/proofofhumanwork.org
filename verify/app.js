@@ -678,6 +678,15 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
         let derivedFromDisplay = '—';
         let derivedFromElement = document.getElementById('pav-derived-from');
         
+        // Debug logging
+        console.log('[Verify] DerivedFrom Debug:', {
+            hasResultProof: !!result.proof,
+            hasProofDetails: !!proofDetails,
+            proofRecordDerivedFrom: proofRecord?.derived_from ? (typeof proofRecord.derived_from) : 'none',
+            pavClaimDerivedFrom: pavClaim?.['pav:derivedFrom'] ? (typeof pavClaim['pav:derivedFrom']) : 'none',
+            pavClaimDerivedFromValue: pavClaim?.['pav:derivedFrom']
+        });
+        
         if (proofRecord && proofRecord.derived_from) {
             try {
                 const derivedFrom = typeof proofRecord.derived_from === 'string' 
@@ -765,13 +774,31 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
             const derivedFrom = pavClaim['pav:derivedFrom'];
             if (derivedFrom) {
                 // PAV claim should only contain source references (strings), not objects
+                // But handle edge case where objects might slip through
                 if (Array.isArray(derivedFrom)) {
-                    derivedFromDisplay = derivedFrom.map(s => typeof s === 'string' ? s : String(s)).join(', ');
+                    // Check if it's an array of objects (edge case - shouldn't happen per PAV ontology)
+                    if (derivedFrom.length > 0 && typeof derivedFrom[0] === 'object' && !Array.isArray(derivedFrom[0]) && derivedFrom[0] !== null) {
+                        // Extract source strings from objects
+                        console.warn('[Verify] PAV claim has objects in derivedFrom (unexpected), extracting sources');
+                        derivedFromDisplay = derivedFrom.map(m => {
+                            if (m && typeof m === 'object' && m.source) {
+                                return m.source;
+                            }
+                            return String(m);
+                        }).join(', ');
+                    } else {
+                        // Normal case: array of strings
+                        derivedFromDisplay = derivedFrom.map(s => typeof s === 'string' ? s : String(s)).join(', ');
+                    }
                 } else if (typeof derivedFrom === 'string') {
                     derivedFromDisplay = derivedFrom;
+                } else if (typeof derivedFrom === 'object' && derivedFrom !== null && !Array.isArray(derivedFrom)) {
+                    // Edge case: single object instead of string
+                    console.warn('[Verify] PAV claim has object in derivedFrom (unexpected), extracting source');
+                    derivedFromDisplay = derivedFrom.source || String(derivedFrom);
                 } else {
-                    // Unexpected: object in PAV claim (shouldn't happen per ontology)
-                    console.warn('[Verify] pav:derivedFrom contains unexpected type:', typeof derivedFrom);
+                    // Unexpected type
+                    console.warn('[Verify] pav:derivedFrom contains unexpected type:', typeof derivedFrom, derivedFrom);
                     derivedFromDisplay = 'Invalid format';
                 }
                 if (derivedFromElement) {
@@ -868,12 +895,29 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
     
     // Additional PAV fields (Verification & Compliance)
     // Get assistance profile from proof record if available (more reliable than PAV claim)
-    const assistanceProfile = (result.proof && result.proof.assistance_profile) 
-        ? result.proof.assistance_profile 
-        : (proofDetails && proofDetails.assistance_profile)
-        ? proofDetails.assistance_profile
-        : (pavClaim?.['pav:assistanceProfile']);
+    // Priority: result.proof > proofDetails > PAV claim
+    let assistanceProfile = null;
+    if (result.proof && result.proof.assistance_profile) {
+        assistanceProfile = result.proof.assistance_profile;
+    } else if (proofDetails && proofDetails.assistance_profile) {
+        assistanceProfile = proofDetails.assistance_profile;
+    } else if (pavClaim && pavClaim['pav:assistanceProfile']) {
+        assistanceProfile = pavClaim['pav:assistanceProfile'];
+    }
+    
     document.getElementById('pav-assistance').textContent = assistanceProfile || '—';
+    
+    // Debug logging for assistance profile issues
+    if (!assistanceProfile || (assistanceProfile !== 'human-only' && result.proof && result.proof.assistance_profile === 'human-only')) {
+        console.warn('[Verify] Assistance profile mismatch:', {
+            fromResultProof: result.proof?.assistance_profile,
+            fromProofDetails: proofDetails?.assistance_profile,
+            fromPAVClaim: pavClaim?.['pav:assistanceProfile'],
+            final: assistanceProfile,
+            resultHasProof: !!result.proof,
+            proofDetailsExists: !!proofDetails
+        });
+    }
     document.getElementById('pav-tier').textContent = pavClaim?.['pav:verificationTier'] || '—';
     document.getElementById('pav-revocation').textContent = pavClaim?.['pav:revocationState'] || '—';
     
