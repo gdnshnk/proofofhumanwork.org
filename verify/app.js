@@ -685,25 +685,40 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
                 
                 // Check if structured format
                 if (Array.isArray(derivedFrom) && derivedFrom.length > 0 && typeof derivedFrom[0] === 'object') {
-                    // Structured format - create HTML with content addresses
+                    // Structured format - create HTML with source references only (privacy-preserving)
+                    // Per whitepaper Section 6.5: "No behavioral or process telemetry ever leaves the local device"
+                    // We show source references, not quoted text
                     let html = '';
                     derivedFrom.forEach((m, i) => {
-                        const textPreview = m.text.length > 30 ? m.text.substring(0, 30) + '...' : m.text;
                         const typeLabel = m.sourceType === 'other' && m.otherType 
                             ? `${m.sourceType} (${m.otherType})` 
                             : m.sourceType;
                         
-                        html += `<div style="margin-bottom: 0.5rem;">`;
-                        html += `<div style="font-size: 0.85rem; color: var(--text-primary);">${i + 1}. "${textPreview}"</div>`;
-                        html += `<div style="font-size: 0.8rem; color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; margin-left: 1rem;">→ ${m.source}</div>`;
+                        html += `<div style="margin-bottom: 0.75rem;">`;
+                        html += `<div style="font-size: 0.85rem; color: var(--text-primary); margin-bottom: 0.25rem;">${i + 1}.</div>`;
+                        
+                        // Source reference (with link if URL or DOI)
+                        if (m.sourceType === 'url' || m.sourceType === 'doi') {
+                            const linkUrl = m.source.startsWith('doi:') 
+                                ? `https://doi.org/${m.source.substring(4)}` 
+                                : m.source;
+                            html += `<div style="font-size: 0.8rem; color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; margin-left: 1rem; margin-bottom: 0.25rem;">`;
+                            html += `→ <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-green); text-decoration: none;">${m.source}</a>`;
+                            html += `</div>`;
+                        } else {
+                            // PoHW hash or other - no link
+                            html += `<div style="font-size: 0.8rem; color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; margin-left: 1rem; margin-bottom: 0.25rem;">→ ${m.source}</div>`;
+                        }
+                        
                         html += `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 1rem;">Type: ${typeLabel}</div>`;
                         
                         // Add content address if available (per whitepaper Section 7.3)
+                        // This allows retrieval of archived content without storing it in registry
                         if (m.contentAddress) {
                             const addressType = m.contentAddress.type === 'ipfs' ? 'IPFS' : 'Arweave';
                             html += `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-left: 1rem; margin-top: 0.25rem;">`;
                             html += `<span>${addressType}: </span>`;
-                            html += `<a href="${m.contentAddress.url}" target="_blank" style="color: var(--accent-green); text-decoration: none; font-family: 'IBM Plex Mono', monospace;">`;
+                            html += `<a href="${m.contentAddress.url}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-green); text-decoration: none; font-family: 'IBM Plex Mono', monospace;">`;
                             html += `${m.contentAddress.value.length > 40 ? m.contentAddress.value.substring(0, 40) + '...' : m.contentAddress.value}`;
                             html += `</a>`;
                             html += `</div>`;
