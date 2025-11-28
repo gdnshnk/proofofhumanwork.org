@@ -771,44 +771,6 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
         const merkleInclusion = pavClaim['pav:merkleInclusion'] || 
             (result.merkle_proof && result.merkle_proof.length > 0 ? result.merkle_proof.join(', ') : null);
         document.getElementById('pav-merkle-inclusion').textContent = merkleInclusion || '—';
-        
-        // Content Address (pohw:claimURI) - per whitepaper Section 7.3
-        const claimUri = pavClaim['pohw:claimURI'];
-        const claimUriEl = document.getElementById('pav-claim-uri');
-        if (claimUri) {
-            // Parse the URI to create a clickable link
-            let displayUri = claimUri;
-            let linkUrl = '';
-            
-            if (claimUri.startsWith('ipfs://')) {
-                const cid = claimUri.substring(7);
-                displayUri = `IPFS: ${cid}`;
-                linkUrl = `https://ipfs.io/ipfs/${cid}`;
-            } else if (claimUri.startsWith('ar://')) {
-                const txId = claimUri.substring(5);
-                displayUri = `Arweave: ${txId}`;
-                linkUrl = `https://arweave.net/${txId}`;
-            } else if (claimUri.startsWith('https://ipfs.io/ipfs/')) {
-                const cid = claimUri.substring(22);
-                displayUri = `IPFS: ${cid}`;
-                linkUrl = claimUri;
-            } else if (claimUri.startsWith('https://arweave.net/')) {
-                const txId = claimUri.substring(21);
-                displayUri = `Arweave: ${txId}`;
-                linkUrl = claimUri;
-            } else {
-                displayUri = claimUri;
-                linkUrl = claimUri;
-            }
-            
-            if (linkUrl) {
-                claimUriEl.innerHTML = `<a href="${linkUrl}" target="_blank" rel="noopener noreferrer" style="color: var(--accent-green); font-family: 'IBM Plex Mono', monospace; text-decoration: none;">${displayUri}</a>`;
-            } else {
-                claimUriEl.textContent = displayUri;
-            }
-        } else {
-            claimUriEl.textContent = '—';
-        }
     } else {
         // Show all fields as "—" if PAV claim not available, but try to use result data
         // Signature is only available in PAV claim
