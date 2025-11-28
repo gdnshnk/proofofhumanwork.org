@@ -38,9 +38,10 @@ const contentAddressSection = document.getElementById('content-address-section')
 const contentAddressType = document.getElementById('content-address-type');
 const contentAddressValue = document.getElementById('content-address-value');
 const contentAddressHint = document.getElementById('content-address-hint');
-const contentArchiveType = document.getElementById('content-archive-type');
-const contentArchiveValue = document.getElementById('content-archive-value');
 const selectedTextPreview = document.getElementById('selected-text-preview');
+const claimUriType = document.getElementById('claim-uri-type');
+const claimUriValue = document.getElementById('claim-uri-value');
+const claimUriHint = document.getElementById('claim-uri-hint');
 
 // Store source mappings
 let sourceMappings = [];
@@ -53,21 +54,12 @@ const errorSection = document.getElementById('error-section');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('[App] Initializing...');
-    
-    // Load keys first (synchronous check)
-    await loadExistingKeys();
-    
-    // Setup UI components
     setupKeyManagement();
     setupProcessTracking();
     setupSourceMapping();
+    await setupRegistrySelector();
     setupCreateButton();
-    
-    // Setup registry selector (async, can fail gracefully)
-    setupRegistrySelector().catch(err => {
-        console.error('[App] Failed to setup registry selector:', err);
-    });
+    await loadExistingKeys();
 });
 
 
@@ -197,44 +189,12 @@ function updateKeyStatus(hasKeys, did = null) {
  */
 async function loadExistingKeys() {
     try {
-        console.log('[App] Loading existing keys...');
-        
-        // Check if keys exist in storage first
-        const hasKeys = await keyManager.hasKeys();
-        if (!hasKeys) {
-            console.log('[App] No keys found in storage');
-            updateKeyStatus(false);
-            return;
-        }
-        
-        // Load keys
         const keys = await keyManager.loadKeys();
-        console.log('[App] Keys loaded:', keys ? 'Yes' : 'No');
-        
-        if (keys && keys.did) {
-            console.log('[App] DID loaded:', keys.did);
+        if (keys) {
             updateKeyStatus(true, keys.did);
-        } else {
-            // Try to get DID directly from keyManager
-            const did = keyManager.getDID();
-            if (did) {
-                console.log('[App] DID retrieved directly:', did);
-                updateKeyStatus(true, did);
-            } else {
-                console.log('[App] No DID available');
-                updateKeyStatus(false);
-            }
         }
     } catch (error) {
-        console.error('[App] Error loading keys:', error);
-        // Try fallback
-        const did = keyManager.getDID();
-        if (did) {
-            console.log('[App] Using fallback DID:', did);
-            updateKeyStatus(true, did);
-        } else {
-            updateKeyStatus(false);
-        }
+        console.warn('Could not load existing keys:', error);
     }
 }
 
@@ -243,34 +203,10 @@ async function loadExistingKeys() {
  */
 async function setupRegistrySelector() {
     try {
-        console.log('[App] Setting up registry selector...');
-        
-        // Show loading state
-        if (registrySelect) {
-            registrySelect.innerHTML = '<option value="">Loading nodes...</option>';
-            registrySelect.disabled = true;
-        }
-        
-        // Check if registryDiscovery is available
-        if (typeof registryDiscovery === 'undefined') {
-            throw new Error('RegistryDiscovery not available');
-        }
-        
         const nodes = await registryDiscovery.discoverNodes();
-        console.log('[App] Discovered', nodes.length, 'registry nodes:', nodes);
-        
-        if (!registrySelect) {
-            console.error('[App] Registry select element not found');
-            return;
-        }
+        console.log('[App] Discovered', nodes.length, 'registry nodes');
         
         registrySelect.innerHTML = '';
-        
-        if (nodes.length === 0) {
-            console.warn('[App] No nodes discovered, using defaults');
-            throw new Error('No nodes discovered');
-        }
-        
         nodes.forEach(node => {
             const option = document.createElement('option');
             option.value = node.url;
@@ -279,85 +215,35 @@ async function setupRegistrySelector() {
         });
         
         const defaultUrl = registryDiscovery.getDefaultRegistry();
-        if (defaultUrl) {
-            registrySelect.value = defaultUrl;
-            registryClient = new RegistryClient(defaultUrl);
-        } else if (nodes.length > 0) {
-            registrySelect.value = nodes[0].url;
-            registryClient = new RegistryClient(nodes[0].url);
-        }
-        
-        registrySelect.disabled = false;
-        console.log('[App] Registry selector setup complete, selected:', registrySelect.value);
+        registrySelect.value = defaultUrl;
+        registryClient = new RegistryClient(defaultUrl);
         
         // Check node status
-        if (registryClient) {
-            try {
-                const status = await registryClient.checkNodeStatus();
-                updateNodeStatus(status);
-            } catch (statusError) {
-                console.warn('[App] Node status check failed:', statusError);
-                updateNodeStatus({ online: false });
-            }
-        }
+        const status = await registryClient.checkNodeStatus();
+        updateNodeStatus(status);
         
     } catch (error) {
         console.error('[App] Registry discovery failed:', error);
-        
-        if (!registrySelect) {
-            console.error('[App] Cannot setup registry selector - element not found');
-            return;
-        }
-        
-        // Fallback to default nodes
-        registrySelect.innerHTML = '';
-        const defaultNodes = [
-            { url: 'https://gdn.sh', name: 'gdn.sh (Primary)' },
-            { url: 'https://pohw-registry-node-production.up.railway.app', name: 'Production (Railway)' }
-        ];
-        
+        registrySelect.innerHTML = `
+            <option value="https://gdn.sh">gdn.sh (Primary)</option>
+            <option value="https://pohw-registry-node-production.up.railway.app">Production (Railway)</option>
+        `;
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            defaultNodes.unshift({ url: 'http://localhost:3000', name: 'Local Development' });
+            const localOption = document.createElement('option');
+            localOption.value = 'http://localhost:3000';
+            localOption.textContent = 'Local Development';
+            registrySelect.insertBefore(localOption, registrySelect.firstChild);
         }
-        
-        defaultNodes.forEach(node => {
-            const option = document.createElement('option');
-            option.value = node.url;
-            option.textContent = node.name;
-            registrySelect.appendChild(option);
-        });
-        
-        registrySelect.value = defaultNodes[0].url;
-        registryClient = new RegistryClient(defaultNodes[0].url);
-        registrySelect.disabled = false;
-        
-        console.log('[App] Using fallback nodes');
-        
-        // Try to check status
-        try {
-            const status = await registryClient.checkNodeStatus();
-            updateNodeStatus(status);
-        } catch (statusError) {
-            updateNodeStatus({ online: false });
-        }
+        registrySelect.value = registrySelect.options[0].value;
+        registryClient = new RegistryClient(registrySelect.value);
     }
     
-    // Setup change handler (only once)
-    if (registrySelect && !registrySelect.hasAttribute('data-handler-attached')) {
-        registrySelect.setAttribute('data-handler-attached', 'true');
-        registrySelect.addEventListener('change', async (e) => {
-            const selectedUrl = e.target.value;
-            if (selectedUrl) {
-                registryClient.setRegistryUrl(selectedUrl);
-                try {
-                    const status = await registryClient.checkNodeStatus();
-                    updateNodeStatus(status);
-                } catch (statusError) {
-                    updateNodeStatus({ online: false });
-                }
-            }
-        });
-    }
+    registrySelect.addEventListener('change', async (e) => {
+        const selectedUrl = e.target.value;
+        registryClient.setRegistryUrl(selectedUrl);
+        const status = await registryClient.checkNodeStatus();
+        updateNodeStatus(status);
+    });
 }
 
 /**
@@ -508,9 +394,9 @@ function setupSourceMapping() {
         contentAddressType.addEventListener('change', updateContentAddressSection);
     }
     
-    // Update content archiving section visibility
-    if (contentArchiveType) {
-        contentArchiveType.addEventListener('change', updateContentArchiveSection);
+    // Update claim URI section visibility
+    if (claimUriType) {
+        claimUriType.addEventListener('change', updateClaimUriSection);
     }
     
     // Close modal on outside click
@@ -1078,7 +964,7 @@ async function createProof() {
                     mapping.otherType = m.otherType;
                 }
                 
-                // Include contentAddress if present
+                // Include contentAddress if present (per whitepaper Section 7.3)
                 if (m.contentAddress) {
                     mapping.contentAddress = m.contentAddress;
                 }
@@ -1087,28 +973,29 @@ async function createProof() {
             });
         }
         
-        // Add content archiving URI (pohw:claimURI) if provided
-        if (contentArchiveType && contentArchiveValue) {
-            const archiveType = contentArchiveType.value;
-            const archiveValue = contentArchiveValue.value.trim();
+        // Add claimURI (pohw:claimURI) for user's own content address (per whitepaper Section 7.3)
+        if (claimUriType && claimUriValue) {
+            const addressType = claimUriType.value;
+            const addressValue = claimUriValue.value.trim();
             
-            if (archiveType && archiveValue) {
-                // Normalize the URI format
-                let claimURI = archiveValue;
+            if (addressType && addressValue) {
+                // Normalize the address format
+                let normalizedAddress = addressValue;
+                let claimUri = '';
                 
-                if (archiveType === 'ipfs') {
-                    // Ensure ipfs:// prefix
-                    if (!claimURI.startsWith('ipfs://') && !claimURI.startsWith('http')) {
-                        claimURI = `ipfs://${claimURI.replace(/^ipfs:\/\//, '')}`;
-                    }
-                } else if (archiveType === 'arweave') {
-                    // Ensure ar:// prefix
-                    if (!claimURI.startsWith('ar://') && !claimURI.startsWith('http')) {
-                        claimURI = `ar://${claimURI.replace(/^ar:\/\//, '')}`;
-                    }
+                if (addressType === 'ipfs') {
+                    // Remove ipfs:// prefix if present, keep CID
+                    normalizedAddress = addressValue.replace(/^ipfs:\/\//, '');
+                    claimUri = `ipfs://${normalizedAddress}`;
+                } else if (addressType === 'arweave') {
+                    // Remove ar:// prefix if present, keep transaction ID
+                    normalizedAddress = addressValue.replace(/^ar:\/\//, '');
+                    claimUri = `ar://${normalizedAddress}`;
                 }
                 
-                attestation.claimURI = claimURI;
+                if (claimUri) {
+                    attestation.claimURI = claimUri;
+                }
             }
         }
         
