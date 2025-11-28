@@ -71,17 +71,17 @@
                         </p>
                     </div>
                     
-                    <!-- Content Archiving (IPFS/Arweave) -->
+                    <!-- Content Address (IPFS/Arweave) - Optional -->
                     <div class="registry-selector" style="margin-top: 1.25rem;">
-                        <label for="content-archive-type">Content Archiving (Optional)</label>
-                        <select id="content-archive-type" class="registry-select" style="margin-bottom: 0.5rem;">
-                            <option value="">No archiving</option>
+                        <label for="claim-uri-type">Content Address (Optional)</label>
+                        <select id="claim-uri-type" class="registry-select" style="margin-bottom: 0.5rem;">
+                            <option value="">No content address</option>
                             <option value="ipfs">IPFS CID</option>
                             <option value="arweave">Arweave Transaction ID</option>
                         </select>
-                        <input type="text" id="content-archive-value" class="registry-select" placeholder="Enter IPFS CID or Arweave ID" style="display: none;">
+                        <input type="text" id="claim-uri-value" class="registry-select" placeholder="Enter IPFS CID (e.g., QmXxx...) or Arweave ID (e.g., xxx...)" style="display: none;">
                         <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
-                            Optional: Archive your content on IPFS or Arweave for long-term preservation. The registry stores only the content identifier, not the file itself.
+                            <span id="claim-uri-hint">Optional: Archive your content on IPFS or Arweave for long-term preservation (per whitepaper Section 7.3). Registry stores only the content identifier, never the files themselves.</span>
                         </p>
                     </div>
                     
