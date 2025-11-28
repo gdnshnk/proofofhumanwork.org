@@ -49,6 +49,21 @@ const createButton = document.getElementById('create-button');
 const resultsSection = document.getElementById('results-section');
 const errorSection = document.getElementById('error-section');
 
+// Content archiving elements
+const contentArchiveOption = document.getElementById('content-archive-option');
+const contentArchiveSection = document.getElementById('content-archive-section');
+const archiveUploadArea = document.getElementById('archive-upload-area');
+const archiveManualInput = document.getElementById('archive-manual-input');
+const archiveUploadBtn = document.getElementById('archive-upload-btn');
+const archiveAddressInput = document.getElementById('archive-address-input');
+const archiveStatus = document.getElementById('archive-status');
+const archiveResult = document.getElementById('archive-result');
+const archiveAddressDisplay = document.getElementById('archive-address-display');
+const archiveLink = document.getElementById('archive-link');
+
+// Store content archive address
+let contentArchiveAddress = null;
+
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
     // Initialize managers after DOM and all scripts are loaded
@@ -71,6 +86,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupKeyManagement();
     setupProcessTracking();
     setupSourceMapping();
+    setupContentArchiving();
     await setupRegistrySelector();
     setupCreateButton();
     await loadExistingKeys();
@@ -210,6 +226,218 @@ async function loadExistingKeys() {
     } catch (error) {
         console.warn('Could not load existing keys:', error);
     }
+}
+
+/**
+ * Setup content archiving
+ */
+function setupContentArchiving() {
+    if (!contentArchiveOption) return;
+    
+    contentArchiveOption.addEventListener('change', () => {
+        const option = contentArchiveOption.value;
+        
+        if (option === 'none') {
+            contentArchiveSection.style.display = 'none';
+            contentArchiveAddress = null;
+        } else {
+            contentArchiveSection.style.display = 'block';
+            
+            if (option === 'ipfs' || option === 'arweave') {
+                archiveUploadArea.style.display = 'block';
+                archiveManualInput.style.display = 'none';
+                archiveResult.style.display = 'none';
+            } else if (option === 'manual') {
+                archiveUploadArea.style.display = 'none';
+                archiveManualInput.style.display = 'block';
+                archiveResult.style.display = 'none';
+            }
+        }
+    });
+    
+    // Handle manual address input
+    if (archiveAddressInput) {
+        archiveAddressInput.addEventListener('input', () => {
+            const address = archiveAddressInput.value.trim();
+            if (address) {
+                updateArchiveResult(address, contentArchiveOption.value);
+            } else {
+                archiveResult.style.display = 'none';
+                contentArchiveAddress = null;
+            }
+        });
+    }
+    
+    // Handle upload button
+    if (archiveUploadBtn) {
+        archiveUploadBtn.addEventListener('click', async () => {
+            await uploadContentToArchive();
+        });
+    }
+}
+
+/**
+ * Upload content to IPFS or Arweave
+ */
+async function uploadContentToArchive() {
+    if (!contentTextarea || !contentArchiveOption) return;
+    
+    const content = contentTextarea.value.trim();
+    if (!content) {
+        showError('Please enter content before archiving');
+        return;
+    }
+    
+    const archiveType = contentArchiveOption.value;
+    if (archiveType !== 'ipfs' && archiveType !== 'arweave') {
+        return;
+    }
+    
+    if (archiveUploadBtn) {
+        archiveUploadBtn.disabled = true;
+        archiveUploadBtn.textContent = 'Uploading...';
+    }
+    
+    if (archiveStatus) {
+        archiveStatus.textContent = `Uploading to ${archiveType.toUpperCase()}...`;
+        archiveStatus.style.color = 'var(--text-secondary)';
+    }
+    
+    try {
+        let contentAddress = null;
+        
+        if (archiveType === 'ipfs') {
+            // Upload to IPFS using public gateway
+            contentAddress = await uploadToIPFS(content);
+        } else if (archiveType === 'arweave') {
+            // Upload to Arweave (requires wallet or service)
+            contentAddress = await uploadToArweave(content);
+        }
+        
+        if (contentAddress) {
+            contentArchiveAddress = contentAddress;
+            updateArchiveResult(contentAddress, archiveType);
+            if (archiveStatus) {
+                archiveStatus.textContent = '✓ Upload successful';
+                archiveStatus.style.color = 'var(--accent-green)';
+            }
+        } else {
+            throw new Error('Upload failed - no content address returned');
+        }
+    } catch (error) {
+        console.error('Archive upload error:', error);
+        if (archiveStatus) {
+            archiveStatus.textContent = `✗ Upload failed: ${error.message}`;
+            archiveStatus.style.color = 'var(--error-color, #ff4444)';
+        }
+        showError(`Failed to archive content: ${error.message}`);
+    } finally {
+        if (archiveUploadBtn) {
+            archiveUploadBtn.disabled = false;
+            archiveUploadBtn.textContent = 'Upload Content';
+        }
+    }
+}
+
+/**
+ * Upload content to IPFS
+ */
+async function uploadToIPFS(content) {
+    try {
+        // Convert content to Blob
+        const blob = new Blob([content], { type: 'text/plain' });
+        
+        // Use public IPFS gateway for upload
+        // Note: In production, you'd use a proper IPFS node or service
+        const formData = new FormData();
+        formData.append('file', blob);
+        
+        // Try multiple IPFS upload endpoints
+        const endpoints = [
+            'https://ipfs.infura.io:5001/api/v0/add',
+            'https://ipfs.io/api/v0/add',
+            'https://dweb.link/api/v0/add'
+        ];
+        
+        for (const endpoint of endpoints) {
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.Hash) {
+                        return `ipfs://${data.Hash}`;
+                    }
+                }
+            } catch (e) {
+                console.warn(`IPFS upload failed for ${endpoint}:`, e);
+                continue;
+            }
+        }
+        
+        // Fallback: Use web3.storage or other service
+        // For now, return a placeholder that user can replace manually
+        throw new Error('IPFS upload unavailable. Please use "Enter content address manually" option.');
+    } catch (error) {
+        throw error;
+    }
+}
+
+/**
+ * Upload content to Arweave
+ */
+async function uploadToArweave(content) {
+    // Arweave upload requires wallet or service integration
+    // For now, guide user to use manual input
+    throw new Error('Arweave upload requires wallet integration. Please use "Enter content address manually" option and upload via Arweave web app.');
+}
+
+/**
+ * Update archive result display
+ */
+function updateArchiveResult(address, type) {
+    if (!archiveResult || !archiveAddressDisplay || !archiveLink) return;
+    
+    // Normalize address format
+    let normalizedAddress = address;
+    let displayAddress = address;
+    let linkUrl = '';
+    
+    if (type === 'ipfs' || address.startsWith('ipfs://') || address.startsWith('Qm') || address.startsWith('baf')) {
+        // IPFS
+        normalizedAddress = address.replace(/^ipfs:\/\//, '');
+        displayAddress = normalizedAddress;
+        linkUrl = `https://ipfs.io/ipfs/${normalizedAddress}`;
+        if (!normalizedAddress.startsWith('ipfs://')) {
+            normalizedAddress = `ipfs://${normalizedAddress}`;
+        }
+    } else if (type === 'arweave' || address.startsWith('ar://')) {
+        // Arweave
+        normalizedAddress = address.replace(/^ar:\/\//, '');
+        displayAddress = normalizedAddress;
+        linkUrl = `https://arweave.net/${normalizedAddress}`;
+        if (!normalizedAddress.startsWith('ar://')) {
+            normalizedAddress = `ar://${normalizedAddress}`;
+        }
+    } else {
+        // Assume IPFS if no prefix
+        normalizedAddress = `ipfs://${address}`;
+        displayAddress = address;
+        linkUrl = `https://ipfs.io/ipfs/${address}`;
+    }
+    
+    archiveAddressDisplay.textContent = displayAddress.length > 50 
+        ? displayAddress.substring(0, 50) + '...' 
+        : displayAddress;
+    archiveLink.href = linkUrl;
+    archiveLink.textContent = type === 'ipfs' ? 'View on IPFS' : 'View on Arweave';
+    archiveResult.style.display = 'block';
+    
+    contentArchiveAddress = normalizedAddress;
 }
 
 /**
@@ -1003,6 +1231,10 @@ async function createProof() {
             // Always send processMetrics if available (server accepts them regardless of thresholds)
             ...(shouldSendProcessMetrics && {
                 processMetrics: processMetrics
+            }),
+            // Include content archive URI (pohw:claimURI) - per whitepaper Section 7.3
+            ...(contentArchiveAddress && {
+                claimURI: contentArchiveAddress
             })
         };
         
