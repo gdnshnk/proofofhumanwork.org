@@ -964,24 +964,57 @@ function updateSourceMappingsDisplay() {
  * Setup create button
  */
 function setupCreateButton() {
-    createButton.addEventListener('click', createProof);
+    if (!createButton) {
+        console.error('[App] Create button element not found');
+        return;
+    }
+    
+    // Remove any existing listeners to prevent duplicates
+    const newButton = createButton.cloneNode(true);
+    createButton.parentNode.replaceChild(newButton, createButton);
+    
+    // Get the new reference
+    const newCreateButton = document.getElementById('create-button');
+    
+    // Add click handler
+    newCreateButton.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('[App] Create button clicked');
+        await createProof();
+    });
+    
+    console.log('[App] Create button event listener attached');
 }
 
 /**
  * Create proof
  */
 async function createProof() {
+    console.log('[App] createProof() called');
+    
     try {
+        // Check if keyManager is initialized
+        if (!keyManager) {
+            console.error('[App] KeyManager not initialized');
+            showError('KeyManager not initialized. Please refresh the page.');
+            return;
+        }
+        
         setLoading(true);
         hideResults();
         hideError();
         
         // Check if keys are loaded
-        if (!keyManager.getDID()) {
+        const did = keyManager.getDID();
+        if (!did) {
+            console.warn('[App] No DID found, keys not loaded');
             showError('Please generate or import keys first');
             setLoading(false);
             return;
         }
+        
+        console.log('[App] Creating proof with DID:', did);
         
         // Get content from textarea
         const text = contentTextarea.value.trim();
@@ -991,7 +1024,7 @@ async function createProof() {
             return;
         }
         
-        const hash = await hashText(text);
+        let hash = await hashText(text);
         
         if (!hash) {
             showError('Failed to generate hash');
@@ -1003,9 +1036,6 @@ async function createProof() {
         if (!hash.startsWith('0x')) {
             hash = '0x' + hash;
         }
-        
-        // Get DID
-        const did = keyManager.getDID();
         
         // Ensure process tracking is started
         if (!processTracker.isTracking) {
@@ -1240,9 +1270,9 @@ async function createProof() {
         });
         
     } catch (error) {
-        console.error('Proof creation error:', error);
-        showError(error.message || 'An error occurred while creating the proof');
-    } finally {
+        console.error('[App] Error creating proof:', error);
+        const errorMessage = error.message || error.toString() || 'An error occurred while creating the proof';
+        showError(errorMessage);
         setLoading(false);
     }
 }
@@ -1319,30 +1349,42 @@ function showSuccess(message) {
  * Hide results
  */
 function hideResults() {
-    resultsSection.classList.add('hidden');
+    if (resultsSection) {
+        resultsSection.classList.add('hidden');
+    }
 }
 
 /**
  * Hide error
  */
 function hideError() {
-    errorSection.classList.add('hidden');
+    if (errorSection) {
+        errorSection.classList.add('hidden');
+    }
 }
 
 /**
  * Set loading state
  */
 function setLoading(loading) {
-    createButton.disabled = loading;
-    const buttonText = createButton.querySelector('.button-text');
-    const buttonLoader = createButton.querySelector('.button-loader');
+    const button = document.getElementById('create-button');
+    if (!button) {
+        console.warn('[App] Create button not found for setLoading');
+        return;
+    }
     
-    if (loading) {
-        buttonText.textContent = 'CREATING...';
-        buttonLoader.classList.remove('hidden');
-    } else {
-        buttonText.textContent = 'Create Proof';
-        buttonLoader.classList.add('hidden');
+    button.disabled = loading;
+    const buttonText = button.querySelector('.button-text');
+    const buttonLoader = button.querySelector('.button-loader');
+    
+    if (buttonText && buttonLoader) {
+        if (loading) {
+            buttonText.textContent = 'CREATING...';
+            buttonLoader.classList.remove('hidden');
+        } else {
+            buttonText.textContent = 'Create Proof';
+            buttonLoader.classList.add('hidden');
+        }
     }
 }
 
