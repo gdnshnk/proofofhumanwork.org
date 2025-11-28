@@ -89,17 +89,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupSourceMapping();
         setupCreateButton();
         
-        // Load registry selector and existing keys in parallel
-        await Promise.all([
-            setupRegistrySelector(),
-            loadExistingKeys()
-        ]);
+        // Load existing keys first (important for identity persistence)
+        await loadExistingKeys();
+        
+        // Then load registry selector
+        await setupRegistrySelector();
     } catch (error) {
         console.error('[App] Initialization error:', error);
-        // Still try to show fallback registry options
+        // Still try to show fallback registry options (gdn.sh first)
         if (registrySelect) {
-            registrySelect.innerHTML = '<option value="https://pohw-registry-node-production.up.railway.app">Production (Railway)</option>';
-            registrySelect.value = registrySelect.options[0].value;
+            registrySelect.innerHTML = `
+                <option value="https://gdn.sh">gdn.sh (Primary)</option>
+                <option value="https://pohw-registry-node-production.up.railway.app">Production (Railway)</option>
+            `;
+            registrySelect.value = 'https://gdn.sh';
+        }
+        // Still try to load keys even if other initialization failed
+        if (keyManager) {
+            try {
+                await loadExistingKeys();
+            } catch (e) {
+                console.error('[App] Failed to load keys after initialization error:', e);
+            }
         }
     }
 });
@@ -237,35 +248,56 @@ function updateKeyStatus(hasKeys, did = null) {
  * Load existing keys
  */
 async function loadExistingKeys() {
+    if (!keyManager) {
+        console.warn('[App] KeyManager not initialized, cannot load keys');
+        return;
+    }
+    
     try {
+        // Check if keys exist in storage first
+        const hasStoredKeys = await keyManager.hasKeys();
+        if (!hasStoredKeys) {
+            console.log('[App] No existing keys found in storage');
+            updateKeyStatus(false);
+            return;
+        }
+        
         // Wait for Ed25519 library to be available before loading keys
         let waitAttempts = 0;
-        const maxWaitAttempts = 50; // 5 seconds
+        const maxWaitAttempts = 100; // 10 seconds (increased timeout)
         
         while ((typeof window.ed25519 === 'undefined' || !window.ed25519.getPublicKey) && waitAttempts < maxWaitAttempts) {
             if (window.ed25519LoadError) {
-                console.warn('[App] Ed25519 library failed to load, cannot load existing keys');
-                return;
+                console.warn('[App] Ed25519 library failed to load, will retry loading keys later');
+                // Don't give up immediately - library might still load
+                await new Promise(resolve => setTimeout(resolve, 100));
+                waitAttempts++;
+                continue;
             }
             await new Promise(resolve => setTimeout(resolve, 100));
             waitAttempts++;
         }
         
         if (typeof window.ed25519 === 'undefined' || !window.ed25519.getPublicKey) {
-            console.warn('[App] Ed25519 library not available, cannot load existing keys');
+            console.warn('[App] Ed25519 library not available after waiting, cannot load existing keys');
+            // Still update UI to show no keys (don't leave it in limbo)
+            updateKeyStatus(false);
             return;
         }
         
+        // Now try to load keys
         const keys = await keyManager.loadKeys();
-        if (keys) {
+        if (keys && keys.did) {
             updateKeyStatus(true, keys.did);
-            console.log('[App] Successfully loaded existing keys for DID:', keys.did);
+            console.log('[App] ✅ Successfully loaded existing keys for DID:', keys.did);
         } else {
-            console.log('[App] No existing keys found in storage');
+            console.log('[App] Keys found in storage but failed to load');
+            updateKeyStatus(false);
         }
     } catch (error) {
         console.error('[App] Error loading existing keys:', error);
-        // Don't update UI on error, just log it
+        // Update UI to show no keys on error
+        updateKeyStatus(false);
     }
 }
 
@@ -273,12 +305,12 @@ async function loadExistingKeys() {
  * Setup registry selector
  */
 async function setupRegistrySelector() {
-    // Always ensure we have fallback options
+    // Always ensure we have fallback options (gdn.sh first as primary)
     const fallbackOptions = () => {
         registrySelect.innerHTML = '';
         const options = [
-            { value: 'https://pohw-registry-node-production.up.railway.app', text: 'Production (Railway)' },
-            { value: 'https://gdn.sh', text: 'gdn.sh (Primary)' }
+            { value: 'https://gdn.sh', text: 'gdn.sh (Primary)' },
+            { value: 'https://pohw-registry-node-production.up.railway.app', text: 'Production (Railway)' }
         ];
         
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -327,14 +359,34 @@ async function setupRegistrySelector() {
         
         if (nodes && nodes.length > 0) {
             registrySelect.innerHTML = '';
+            
+            // Ensure gdn.sh is always included (add it first if not in discovered nodes)
+            const hasGdnSh = nodes.some(n => n.url === 'https://gdn.sh' || n.url.includes('gdn.sh'));
+            if (!hasGdnSh) {
+                const gdnOption = document.createElement('option');
+                gdnOption.value = 'https://gdn.sh';
+                gdnOption.textContent = 'gdn.sh (Primary)';
+                registrySelect.appendChild(gdnOption);
+            }
+            
             nodes.forEach(node => {
+                // Skip if already added (gdn.sh)
+                if (node.url === 'https://gdn.sh' || node.url.includes('gdn.sh')) {
+                    return;
+                }
                 const option = document.createElement('option');
                 option.value = node.url;
                 option.textContent = node.name;
                 registrySelect.appendChild(option);
             });
             
-            const defaultUrl = registryDiscovery.getDefaultRegistry();
+            // Prefer gdn.sh as default, otherwise use discovery default
+            let defaultUrl = registryDiscovery.getDefaultRegistry();
+            const gdnShOption = Array.from(registrySelect.options).find(opt => opt.value === 'https://gdn.sh');
+            if (gdnShOption) {
+                defaultUrl = 'https://gdn.sh';
+            }
+            
             registrySelect.value = defaultUrl;
             if (typeof RegistryClient !== 'undefined') {
                 registryClient = new RegistryClient(defaultUrl);
