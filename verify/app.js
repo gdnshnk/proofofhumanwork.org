@@ -673,7 +673,8 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
     if (pavClaim) {
         
         // Handle derivedFrom - check if it's structured (from proof record) or simple (from PAV claim)
-        const proofRecord = result.proof;
+        // Try multiple sources: result.proof (from verification response), proofDetails (from separate fetch), or PAV claim
+        const proofRecord = result.proof || proofDetails;
         let derivedFromDisplay = '—';
         let derivedFromElement = document.getElementById('pav-derived-from');
         
@@ -866,7 +867,13 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
     }
     
     // Additional PAV fields (Verification & Compliance)
-    document.getElementById('pav-assistance').textContent = pavClaim?.['pav:assistanceProfile'] || '—';
+    // Get assistance profile from proof record if available (more reliable than PAV claim)
+    const assistanceProfile = (result.proof && result.proof.assistance_profile) 
+        ? result.proof.assistance_profile 
+        : (proofDetails && proofDetails.assistance_profile)
+        ? proofDetails.assistance_profile
+        : (pavClaim?.['pav:assistanceProfile']);
+    document.getElementById('pav-assistance').textContent = assistanceProfile || '—';
     document.getElementById('pav-tier').textContent = pavClaim?.['pav:verificationTier'] || '—';
     document.getElementById('pav-revocation').textContent = pavClaim?.['pav:revocationState'] || '—';
     
