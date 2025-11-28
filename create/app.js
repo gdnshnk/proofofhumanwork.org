@@ -3,11 +3,11 @@
  * Main application logic for creating proofs
  */
 
-// Initialize
-let keyManager = new PoHWKeyManager();
-let registryClient = new RegistryClient();
-let registryDiscovery = new RegistryDiscovery();
-let processTracker = new BrowserProcessTracker();
+// Initialize (will be set after DOM loads)
+let keyManager;
+let registryClient;
+let registryDiscovery;
+let processTracker;
 
 // DOM Elements
 const generateKeysBtn = document.getElementById('generate-keys-btn');
@@ -51,6 +51,23 @@ const errorSection = document.getElementById('error-section');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize managers after DOM and all scripts are loaded
+    try {
+        keyManager = new PoHWKeyManager();
+        registryClient = new RegistryClient();
+        registryDiscovery = new RegistryDiscovery();
+        processTracker = new BrowserProcessTracker();
+    } catch (error) {
+        console.error('[App] Failed to initialize managers:', error);
+        // Show error to user
+        const errorEl = document.getElementById('error-section');
+        if (errorEl) {
+            errorEl.innerHTML = `<div class="error-message">Failed to initialize: ${error.message}</div>`;
+            errorEl.classList.remove('hidden');
+        }
+        return;
+    }
+    
     setupKeyManagement();
     setupProcessTracking();
     setupSourceMapping();
@@ -199,9 +216,29 @@ async function loadExistingKeys() {
  * Setup registry selector
  */
 async function setupRegistrySelector() {
+    if (!registrySelect) {
+        console.error('[App] Registry select element not found');
+        return;
+    }
+    
+    // Show loading state
+    registrySelect.innerHTML = '<option value="">Loading nodes...</option>';
+    
     try {
+        // Ensure registryDiscovery is initialized
+        if (!registryDiscovery) {
+            if (typeof RegistryDiscovery === 'undefined') {
+                throw new Error('RegistryDiscovery class not loaded');
+            }
+            registryDiscovery = new RegistryDiscovery();
+        }
+        
         const nodes = await registryDiscovery.discoverNodes();
         console.log('[App] Discovered', nodes.length, 'registry nodes');
+        
+        if (!nodes || nodes.length === 0) {
+            throw new Error('No registry nodes found');
+        }
         
         registrySelect.innerHTML = '';
         nodes.forEach(node => {
@@ -213,17 +250,32 @@ async function setupRegistrySelector() {
         
         const defaultUrl = registryDiscovery.getDefaultRegistry();
         registrySelect.value = defaultUrl;
-        registryClient = new RegistryClient(defaultUrl);
         
-        // Check node status
-        const status = await registryClient.checkNodeStatus();
-        updateNodeStatus(status);
+        // Ensure registryClient is initialized
+        if (!registryClient) {
+            if (typeof RegistryClient === 'undefined') {
+                throw new Error('RegistryClient class not loaded');
+            }
+            registryClient = new RegistryClient(defaultUrl);
+        } else {
+            registryClient.setRegistryUrl(defaultUrl);
+        }
+        
+        // Check node status (non-blocking)
+        try {
+            const status = await registryClient.checkNodeStatus();
+            updateNodeStatus(status);
+        } catch (statusError) {
+            console.warn('[App] Node status check failed:', statusError);
+            // Continue anyway - status check is optional
+        }
         
     } catch (error) {
         console.error('[App] Registry discovery failed:', error);
+        // Fallback to hardcoded nodes
         registrySelect.innerHTML = `
-            <option value="https://gdn.sh">gdn.sh (Primary)</option>
             <option value="https://pohw-registry-node-production.up.railway.app">Production (Railway)</option>
+            <option value="https://gdn.sh">gdn.sh (Primary)</option>
         `;
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             const localOption = document.createElement('option');
@@ -232,15 +284,32 @@ async function setupRegistrySelector() {
             registrySelect.insertBefore(localOption, registrySelect.firstChild);
         }
         registrySelect.value = registrySelect.options[0].value;
-        registryClient = new RegistryClient(registrySelect.value);
+        
+        if (!registryClient) {
+            if (typeof RegistryClient !== 'undefined') {
+                registryClient = new RegistryClient(registrySelect.value);
+            }
+        } else {
+            registryClient.setRegistryUrl(registrySelect.value);
+        }
     }
     
-    registrySelect.addEventListener('change', async (e) => {
-        const selectedUrl = e.target.value;
+    // Setup change handler (only once)
+    registrySelect.removeEventListener('change', handleRegistryChange);
+    registrySelect.addEventListener('change', handleRegistryChange);
+}
+
+async function handleRegistryChange(e) {
+    const selectedUrl = e.target.value;
+    if (registryClient) {
         registryClient.setRegistryUrl(selectedUrl);
-        const status = await registryClient.checkNodeStatus();
-        updateNodeStatus(status);
-    });
+        try {
+            const status = await registryClient.checkNodeStatus();
+            updateNodeStatus(status);
+        } catch (statusError) {
+            console.warn('[App] Node status check failed:', statusError);
+        }
+    }
 }
 
 /**
