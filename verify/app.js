@@ -747,6 +747,44 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
             }
         }
         
+        // Content Archive URI (pohw:claimURI) - per whitepaper Section 7.3
+        const claimURI = pavClaim['pohw:claimURI'];
+        const claimURIEl = document.getElementById('pav-claim-uri');
+        if (claimURI && claimURIEl) {
+            let displayURI = claimURI;
+            let linkUrl = '';
+            
+            // Parse URI format (ipfs://, ar://, or plain CID/TX ID)
+            if (claimURI.startsWith('ipfs://')) {
+                const cid = claimURI.substring(7);
+                displayURI = cid;
+                linkUrl = `https://ipfs.io/ipfs/${cid}`;
+            } else if (claimURI.startsWith('ar://')) {
+                const txId = claimURI.substring(5);
+                displayURI = txId;
+                linkUrl = `https://arweave.net/${txId}`;
+            } else if (claimURI.startsWith('Qm') || claimURI.startsWith('baf')) {
+                // IPFS CID without prefix
+                displayURI = claimURI;
+                linkUrl = `https://ipfs.io/ipfs/${claimURI}`;
+            } else {
+                // Assume Arweave TX ID
+                displayURI = claimURI;
+                linkUrl = `https://arweave.net/${claimURI}`;
+            }
+            
+            claimURIEl.innerHTML = `
+                <div style="font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--accent-green); word-break: break-all; margin-bottom: 0.25rem;">
+                    ${displayURI.length > 60 ? displayURI.substring(0, 60) + '...' : displayURI}
+                </div>
+                <a href="${linkUrl}" target="_blank" rel="noopener noreferrer" style="font-size: 0.75rem; color: var(--accent-green); text-decoration: none;">
+                    ${claimURI.startsWith('ipfs://') || claimURI.startsWith('Qm') || claimURI.startsWith('baf') ? 'View on IPFS' : 'View on Arweave'}
+                </a>
+            `;
+        } else if (claimURIEl) {
+            claimURIEl.textContent = '—';
+        }
+        
         // Environment Attestations
         document.getElementById('pav-device').textContent = pavClaim['pav:authoredOnDevice'] || '—';
         const envAttestation = pavClaim['pav:environmentAttestation'];
