@@ -380,6 +380,18 @@ async function setupRegistrySelector() {
                 registrySelect.appendChild(option);
             });
             
+            // Check all nodes status (like verify page)
+            let nodesWithStatus = [];
+            if (registryDiscovery.checkAllNodesStatus) {
+                try {
+                    nodesWithStatus = await registryDiscovery.checkAllNodesStatus();
+                    // Update dropdown with status indicators
+                    updateNodeOptionsWithStatus(nodesWithStatus);
+                } catch (e) {
+                    console.warn('[App] Could not check all nodes status:', e);
+                }
+            }
+            
             // Prefer gdn.sh as default, otherwise use discovery default
             let defaultUrl = registryDiscovery.getDefaultRegistry();
             const gdnShOption = Array.from(registrySelect.options).find(opt => opt.value === 'https://gdn.sh');
@@ -392,13 +404,19 @@ async function setupRegistrySelector() {
                 registryClient = new RegistryClient(defaultUrl);
             }
             
-            // Check node status
-            try {
-                const status = await registryClient.checkNodeStatus();
-                updateNodeStatus(status);
-            } catch (e) {
-                console.warn('[App] Could not check node status:', e);
-                updateNodeStatus({ online: false, error: 'Status check failed' });
+            // Check selected node status (like verify page)
+            if (nodesWithStatus.length > 0) {
+                // Update status display based on selected node
+                updateNodeStatusDisplay(nodesWithStatus);
+            } else {
+                // No status from discovery, check directly
+                try {
+                    const status = await registryClient.checkNodeStatus();
+                    updateNodeStatus(status);
+                } catch (e) {
+                    console.warn('[App] Could not check node status:', e);
+                    updateNodeStatus({ online: false, error: 'Status check failed' });
+                }
             }
         } else {
             // No nodes discovered, use fallback
@@ -447,10 +465,31 @@ async function handleRegistryChange(e) {
     const selectedUrl = e.target.value;
     if (!selectedUrl) return;
     
-    registryClient.setRegistryUrl(selectedUrl);
+    if (!registryClient) {
+        if (typeof RegistryClient !== 'undefined') {
+            registryClient = new RegistryClient(selectedUrl);
+        } else {
+            console.error('[App] RegistryClient not available');
+            updateNodeStatus({ online: false, error: 'Registry client not available' });
+            return;
+        }
+    } else {
+        registryClient.setRegistryUrl(selectedUrl);
+    }
+    
     try {
         const status = await registryClient.checkNodeStatus();
         updateNodeStatus(status);
+        
+        // Also update dropdown indicator if we have status
+        if (registrySelect) {
+            const option = Array.from(registrySelect.options).find(opt => opt.value === selectedUrl);
+            if (option) {
+                const statusIcon = status.online ? '🟢' : '🔴';
+                const originalText = option.textContent.replace(/^[🟢🔴]\s*/, '');
+                option.textContent = `${statusIcon} ${originalText}`;
+            }
+        }
     } catch (e) {
         console.warn('[App] Could not check node status:', e);
         updateNodeStatus({ online: false, error: 'Status check failed' });
@@ -458,7 +497,54 @@ async function handleRegistryChange(e) {
 }
 
 /**
- * Update node status display
+ * Update node options with status indicators (like verify page)
+ */
+function updateNodeOptionsWithStatus(nodesWithStatus) {
+    if (!registrySelect || !nodesWithStatus || nodesWithStatus.length === 0) return;
+    
+    Array.from(registrySelect.options).forEach(option => {
+        const node = nodesWithStatus.find(n => n.url === option.value);
+        if (node) {
+            const statusIcon = node.online ? '🟢' : '🔴';
+            const originalText = option.textContent.replace(/^[🟢🔴]\s*/, ''); // Remove existing status icon
+            option.textContent = `${statusIcon} ${originalText}`;
+        }
+    });
+}
+
+/**
+ * Update node status display (like verify page - shows selected node status)
+ */
+function updateNodeStatusDisplay(nodes) {
+    const statusEl = document.getElementById('node-status');
+    if (!statusEl || !registrySelect) return;
+    
+    const selectedUrl = registrySelect.value;
+    const selectedNode = nodes.find(n => n.url === selectedUrl);
+    
+    if (selectedNode) {
+        if (selectedNode.online) {
+            statusEl.innerHTML = `
+                <span class="status-indicator online"></span>
+                <span class="status-text">Online</span>
+                ${selectedNode.responseTime ? `<span class="status-response">${selectedNode.responseTime.toFixed(0)}ms</span>` : ''}
+            `;
+            statusEl.className = 'node-status online';
+        } else {
+            statusEl.innerHTML = `
+                <span class="status-indicator offline"></span>
+                <span class="status-text">Offline</span>
+            `;
+            statusEl.className = 'node-status offline';
+        }
+    } else {
+        statusEl.innerHTML = '';
+        statusEl.className = 'node-status';
+    }
+}
+
+/**
+ * Update single node status (for direct status checks)
  */
 function updateNodeStatus(status) {
     const statusEl = document.getElementById('node-status');
@@ -965,58 +1051,58 @@ function updateSourceMappingsDisplay() {
  */
 function setupCreateButton() {
     if (!createButton) {
-        console.error('[App] Create button element not found');
+        console.error('[App] Create button not found');
         return;
     }
     
-    // Remove any existing listeners to prevent duplicates
-    const newButton = createButton.cloneNode(true);
-    createButton.parentNode.replaceChild(newButton, createButton);
-    
-    // Get the new reference
-    const newCreateButton = document.getElementById('create-button');
-    
-    // Add click handler
-    newCreateButton.addEventListener('click', async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        console.log('[App] Create button clicked');
-        await createProof();
-    });
-    
-    console.log('[App] Create button event listener attached');
+    // Remove any existing listeners
+    createButton.removeEventListener('click', createProof);
+    // Add click listener
+    createButton.addEventListener('click', createProof);
+    console.log('[App] Create button setup complete');
 }
 
 /**
  * Create proof
  */
 async function createProof() {
-    console.log('[App] createProof() called');
-    
     try {
-        // Check if keyManager is initialized
-        if (!keyManager) {
-            console.error('[App] KeyManager not initialized');
-            showError('KeyManager not initialized. Please refresh the page.');
-            return;
-        }
-        
         setLoading(true);
         hideResults();
         hideError();
         
         // Check if keys are loaded
-        const did = keyManager.getDID();
-        if (!did) {
-            console.warn('[App] No DID found, keys not loaded');
+        if (!keyManager || !keyManager.getDID()) {
             showError('Please generate or import keys first');
             setLoading(false);
             return;
         }
         
-        console.log('[App] Creating proof with DID:', did);
+        // Check if registry is selected
+        if (!registrySelect || !registrySelect.value) {
+            showError('Please select a registry node');
+            setLoading(false);
+            return;
+        }
+        
+        // Check if registry client is available
+        if (!registryClient) {
+            if (typeof RegistryClient !== 'undefined' && registrySelect.value) {
+                registryClient = new RegistryClient(registrySelect.value);
+            } else {
+                showError('Registry client not initialized. Please refresh the page.');
+                setLoading(false);
+                return;
+            }
+        }
         
         // Get content from textarea
+        if (!contentTextarea) {
+            showError('Content textarea not found');
+            setLoading(false);
+            return;
+        }
+        
         const text = contentTextarea.value.trim();
         if (!text) {
             showError('Please enter content');
@@ -1036,6 +1122,9 @@ async function createProof() {
         if (!hash.startsWith('0x')) {
             hash = '0x' + hash;
         }
+        
+        // Get DID
+        const did = keyManager.getDID();
         
         // Ensure process tracking is started
         if (!processTracker.isTracking) {
@@ -1270,9 +1359,9 @@ async function createProof() {
         });
         
     } catch (error) {
-        console.error('[App] Error creating proof:', error);
-        const errorMessage = error.message || error.toString() || 'An error occurred while creating the proof';
-        showError(errorMessage);
+        console.error('Proof creation error:', error);
+        showError(error.message || 'An error occurred while creating the proof');
+    } finally {
         setLoading(false);
     }
 }
@@ -1349,42 +1438,30 @@ function showSuccess(message) {
  * Hide results
  */
 function hideResults() {
-    if (resultsSection) {
-        resultsSection.classList.add('hidden');
-    }
+    resultsSection.classList.add('hidden');
 }
 
 /**
  * Hide error
  */
 function hideError() {
-    if (errorSection) {
-        errorSection.classList.add('hidden');
-    }
+    errorSection.classList.add('hidden');
 }
 
 /**
  * Set loading state
  */
 function setLoading(loading) {
-    const button = document.getElementById('create-button');
-    if (!button) {
-        console.warn('[App] Create button not found for setLoading');
-        return;
-    }
+    createButton.disabled = loading;
+    const buttonText = createButton.querySelector('.button-text');
+    const buttonLoader = createButton.querySelector('.button-loader');
     
-    button.disabled = loading;
-    const buttonText = button.querySelector('.button-text');
-    const buttonLoader = button.querySelector('.button-loader');
-    
-    if (buttonText && buttonLoader) {
-        if (loading) {
-            buttonText.textContent = 'CREATING...';
-            buttonLoader.classList.remove('hidden');
-        } else {
-            buttonText.textContent = 'Create Proof';
-            buttonLoader.classList.add('hidden');
-        }
+    if (loading) {
+        buttonText.textContent = 'CREATING...';
+        buttonLoader.classList.remove('hidden');
+    } else {
+        buttonText.textContent = 'Create Proof';
+        buttonLoader.classList.add('hidden');
     }
 }
 
