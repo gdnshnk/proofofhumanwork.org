@@ -100,12 +100,23 @@ class VerificationClient {
     /**
      * Get proof details by hash
      * @param {string} hash - Content hash
-     * @returns {Promise<Object>} Proof details
+     * @returns {Promise<Object>} Proof details (full proof record)
      */
     async getProof(hash) {
         const normalizedHash = hash.startsWith('0x') ? hash.substring(2) : hash;
         
         try {
+            // Try to get full proof record from verification endpoint first (includes proof record)
+            const verifyResponse = await fetch(`${this.registryUrl}/pohw/verify/${normalizedHash}`);
+            if (verifyResponse.ok) {
+                const verifyData = await verifyResponse.json();
+                if (verifyData.proof) {
+                    // Return the proof record from verification response
+                    return verifyData.proof;
+                }
+            }
+            
+            // Fallback: Try to get from proof endpoint (may only have Merkle data)
             const response = await fetch(`${this.registryUrl}/pohw/proof/${normalizedHash}`);
             
             if (!response.ok) {
