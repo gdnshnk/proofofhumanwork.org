@@ -738,10 +738,20 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
                     }
                 }
             } catch (e) {
-                // Fallback to PAV claim value
+                console.warn('[Verify] Error parsing derived_from from proof record:', e);
+                // Fallback to PAV claim value (should be string/array of strings per PAV ontology)
                 const derivedFrom = pavClaim['pav:derivedFrom'];
                 if (derivedFrom) {
-                    derivedFromDisplay = Array.isArray(derivedFrom) ? derivedFrom.join(', ') : derivedFrom;
+                    // PAV claim should only contain source references (strings), not objects
+                    if (Array.isArray(derivedFrom)) {
+                        derivedFromDisplay = derivedFrom.map(s => typeof s === 'string' ? s : String(s)).join(', ');
+                    } else if (typeof derivedFrom === 'string') {
+                        derivedFromDisplay = derivedFrom;
+                    } else {
+                        // Unexpected: object in PAV claim (shouldn't happen per ontology)
+                        console.warn('[Verify] pav:derivedFrom contains unexpected type:', typeof derivedFrom);
+                        derivedFromDisplay = 'Invalid format';
+                    }
                     if (derivedFromElement) {
                         derivedFromElement.textContent = derivedFromDisplay;
                     }
@@ -750,10 +760,19 @@ function displayResults(result, hash, proofDetails, anchors, pavClaim, reputatio
                 }
             }
         } else {
-            // Fallback to PAV claim value
+            // Fallback to PAV claim value (should be string/array of strings per PAV ontology)
             const derivedFrom = pavClaim['pav:derivedFrom'];
             if (derivedFrom) {
-                derivedFromDisplay = Array.isArray(derivedFrom) ? derivedFrom.join(', ') : derivedFrom;
+                // PAV claim should only contain source references (strings), not objects
+                if (Array.isArray(derivedFrom)) {
+                    derivedFromDisplay = derivedFrom.map(s => typeof s === 'string' ? s : String(s)).join(', ');
+                } else if (typeof derivedFrom === 'string') {
+                    derivedFromDisplay = derivedFrom;
+                } else {
+                    // Unexpected: object in PAV claim (shouldn't happen per ontology)
+                    console.warn('[Verify] pav:derivedFrom contains unexpected type:', typeof derivedFrom);
+                    derivedFromDisplay = 'Invalid format';
+                }
                 if (derivedFromElement) {
                     derivedFromElement.textContent = derivedFromDisplay;
                 }
