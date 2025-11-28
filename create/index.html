@@ -71,6 +71,42 @@
                         </p>
                     </div>
                     
+                    <!-- Content Archiving (Optional) - per whitepaper Section 7.3 -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label for="content-archive-option">Content Archiving (Optional)</label>
+                        <select id="content-archive-option" class="registry-select">
+                            <option value="none">No archiving</option>
+                            <option value="ipfs">Archive to IPFS</option>
+                            <option value="arweave">Archive to Arweave</option>
+                            <option value="manual">Enter content address manually</option>
+                        </select>
+                        <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                            Optional: Archive your content to IPFS or Arweave for long-term preservation. The registry stores only the content address, not the file itself.
+                        </p>
+                        <div id="content-archive-section" class="content-archive-section" style="display: none; margin-top: 0.75rem;">
+                            <div id="archive-upload-area" class="archive-upload-area" style="display: none;">
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                    Your content will be uploaded to the selected storage network. This may take a moment.
+                                </p>
+                                <button type="button" id="archive-upload-btn" class="action-btn" style="width: 100%;">
+                                    Upload Content
+                                </button>
+                                <div id="archive-status" class="archive-status" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);"></div>
+                            </div>
+                            <div id="archive-manual-input" class="archive-manual-input" style="display: none;">
+                                <input type="text" id="archive-address-input" class="registry-select" placeholder="Enter IPFS CID (e.g., QmXxx...) or Arweave ID (e.g., xxx...)">
+                                <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                    If you've already archived your content, enter the content address here.
+                                </p>
+                            </div>
+                            <div id="archive-result" class="archive-result" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: var(--bg-secondary); border-radius: 4px;">
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);">Content Address:</div>
+                                <div id="archive-address-display" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--accent-green); word-break: break-all; margin-top: 0.25rem;"></div>
+                                <a id="archive-link" href="#" target="_blank" style="font-size: 0.75rem; color: var(--accent-green); text-decoration: none; margin-top: 0.25rem; display: inline-block;">View on network</a>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Source Mapping (Citations/Quotes) -->
                     <div class="registry-selector" style="margin-top: 1.25rem;">
                         <label>Source Citations</label>
