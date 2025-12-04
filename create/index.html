@@ -309,3 +309,1243 @@
 </body>
 </html>
 
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Proof — Proof of Human Work</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>CREATE PROOF</h1>
+                <p class="subtitle">Cryptographically prove your authorship</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="verification-card">
+                <div class="card-header">
+                    <h2>PROOF CREATION</h2>
+                </div>
+
+                <!-- Key Management Section -->
+                <div class="key-section">
+                    <h3>Your Identity</h3>
+                    <div id="key-status" class="key-status">
+                        <div class="key-status-item">
+                            <span class="key-label">Status:</span>
+                            <span id="key-status-text" class="key-status-text">No keys loaded</span>
+                        </div>
+                        <div class="key-status-item" id="did-display" style="display: none;">
+                            <span class="key-label">DID:</span>
+                            <span id="did-value" class="did-value">—</span>
+                        </div>
+                    </div>
+                    <div class="key-actions">
+                        <button id="generate-keys-btn" class="action-btn primary">Generate New Keys</button>
+                        <button id="import-keys-btn" class="action-btn">Import Keys</button>
+                        <button id="export-keys-btn" class="action-btn" style="display: none;">Export Keys</button>
+                    </div>
+                    <div id="import-keys-input" class="import-keys-input hidden">
+                        <textarea id="import-keys-textarea" placeholder="Paste your private key (hex format) or encrypted key"></textarea>
+                        <input type="password" id="import-password" placeholder="Password (if encrypted)" style="display: none;">
+                        <div class="import-actions">
+                            <button id="confirm-import-btn" class="action-btn">Import</button>
+                            <button id="cancel-import-btn" class="action-btn secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Input Section -->
+                <div class="input-section">
+                    <h3>Content to Prove</h3>
+                    <div class="tab-content active" id="text-tab">
+                        <textarea id="content-textarea" class="content-textarea" placeholder="Paste or type your content here..."></textarea>
+                        <p class="input-hint">The content will be hashed and signed. Process metrics (entropy, temporal coherence) will be tracked as you type.</p>
+                    </div>
+                    
+                    <!-- Assistance Profile Selection -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label for="assistance-profile">Assistance Profile</label>
+                        <select id="assistance-profile" class="registry-select">
+                            <option value="human-only">Human-Only (No AI assistance)</option>
+                            <option value="AI-assisted">AI-Assisted (Human with AI help)</option>
+                            <option value="AI-generated">AI-Generated (Primarily AI)</option>
+                        </select>
+                        <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                            Hint: Actual profile is determined from process data. This selection is used only if data is ambiguous.
+                        </p>
+                    </div>
+                    
+                    <!-- Content Archiving (Optional) - per whitepaper Section 7.3 -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label for="content-archive-option">Content Archiving (Optional)</label>
+                        <select id="content-archive-option" class="registry-select">
+                            <option value="none">No archiving</option>
+                            <option value="ipfs">Archive to IPFS</option>
+                            <option value="arweave">Archive to Arweave</option>
+                            <option value="manual">Enter content address manually</option>
+                        </select>
+                        <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                            Optional: Archive your content to IPFS or Arweave for long-term preservation. The registry stores only the content address, not the file itself.
+                        </p>
+                        <div id="content-archive-section" class="content-archive-section" style="display: none; margin-top: 0.75rem;">
+                            <div id="archive-upload-area" class="archive-upload-area" style="display: none;">
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                    Your content will be uploaded to the selected storage network. This may take a moment.
+                                </p>
+                                <button type="button" id="archive-upload-btn" class="action-btn" style="width: 100%;">
+                                    Upload Content
+                                </button>
+                                <div id="archive-status" class="archive-status" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);"></div>
+                            </div>
+                            <div id="archive-manual-input" class="archive-manual-input" style="display: none;">
+                                <input type="text" id="archive-address-input" class="registry-select" placeholder="Enter IPFS CID (e.g., QmXxx...) or Arweave ID (e.g., xxx...)">
+                                <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                    If you've already archived your content, enter the content address here.
+                                </p>
+                            </div>
+                            <div id="archive-result" class="archive-result" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: var(--bg-secondary); border-radius: 4px;">
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);">Content Address:</div>
+                                <div id="archive-address-display" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--accent-green); word-break: break-all; margin-top: 0.25rem;"></div>
+                                <a id="archive-link" href="#" target="_blank" style="font-size: 0.75rem; color: var(--accent-green); text-decoration: none; margin-top: 0.25rem; display: inline-block;">View on network</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Source Mapping (Citations/Quotes) -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label>Source Citations</label>
+                        <div class="source-mapping-controls">
+                            <button type="button" id="link-source-btn" class="action-btn" style="display: none;">
+                                Link Selected Text to Source
+                            </button>
+                            <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                                Select text in the content area above, then click "Link Selected Text to Source" to cite it.
+                            </p>
+                        </div>
+                        <div id="source-mappings-list" class="source-mappings-list" style="margin-top: 1rem; display: none;">
+                            <div class="source-mappings-header">
+                                <strong style="color: var(--text-primary); font-size: 0.85rem;">Linked Sources:</strong>
+                            </div>
+                            <div id="source-mappings-items"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registry Selector -->
+                <div class="registry-selector">
+                    <label for="registry-select">Registry Node</label>
+                    <select id="registry-select" class="registry-select">
+                        <option value="">Loading nodes...</option>
+                    </select>
+                    <div id="node-status" class="node-status"></div>
+                </div>
+
+                <!-- Create Proof Button -->
+                <button id="create-button" class="verify-button" disabled>
+                    <span class="button-text">Create Proof</span>
+                    <span class="button-loader hidden">⏳</span>
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-section" class="result-card hidden">
+                <div class="card-header">
+                    <h2>PROOF CREATED</h2>
+                    <span id="status-badge" class="status-badge">SUCCESS</span>
+                </div>
+
+                <div class="result-content">
+                    <div class="result-item">
+                        <span class="result-label">Status</span>
+                        <span class="result-value" id="result-status">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Content Hash</span>
+                        <span class="result-value hash-value" id="result-hash">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Signer DID</span>
+                        <span class="result-value" id="result-signer">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Timestamp</span>
+                        <span class="result-value" id="result-timestamp">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Registry</span>
+                        <span class="result-value" id="result-registry">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Proof Receipt</span>
+                        <span class="result-value hash-value" id="result-receipt">—</span>
+                    </div>
+                </div>
+
+                <div class="proof-actions">
+                    <button id="copy-hash-btn" class="action-btn">Copy Hash</button>
+                    <button id="copy-receipt-btn" class="action-btn">Copy Receipt</button>
+                    <a id="verify-link" href="../verify/" class="action-btn" target="_blank">Verify This Proof</a>
+                </div>
+
+                <div class="info-box">
+                    <strong>IMPORTANT:</strong> Save your proof hash and receipt. You can use the hash to verify this proof later.
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="error-section" class="error-section hidden">
+                <div class="error-message" id="error-message"></div>
+            </div>
+
+            <div class="info-box">
+                <strong>PRIVACY:</strong> Your content is hashed locally. Only the hash and signature are sent to the registry. Your original content never leaves your browser.
+            </div>
+        </main>
+
+        <!-- Source Link Modal -->
+        <div id="source-link-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Link Text to Source</h3>
+                    <button type="button" class="modal-close" id="modal-close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <label>Selected Text:</label>
+                        <div id="selected-text-preview" class="selected-text-preview"></div>
+                    </div>
+                    <div class="modal-section">
+                        <label for="source-type">Source Type:</label>
+                        <select id="source-type" class="registry-select">
+                            <option value="pohw-hash">PoHW Proof Hash</option>
+                            <option value="url">Website URL</option>
+                            <option value="doi">DOI (Digital Object Identifier)</option>
+                            <option value="other">Other Identifier</option>
+                        </select>
+                    </div>
+                    <div class="modal-section">
+                        <label for="source-value">Source:</label>
+                        <input type="text" id="source-value" class="registry-select" placeholder="Enter source (e.g., 0x6bf8a1..., https://example.com, doi:10.1234/example)">
+                        <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                            <span id="source-hint">For PoHW proofs, enter the hash starting with 0x</span>
+                        </p>
+                        <div id="other-type-input" class="other-type-input" style="display: none; margin-top: 0.75rem;">
+                            <label for="other-identifier-type">Identifier Type:</label>
+                            <input type="text" id="other-identifier-type" class="registry-select" placeholder="e.g., ISBN, arXiv, GitHub commit, Custom ID">
+                            <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                Specify what type of identifier this is (e.g., ISBN, arXiv, GitHub commit, etc.)
+                            </p>
+                        </div>
+                        <!-- Content Address (for PoHW hashes only) -->
+                        <div id="content-address-section" class="content-address-section" style="display: none; margin-top: 0.75rem;">
+                            <label for="content-address-type">Content Address (Optional):</label>
+                            <select id="content-address-type" class="registry-select" style="margin-bottom: 0.5rem;">
+                                <option value="">No content address</option>
+                                <option value="ipfs">IPFS CID</option>
+                                <option value="arweave">Arweave Transaction ID</option>
+                            </select>
+                            <input type="text" id="content-address-value" class="registry-select" placeholder="Enter IPFS CID (e.g., QmXxx...) or Arweave ID (e.g., xxx...)" style="display: none;">
+                            <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                <span id="content-address-hint">Optional: If the cited author archived their content, add the IPFS CID or Arweave ID to enable content retrieval</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="save-source-btn" class="action-btn primary">Link Source</button>
+                        <button type="button" id="cancel-source-btn" class="action-btn secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../verify/">Verify</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/gdnshnk/pohw-registry-node" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script type="module">
+        // Load ed25519 using esm.sh (designed for ES modules in browsers)
+        (async function() {
+            try {
+                console.log('[PoHW] Loading Ed25519 library from esm.sh...');
+                const ed25519Module = await import('https://esm.sh/@noble/ed25519@1.7.3');
+                window.ed25519 = ed25519Module;
+                console.log('[PoHW] ✅ Ed25519 library loaded successfully from esm.sh');
+            } catch (error) {
+                console.error('[PoHW] ❌ esm.sh failed:', error);
+                // Fallback 1: Try jsDelivr
+                try {
+                    console.log('[PoHW] Trying fallback: jsDelivr...');
+                    const ed25519Module = await import('https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/index.js');
+                    window.ed25519 = ed25519Module;
+                    console.log('[PoHW] ✅ Ed25519 loaded from jsDelivr');
+                } catch (error2) {
+                    console.error('[PoHW] ❌ jsDelivr failed:', error2);
+                    // Fallback 2: Try unpkg
+                    try {
+                        console.log('[PoHW] Trying fallback: unpkg...');
+                        const ed25519Module = await import('https://unpkg.com/@noble/ed25519@1.7.3/index.js');
+                        window.ed25519 = ed25519Module;
+                        console.log('[PoHW] ✅ Ed25519 loaded from unpkg');
+                    } catch (error3) {
+                        console.error('[PoHW] ❌ All Ed25519 loading methods failed:', error3);
+                        window.ed25519 = null;
+                        // Show user-friendly error
+                        window.ed25519LoadError = 'Failed to load cryptographic library. Please check your internet connection.';
+                    }
+                }
+            }
+        })();
+    </script>
+    <script src="../verify/crypto-utils.js"></script>
+    <script src="../verify/registry-discovery.js"></script>
+    <script src="process-tracker.js"></script>
+    <script src="key-manager.js"></script>
+    <script src="registry-client.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Proof — Proof of Human Work</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>CREATE PROOF</h1>
+                <p class="subtitle">Cryptographically prove your authorship</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="verification-card">
+                <div class="card-header">
+                    <h2>PROOF CREATION</h2>
+                </div>
+
+                <!-- Key Management Section -->
+                <div class="key-section">
+                    <h3>Your Identity</h3>
+                    <div id="key-status" class="key-status">
+                        <div class="key-status-item">
+                            <span class="key-label">Status:</span>
+                            <span id="key-status-text" class="key-status-text">No keys loaded</span>
+                        </div>
+                        <div class="key-status-item" id="did-display" style="display: none;">
+                            <span class="key-label">DID:</span>
+                            <span id="did-value" class="did-value">—</span>
+                        </div>
+                    </div>
+                    <div class="key-actions">
+                        <button id="generate-keys-btn" class="action-btn primary">Generate New Keys</button>
+                        <button id="import-keys-btn" class="action-btn">Import Keys</button>
+                        <button id="export-keys-btn" class="action-btn" style="display: none;">Export Keys</button>
+                    </div>
+                    <div id="import-keys-input" class="import-keys-input hidden">
+                        <textarea id="import-keys-textarea" placeholder="Paste your private key (hex format) or encrypted key"></textarea>
+                        <input type="password" id="import-password" placeholder="Password (if encrypted)" style="display: none;">
+                        <div class="import-actions">
+                            <button id="confirm-import-btn" class="action-btn">Import</button>
+                            <button id="cancel-import-btn" class="action-btn secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Input Section -->
+                <div class="input-section">
+                    <h3>Content to Prove</h3>
+                    <div class="tab-content active" id="text-tab">
+                        <textarea id="content-textarea" class="content-textarea" placeholder="Paste or type your content here..."></textarea>
+                        <p class="input-hint">The content will be hashed and signed. Process metrics (entropy, temporal coherence) will be tracked as you type.</p>
+                    </div>
+                    
+                    <!-- Assistance Profile Selection -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label for="assistance-profile">Assistance Profile</label>
+                        <select id="assistance-profile" class="registry-select">
+                            <option value="human-only">Human-Only (No AI assistance)</option>
+                            <option value="AI-assisted">AI-Assisted (Human with AI help)</option>
+                            <option value="AI-generated">AI-Generated (Primarily AI)</option>
+                        </select>
+                        <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                            Hint: Actual profile is determined from process data. This selection is used only if data is ambiguous.
+                        </p>
+                    </div>
+                    
+                    <!-- Content Archiving (Optional) - per whitepaper Section 7.3 -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label for="content-archive-option">Content Archiving (Optional)</label>
+                        <select id="content-archive-option" class="registry-select">
+                            <option value="none">No archiving</option>
+                            <option value="ipfs">Archive to IPFS</option>
+                            <option value="arweave">Archive to Arweave</option>
+                            <option value="manual">Enter content address manually</option>
+                        </select>
+                        <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                            Optional: Archive your content to IPFS or Arweave for long-term preservation. The registry stores only the content address, not the file itself.
+                        </p>
+                        <div id="content-archive-section" class="content-archive-section" style="display: none; margin-top: 0.75rem;">
+                            <div id="archive-upload-area" class="archive-upload-area" style="display: none;">
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                    Your content will be uploaded to the selected storage network. This may take a moment.
+                                </p>
+                                <button type="button" id="archive-upload-btn" class="action-btn" style="width: 100%;">
+                                    Upload Content
+                                </button>
+                                <div id="archive-status" class="archive-status" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);"></div>
+                            </div>
+                            <div id="archive-manual-input" class="archive-manual-input" style="display: none;">
+                                <input type="text" id="archive-address-input" class="registry-select" placeholder="Enter IPFS CID (e.g., QmXxx...) or Arweave ID (e.g., xxx...)">
+                                <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                    If you've already archived your content, enter the content address here.
+                                </p>
+                            </div>
+                            <div id="archive-result" class="archive-result" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: var(--bg-secondary); border-radius: 4px;">
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);">Content Address:</div>
+                                <div id="archive-address-display" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--accent-green); word-break: break-all; margin-top: 0.25rem;"></div>
+                                <a id="archive-link" href="#" target="_blank" style="font-size: 0.75rem; color: var(--accent-green); text-decoration: none; margin-top: 0.25rem; display: inline-block;">View on network</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Source Mapping (Citations/Quotes) -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label>Source Citations</label>
+                        <div class="source-mapping-controls">
+                            <button type="button" id="link-source-btn" class="action-btn" style="display: none;">
+                                Link Selected Text to Source
+                            </button>
+                            <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                                Select text in the content area above, then click "Link Selected Text to Source" to cite it.
+                            </p>
+                        </div>
+                        <div id="source-mappings-list" class="source-mappings-list" style="margin-top: 1rem; display: none;">
+                            <div class="source-mappings-header">
+                                <strong style="color: var(--text-primary); font-size: 0.85rem;">Linked Sources:</strong>
+                            </div>
+                            <div id="source-mappings-items"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registry Selector -->
+                <div class="registry-selector">
+                    <label for="registry-select">Registry Node</label>
+                    <select id="registry-select" class="registry-select">
+                        <option value="">Loading nodes...</option>
+                    </select>
+                    <div id="node-status" class="node-status"></div>
+                </div>
+
+                <!-- Create Proof Button -->
+                <button id="create-button" class="verify-button" disabled>
+                    <span class="button-text">Create Proof</span>
+                    <span class="button-loader hidden">⏳</span>
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-section" class="result-card hidden">
+                <div class="card-header">
+                    <h2>PROOF CREATED</h2>
+                    <span id="status-badge" class="status-badge">SUCCESS</span>
+                </div>
+
+                <div class="result-content">
+                    <div class="result-item">
+                        <span class="result-label">Status</span>
+                        <span class="result-value" id="result-status">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Content Hash</span>
+                        <span class="result-value hash-value" id="result-hash">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Signer DID</span>
+                        <span class="result-value" id="result-signer">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Timestamp</span>
+                        <span class="result-value" id="result-timestamp">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Registry</span>
+                        <span class="result-value" id="result-registry">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Proof Receipt</span>
+                        <span class="result-value hash-value" id="result-receipt">—</span>
+                    </div>
+                </div>
+
+                <div class="proof-actions">
+                    <button id="copy-hash-btn" class="action-btn">Copy Hash</button>
+                    <button id="copy-receipt-btn" class="action-btn">Copy Receipt</button>
+                    <a id="verify-link" href="../verify/" class="action-btn" target="_blank">Verify This Proof</a>
+                </div>
+
+                <div class="info-box">
+                    <strong>IMPORTANT:</strong> Save your proof hash and receipt. You can use the hash to verify this proof later.
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="error-section" class="error-section hidden">
+                <div class="error-message" id="error-message"></div>
+            </div>
+
+            <div class="info-box">
+                <strong>PRIVACY:</strong> Your content is hashed locally. Only the hash and signature are sent to the registry. Your original content never leaves your browser.
+            </div>
+        </main>
+
+        <!-- Source Link Modal -->
+        <div id="source-link-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Link Text to Source</h3>
+                    <button type="button" class="modal-close" id="modal-close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <label>Selected Text:</label>
+                        <div id="selected-text-preview" class="selected-text-preview"></div>
+                    </div>
+                    <div class="modal-section">
+                        <label for="source-type">Source Type:</label>
+                        <select id="source-type" class="registry-select">
+                            <option value="pohw-hash">PoHW Proof Hash</option>
+                            <option value="url">Website URL</option>
+                            <option value="doi">DOI (Digital Object Identifier)</option>
+                            <option value="other">Other Identifier</option>
+                        </select>
+                    </div>
+                    <div class="modal-section">
+                        <label for="source-value">Source:</label>
+                        <input type="text" id="source-value" class="registry-select" placeholder="Enter source (e.g., 0x6bf8a1..., https://example.com, doi:10.1234/example)">
+                        <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                            <span id="source-hint">For PoHW proofs, enter the hash starting with 0x</span>
+                        </p>
+                        <div id="other-type-input" class="other-type-input" style="display: none; margin-top: 0.75rem;">
+                            <label for="other-identifier-type">Identifier Type:</label>
+                            <input type="text" id="other-identifier-type" class="registry-select" placeholder="e.g., ISBN, arXiv, GitHub commit, Custom ID">
+                            <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                Specify what type of identifier this is (e.g., ISBN, arXiv, GitHub commit, etc.)
+                            </p>
+                        </div>
+                        <!-- Content Address (for PoHW hashes only) -->
+                        <div id="content-address-section" class="content-address-section" style="display: none; margin-top: 0.75rem;">
+                            <label for="content-address-type">Content Address (Optional):</label>
+                            <select id="content-address-type" class="registry-select" style="margin-bottom: 0.5rem;">
+                                <option value="">No content address</option>
+                                <option value="ipfs">IPFS CID</option>
+                                <option value="arweave">Arweave Transaction ID</option>
+                            </select>
+                            <input type="text" id="content-address-value" class="registry-select" placeholder="Enter IPFS CID (e.g., QmXxx...) or Arweave ID (e.g., xxx...)" style="display: none;">
+                            <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                <span id="content-address-hint">Optional: If the cited author archived their content, add the IPFS CID or Arweave ID to enable content retrieval</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="save-source-btn" class="action-btn primary">Link Source</button>
+                        <button type="button" id="cancel-source-btn" class="action-btn secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../verify/">Verify</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/gdnshnk/pohw-registry-node" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script type="module">
+        // Load ed25519 using esm.sh (designed for ES modules in browsers)
+        (async function() {
+            try {
+                console.log('[PoHW] Loading Ed25519 library from esm.sh...');
+                const ed25519Module = await import('https://esm.sh/@noble/ed25519@1.7.3');
+                window.ed25519 = ed25519Module;
+                console.log('[PoHW] ✅ Ed25519 library loaded successfully from esm.sh');
+            } catch (error) {
+                console.error('[PoHW] ❌ esm.sh failed:', error);
+                // Fallback 1: Try jsDelivr
+                try {
+                    console.log('[PoHW] Trying fallback: jsDelivr...');
+                    const ed25519Module = await import('https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/index.js');
+                    window.ed25519 = ed25519Module;
+                    console.log('[PoHW] ✅ Ed25519 loaded from jsDelivr');
+                } catch (error2) {
+                    console.error('[PoHW] ❌ jsDelivr failed:', error2);
+                    // Fallback 2: Try unpkg
+                    try {
+                        console.log('[PoHW] Trying fallback: unpkg...');
+                        const ed25519Module = await import('https://unpkg.com/@noble/ed25519@1.7.3/index.js');
+                        window.ed25519 = ed25519Module;
+                        console.log('[PoHW] ✅ Ed25519 loaded from unpkg');
+                    } catch (error3) {
+                        console.error('[PoHW] ❌ All Ed25519 loading methods failed:', error3);
+                        window.ed25519 = null;
+                        // Show user-friendly error
+                        window.ed25519LoadError = 'Failed to load cryptographic library. Please check your internet connection.';
+                    }
+                }
+            }
+        })();
+    </script>
+    <script src="../verify/crypto-utils.js"></script>
+    <script src="../verify/registry-discovery.js"></script>
+    <script src="process-tracker.js"></script>
+    <script src="key-manager.js"></script>
+    <script src="registry-client.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Proof — Proof of Human Work</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>CREATE PROOF</h1>
+                <p class="subtitle">Cryptographically prove your authorship</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="verification-card">
+                <div class="card-header">
+                    <h2>PROOF CREATION</h2>
+                </div>
+
+                <!-- Key Management Section -->
+                <div class="key-section">
+                    <h3>Your Identity</h3>
+                    <div id="key-status" class="key-status">
+                        <div class="key-status-item">
+                            <span class="key-label">Status:</span>
+                            <span id="key-status-text" class="key-status-text">No keys loaded</span>
+                        </div>
+                        <div class="key-status-item" id="did-display" style="display: none;">
+                            <span class="key-label">DID:</span>
+                            <span id="did-value" class="did-value">—</span>
+                        </div>
+                    </div>
+                    <div class="key-actions">
+                        <button id="generate-keys-btn" class="action-btn primary">Generate New Keys</button>
+                        <button id="import-keys-btn" class="action-btn">Import Keys</button>
+                        <button id="export-keys-btn" class="action-btn" style="display: none;">Export Keys</button>
+                    </div>
+                    <div id="import-keys-input" class="import-keys-input hidden">
+                        <textarea id="import-keys-textarea" placeholder="Paste your private key (hex format) or encrypted key"></textarea>
+                        <input type="password" id="import-password" placeholder="Password (if encrypted)" style="display: none;">
+                        <div class="import-actions">
+                            <button id="confirm-import-btn" class="action-btn">Import</button>
+                            <button id="cancel-import-btn" class="action-btn secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Input Section -->
+                <div class="input-section">
+                    <h3>Content to Prove</h3>
+                    <div class="tab-content active" id="text-tab">
+                        <textarea id="content-textarea" class="content-textarea" placeholder="Paste or type your content here..."></textarea>
+                        <p class="input-hint">The content will be hashed and signed. Process metrics (entropy, temporal coherence) will be tracked as you type.</p>
+                    </div>
+                    
+                    <!-- Assistance Profile Selection -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label for="assistance-profile">Assistance Profile</label>
+                        <select id="assistance-profile" class="registry-select">
+                            <option value="human-only">Human-Only (No AI assistance)</option>
+                            <option value="AI-assisted">AI-Assisted (Human with AI help)</option>
+                            <option value="AI-generated">AI-Generated (Primarily AI)</option>
+                        </select>
+                        <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                            Hint: Actual profile is determined from process data. This selection is used only if data is ambiguous.
+                        </p>
+                    </div>
+                    
+                    <!-- Content Archiving (Optional) - per whitepaper Section 7.3 -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label for="content-archive-option">Content Archiving (Optional)</label>
+                        <select id="content-archive-option" class="registry-select">
+                            <option value="none">No archiving</option>
+                            <option value="ipfs">Archive to IPFS</option>
+                            <option value="arweave">Archive to Arweave</option>
+                            <option value="manual">Enter content address manually</option>
+                        </select>
+                        <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                            Optional: Archive your content to IPFS or Arweave for long-term preservation. The registry stores only the content address, not the file itself.
+                        </p>
+                        <div id="content-archive-section" class="content-archive-section" style="display: none; margin-top: 0.75rem;">
+                            <div id="archive-upload-area" class="archive-upload-area" style="display: none;">
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                    Your content will be uploaded to the selected storage network. This may take a moment.
+                                </p>
+                                <button type="button" id="archive-upload-btn" class="action-btn" style="width: 100%;">
+                                    Upload Content
+                                </button>
+                                <div id="archive-status" class="archive-status" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);"></div>
+                            </div>
+                            <div id="archive-manual-input" class="archive-manual-input" style="display: none;">
+                                <input type="text" id="archive-address-input" class="registry-select" placeholder="Enter IPFS CID (e.g., QmXxx...) or Arweave ID (e.g., xxx...)">
+                                <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                    If you've already archived your content, enter the content address here.
+                                </p>
+                            </div>
+                            <div id="archive-result" class="archive-result" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: var(--bg-secondary); border-radius: 4px;">
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);">Content Address:</div>
+                                <div id="archive-address-display" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--accent-green); word-break: break-all; margin-top: 0.25rem;"></div>
+                                <a id="archive-link" href="#" target="_blank" style="font-size: 0.75rem; color: var(--accent-green); text-decoration: none; margin-top: 0.25rem; display: inline-block;">View on network</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Source Mapping (Citations/Quotes) -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label>Source Citations</label>
+                        <div class="source-mapping-controls">
+                            <button type="button" id="link-source-btn" class="action-btn" style="display: none;">
+                                Link Selected Text to Source
+                            </button>
+                            <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                                Select text in the content area above, then click "Link Selected Text to Source" to cite it.
+                            </p>
+                        </div>
+                        <div id="source-mappings-list" class="source-mappings-list" style="margin-top: 1rem; display: none;">
+                            <div class="source-mappings-header">
+                                <strong style="color: var(--text-primary); font-size: 0.85rem;">Linked Sources:</strong>
+                            </div>
+                            <div id="source-mappings-items"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registry Selector -->
+                <div class="registry-selector">
+                    <label for="registry-select">Registry Node</label>
+                    <select id="registry-select" class="registry-select">
+                        <option value="">Loading nodes...</option>
+                    </select>
+                    <div id="node-status" class="node-status"></div>
+                </div>
+
+                <!-- Create Proof Button -->
+                <button id="create-button" class="verify-button" disabled>
+                    <span class="button-text">Create Proof</span>
+                    <span class="button-loader hidden">⏳</span>
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-section" class="result-card hidden">
+                <div class="card-header">
+                    <h2>PROOF CREATED</h2>
+                    <span id="status-badge" class="status-badge">SUCCESS</span>
+                </div>
+
+                <div class="result-content">
+                    <div class="result-item">
+                        <span class="result-label">Status</span>
+                        <span class="result-value" id="result-status">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Content Hash</span>
+                        <span class="result-value hash-value" id="result-hash">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Signer DID</span>
+                        <span class="result-value" id="result-signer">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Timestamp</span>
+                        <span class="result-value" id="result-timestamp">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Registry</span>
+                        <span class="result-value" id="result-registry">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Proof Receipt</span>
+                        <span class="result-value hash-value" id="result-receipt">—</span>
+                    </div>
+                </div>
+
+                <div class="proof-actions">
+                    <button id="copy-hash-btn" class="action-btn">Copy Hash</button>
+                    <button id="copy-receipt-btn" class="action-btn">Copy Receipt</button>
+                    <a id="verify-link" href="../verify/" class="action-btn" target="_blank">Verify This Proof</a>
+                </div>
+
+                <div class="info-box">
+                    <strong>IMPORTANT:</strong> Save your proof hash and receipt. You can use the hash to verify this proof later.
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="error-section" class="error-section hidden">
+                <div class="error-message" id="error-message"></div>
+            </div>
+
+            <div class="info-box">
+                <strong>PRIVACY:</strong> Your content is hashed locally. Only the hash and signature are sent to the registry. Your original content never leaves your browser.
+            </div>
+        </main>
+
+        <!-- Source Link Modal -->
+        <div id="source-link-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Link Text to Source</h3>
+                    <button type="button" class="modal-close" id="modal-close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <label>Selected Text:</label>
+                        <div id="selected-text-preview" class="selected-text-preview"></div>
+                    </div>
+                    <div class="modal-section">
+                        <label for="source-type">Source Type:</label>
+                        <select id="source-type" class="registry-select">
+                            <option value="pohw-hash">PoHW Proof Hash</option>
+                            <option value="url">Website URL</option>
+                            <option value="doi">DOI (Digital Object Identifier)</option>
+                            <option value="other">Other Identifier</option>
+                        </select>
+                    </div>
+                    <div class="modal-section">
+                        <label for="source-value">Source:</label>
+                        <input type="text" id="source-value" class="registry-select" placeholder="Enter source (e.g., 0x6bf8a1..., https://example.com, doi:10.1234/example)">
+                        <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                            <span id="source-hint">For PoHW proofs, enter the hash starting with 0x</span>
+                        </p>
+                        <div id="other-type-input" class="other-type-input" style="display: none; margin-top: 0.75rem;">
+                            <label for="other-identifier-type">Identifier Type:</label>
+                            <input type="text" id="other-identifier-type" class="registry-select" placeholder="e.g., ISBN, arXiv, GitHub commit, Custom ID">
+                            <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                Specify what type of identifier this is (e.g., ISBN, arXiv, GitHub commit, etc.)
+                            </p>
+                        </div>
+                        <!-- Content Address (for PoHW hashes only) -->
+                        <div id="content-address-section" class="content-address-section" style="display: none; margin-top: 0.75rem;">
+                            <label for="content-address-type">Content Address (Optional):</label>
+                            <select id="content-address-type" class="registry-select" style="margin-bottom: 0.5rem;">
+                                <option value="">No content address</option>
+                                <option value="ipfs">IPFS CID</option>
+                                <option value="arweave">Arweave Transaction ID</option>
+                            </select>
+                            <input type="text" id="content-address-value" class="registry-select" placeholder="Enter IPFS CID (e.g., QmXxx...) or Arweave ID (e.g., xxx...)" style="display: none;">
+                            <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                <span id="content-address-hint">Optional: If the cited author archived their content, add the IPFS CID or Arweave ID to enable content retrieval</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="save-source-btn" class="action-btn primary">Link Source</button>
+                        <button type="button" id="cancel-source-btn" class="action-btn secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../verify/">Verify</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/gdnshnk/pohw-registry-node" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script type="module">
+        // Load ed25519 using esm.sh (designed for ES modules in browsers)
+        (async function() {
+            try {
+                console.log('[PoHW] Loading Ed25519 library from esm.sh...');
+                const ed25519Module = await import('https://esm.sh/@noble/ed25519@1.7.3');
+                window.ed25519 = ed25519Module;
+                console.log('[PoHW] ✅ Ed25519 library loaded successfully from esm.sh');
+            } catch (error) {
+                console.error('[PoHW] ❌ esm.sh failed:', error);
+                // Fallback 1: Try jsDelivr
+                try {
+                    console.log('[PoHW] Trying fallback: jsDelivr...');
+                    const ed25519Module = await import('https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/index.js');
+                    window.ed25519 = ed25519Module;
+                    console.log('[PoHW] ✅ Ed25519 loaded from jsDelivr');
+                } catch (error2) {
+                    console.error('[PoHW] ❌ jsDelivr failed:', error2);
+                    // Fallback 2: Try unpkg
+                    try {
+                        console.log('[PoHW] Trying fallback: unpkg...');
+                        const ed25519Module = await import('https://unpkg.com/@noble/ed25519@1.7.3/index.js');
+                        window.ed25519 = ed25519Module;
+                        console.log('[PoHW] ✅ Ed25519 loaded from unpkg');
+                    } catch (error3) {
+                        console.error('[PoHW] ❌ All Ed25519 loading methods failed:', error3);
+                        window.ed25519 = null;
+                        // Show user-friendly error
+                        window.ed25519LoadError = 'Failed to load cryptographic library. Please check your internet connection.';
+                    }
+                }
+            }
+        })();
+    </script>
+    <script src="../verify/crypto-utils.js"></script>
+    <script src="../verify/registry-discovery.js"></script>
+    <script src="process-tracker.js"></script>
+    <script src="key-manager.js"></script>
+    <script src="registry-client.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Proof — Proof of Human Work</title>
+    <link rel="stylesheet" href="../shared-styles.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>CREATE PROOF</h1>
+                <p class="subtitle">Cryptographically prove your authorship</p>
+            </div>
+        </header>
+
+        <main>
+            <div class="verification-card">
+                <div class="card-header">
+                    <h2>PROOF CREATION</h2>
+                </div>
+
+                <!-- Key Management Section -->
+                <div class="key-section">
+                    <h3>Your Identity</h3>
+                    <div id="key-status" class="key-status">
+                        <div class="key-status-item">
+                            <span class="key-label">Status:</span>
+                            <span id="key-status-text" class="key-status-text">No keys loaded</span>
+                        </div>
+                        <div class="key-status-item" id="did-display" style="display: none;">
+                            <span class="key-label">DID:</span>
+                            <span id="did-value" class="did-value">—</span>
+                        </div>
+                    </div>
+                    <div class="key-actions">
+                        <button id="generate-keys-btn" class="action-btn primary">Generate New Keys</button>
+                        <button id="import-keys-btn" class="action-btn">Import Keys</button>
+                        <button id="export-keys-btn" class="action-btn" style="display: none;">Export Keys</button>
+                    </div>
+                    <div id="import-keys-input" class="import-keys-input hidden">
+                        <textarea id="import-keys-textarea" placeholder="Paste your private key (hex format) or encrypted key"></textarea>
+                        <input type="password" id="import-password" placeholder="Password (if encrypted)" style="display: none;">
+                        <div class="import-actions">
+                            <button id="confirm-import-btn" class="action-btn">Import</button>
+                            <button id="cancel-import-btn" class="action-btn secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Input Section -->
+                <div class="input-section">
+                    <h3>Content to Prove</h3>
+                    <div class="tab-content active" id="text-tab">
+                        <textarea id="content-textarea" class="content-textarea" placeholder="Paste or type your content here..."></textarea>
+                        <p class="input-hint">The content will be hashed and signed. Process metrics (entropy, temporal coherence) will be tracked as you type.</p>
+                    </div>
+                    
+                    <!-- Assistance Profile Selection -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label for="assistance-profile">Assistance Profile</label>
+                        <select id="assistance-profile" class="registry-select">
+                            <option value="human-only">Human-Only (No AI assistance)</option>
+                            <option value="AI-assisted">AI-Assisted (Human with AI help)</option>
+                            <option value="AI-generated">AI-Generated (Primarily AI)</option>
+                        </select>
+                        <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                            Hint: Actual profile is determined from process data. This selection is used only if data is ambiguous.
+                        </p>
+                    </div>
+                    
+                    <!-- Content Archiving (Optional) - per whitepaper Section 7.3 -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label for="content-archive-option">Content Archiving (Optional)</label>
+                        <select id="content-archive-option" class="registry-select">
+                            <option value="none">No archiving</option>
+                            <option value="ipfs">Archive to IPFS</option>
+                            <option value="arweave">Archive to Arweave</option>
+                            <option value="manual">Enter content address manually</option>
+                        </select>
+                        <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                            Optional: Archive your content to IPFS or Arweave for long-term preservation. The registry stores only the content address, not the file itself.
+                        </p>
+                        <div id="content-archive-section" class="content-archive-section" style="display: none; margin-top: 0.75rem;">
+                            <div id="archive-upload-area" class="archive-upload-area" style="display: none;">
+                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                                    Your content will be uploaded to the selected storage network. This may take a moment.
+                                </p>
+                                <button type="button" id="archive-upload-btn" class="action-btn" style="width: 100%;">
+                                    Upload Content
+                                </button>
+                                <div id="archive-status" class="archive-status" style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--text-secondary);"></div>
+                            </div>
+                            <div id="archive-manual-input" class="archive-manual-input" style="display: none;">
+                                <input type="text" id="archive-address-input" class="registry-select" placeholder="Enter IPFS CID (e.g., QmXxx...) or Arweave ID (e.g., xxx...)">
+                                <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                    If you've already archived your content, enter the content address here.
+                                </p>
+                            </div>
+                            <div id="archive-result" class="archive-result" style="display: none; margin-top: 0.5rem; padding: 0.5rem; background: var(--bg-secondary); border-radius: 4px;">
+                                <div style="font-size: 0.8rem; color: var(--text-secondary);">Content Address:</div>
+                                <div id="archive-address-display" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--accent-green); word-break: break-all; margin-top: 0.25rem;"></div>
+                                <a id="archive-link" href="#" target="_blank" style="font-size: 0.75rem; color: var(--accent-green); text-decoration: none; margin-top: 0.25rem; display: inline-block;">View on network</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Source Mapping (Citations/Quotes) -->
+                    <div class="registry-selector" style="margin-top: 1.25rem;">
+                        <label>Source Citations</label>
+                        <div class="source-mapping-controls">
+                            <button type="button" id="link-source-btn" class="action-btn" style="display: none;">
+                                Link Selected Text to Source
+                            </button>
+                            <p class="input-hint" style="margin-top: 8px; font-size: 12px; color: #888;">
+                                Select text in the content area above, then click "Link Selected Text to Source" to cite it.
+                            </p>
+                        </div>
+                        <div id="source-mappings-list" class="source-mappings-list" style="margin-top: 1rem; display: none;">
+                            <div class="source-mappings-header">
+                                <strong style="color: var(--text-primary); font-size: 0.85rem;">Linked Sources:</strong>
+                            </div>
+                            <div id="source-mappings-items"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registry Selector -->
+                <div class="registry-selector">
+                    <label for="registry-select">Registry Node</label>
+                    <select id="registry-select" class="registry-select">
+                        <option value="">Loading nodes...</option>
+                    </select>
+                    <div id="node-status" class="node-status"></div>
+                </div>
+
+                <!-- Create Proof Button -->
+                <button id="create-button" class="verify-button" disabled>
+                    <span class="button-text">Create Proof</span>
+                    <span class="button-loader hidden">⏳</span>
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="results-section" class="result-card hidden">
+                <div class="card-header">
+                    <h2>PROOF CREATED</h2>
+                    <span id="status-badge" class="status-badge">SUCCESS</span>
+                </div>
+
+                <div class="result-content">
+                    <div class="result-item">
+                        <span class="result-label">Status</span>
+                        <span class="result-value" id="result-status">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Content Hash</span>
+                        <span class="result-value hash-value" id="result-hash">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Signer DID</span>
+                        <span class="result-value" id="result-signer">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Timestamp</span>
+                        <span class="result-value" id="result-timestamp">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Registry</span>
+                        <span class="result-value" id="result-registry">—</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Proof Receipt</span>
+                        <span class="result-value hash-value" id="result-receipt">—</span>
+                    </div>
+                </div>
+
+                <div class="proof-actions">
+                    <button id="copy-hash-btn" class="action-btn">Copy Hash</button>
+                    <button id="copy-receipt-btn" class="action-btn">Copy Receipt</button>
+                    <a id="verify-link" href="../verify/" class="action-btn" target="_blank">Verify This Proof</a>
+                </div>
+
+                <div class="info-box">
+                    <strong>IMPORTANT:</strong> Save your proof hash and receipt. You can use the hash to verify this proof later.
+                </div>
+            </div>
+
+            <!-- Error Section -->
+            <div id="error-section" class="error-section hidden">
+                <div class="error-message" id="error-message"></div>
+            </div>
+
+            <div class="info-box">
+                <strong>PRIVACY:</strong> Your content is hashed locally. Only the hash and signature are sent to the registry. Your original content never leaves your browser.
+            </div>
+        </main>
+
+        <!-- Source Link Modal -->
+        <div id="source-link-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Link Text to Source</h3>
+                    <button type="button" class="modal-close" id="modal-close-btn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <label>Selected Text:</label>
+                        <div id="selected-text-preview" class="selected-text-preview"></div>
+                    </div>
+                    <div class="modal-section">
+                        <label for="source-type">Source Type:</label>
+                        <select id="source-type" class="registry-select">
+                            <option value="pohw-hash">PoHW Proof Hash</option>
+                            <option value="url">Website URL</option>
+                            <option value="doi">DOI (Digital Object Identifier)</option>
+                            <option value="other">Other Identifier</option>
+                        </select>
+                    </div>
+                    <div class="modal-section">
+                        <label for="source-value">Source:</label>
+                        <input type="text" id="source-value" class="registry-select" placeholder="Enter source (e.g., 0x6bf8a1..., https://example.com, doi:10.1234/example)">
+                        <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                            <span id="source-hint">For PoHW proofs, enter the hash starting with 0x</span>
+                        </p>
+                        <div id="other-type-input" class="other-type-input" style="display: none; margin-top: 0.75rem;">
+                            <label for="other-identifier-type">Identifier Type:</label>
+                            <input type="text" id="other-identifier-type" class="registry-select" placeholder="e.g., ISBN, arXiv, GitHub commit, Custom ID">
+                            <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                Specify what type of identifier this is (e.g., ISBN, arXiv, GitHub commit, etc.)
+                            </p>
+                        </div>
+                        <!-- Content Address (for PoHW hashes only) -->
+                        <div id="content-address-section" class="content-address-section" style="display: none; margin-top: 0.75rem;">
+                            <label for="content-address-type">Content Address (Optional):</label>
+                            <select id="content-address-type" class="registry-select" style="margin-bottom: 0.5rem;">
+                                <option value="">No content address</option>
+                                <option value="ipfs">IPFS CID</option>
+                                <option value="arweave">Arweave Transaction ID</option>
+                            </select>
+                            <input type="text" id="content-address-value" class="registry-select" placeholder="Enter IPFS CID (e.g., QmXxx...) or Arweave ID (e.g., xxx...)" style="display: none;">
+                            <p class="input-hint" style="margin-top: 4px; font-size: 11px; color: #888;">
+                                <span id="content-address-hint">Optional: If the cited author archived their content, add the IPFS CID or Arweave ID to enable content retrieval</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" id="save-source-btn" class="action-btn primary">Link Source</button>
+                        <button type="button" id="cancel-source-btn" class="action-btn secondary">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../verify/">Verify</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/gdnshnk/pohw-registry-node" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script type="module">
+        // Load ed25519 using esm.sh (designed for ES modules in browsers)
+        (async function() {
+            try {
+                console.log('[PoHW] Loading Ed25519 library from esm.sh...');
+                const ed25519Module = await import('https://esm.sh/@noble/ed25519@1.7.3');
+                window.ed25519 = ed25519Module;
+                console.log('[PoHW] ✅ Ed25519 library loaded successfully from esm.sh');
+            } catch (error) {
+                console.error('[PoHW] ❌ esm.sh failed:', error);
+                // Fallback 1: Try jsDelivr
+                try {
+                    console.log('[PoHW] Trying fallback: jsDelivr...');
+                    const ed25519Module = await import('https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/index.js');
+                    window.ed25519 = ed25519Module;
+                    console.log('[PoHW] ✅ Ed25519 loaded from jsDelivr');
+                } catch (error2) {
+                    console.error('[PoHW] ❌ jsDelivr failed:', error2);
+                    // Fallback 2: Try unpkg
+                    try {
+                        console.log('[PoHW] Trying fallback: unpkg...');
+                        const ed25519Module = await import('https://unpkg.com/@noble/ed25519@1.7.3/index.js');
+                        window.ed25519 = ed25519Module;
+                        console.log('[PoHW] ✅ Ed25519 loaded from unpkg');
+                    } catch (error3) {
+                        console.error('[PoHW] ❌ All Ed25519 loading methods failed:', error3);
+                        window.ed25519 = null;
+                        // Show user-friendly error
+                        window.ed25519LoadError = 'Failed to load cryptographic library. Please check your internet connection.';
+                    }
+                }
+            }
+        })();
+    </script>
+    <script src="../verify/crypto-utils.js"></script>
+    <script src="../verify/registry-discovery.js"></script>
+    <script src="process-tracker.js"></script>
+    <script src="key-manager.js"></script>
+    <script src="registry-client.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
