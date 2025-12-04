@@ -446,3 +446,499 @@
 </body>
 </html>
 
+
+                            <div class="result-item">
+                                <span class="result-label">Tier</span>
+                                <span class="result-value reputation-tier" id="reputation-tier">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Trust Level</span>
+                                <span class="result-value" id="reputation-trust">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Successful Proofs</span>
+                                <span class="result-value" id="reputation-proofs">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Anomalies</span>
+                                <span class="result-value" id="reputation-anomalies">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Challenge/Dispute Section -->
+                    <div id="challenge-section" class="challenge-section hidden">
+                        <h4>DISPUTE RESOLUTION</h4>
+                        <div class="result-content">
+                            <div class="result-item">
+                                <span class="result-label">Challenges</span>
+                                <span class="result-value" id="challenge-count">—</span>
+                            </div>
+                            <div class="result-item" id="challenge-list-item" style="display: none;">
+                                <span class="result-label">Active Challenges</span>
+                                <div class="challenge-list" id="challenge-list"></div>
+                            </div>
+                            <div class="challenge-actions">
+                                <button id="submit-challenge-btn" class="challenge-btn">Submit Challenge</button>
+                                <button id="view-challenges-btn" class="challenge-btn secondary">View Challenges</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Challenge Form (hidden by default) -->
+                        <div id="challenge-form" class="challenge-form hidden">
+                            <div class="input-group">
+                                <label for="challenger-did">Your DID</label>
+                                <input type="text" id="challenger-did" class="challenge-input" placeholder="did:pohw:...">
+                            </div>
+                            <div class="input-group">
+                                <label for="challenge-reason">Reason</label>
+                                <select id="challenge-reason" class="challenge-select">
+                                    <option value="suspected_ai_generated">Suspected AI-Generated</option>
+                                    <option value="suspected_plagiarism">Suspected Plagiarism</option>
+                                    <option value="suspected_fraud">Suspected Fraud</option>
+                                    <option value="entropy_discrepancy">Entropy Discrepancy</option>
+                                    <option value="rate_limit_anomaly">Rate Limit Anomaly</option>
+                                    <option value="process_metrics_inconsistent">Process Metrics Inconsistent</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="challenge-description">Description</label>
+                                <textarea id="challenge-description" class="challenge-textarea" rows="4" placeholder="Describe why you are challenging this proof..."></textarea>
+                            </div>
+                            <div class="challenge-form-actions">
+                                <button id="submit-challenge-submit" class="challenge-btn primary">Submit Challenge</button>
+                                <button id="cancel-challenge-btn" class="challenge-btn secondary">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blockchain Anchors Section -->
+                    <div id="anchors-section" class="anchors-section hidden">
+                        <h4>BLOCKCHAIN ANCHORS</h4>
+                        <div id="anchors-list" class="anchors-list"></div>
+                    </div>
+
+                    <!-- Error Section -->
+                    <div id="error-section" class="error-section hidden">
+                        <div class="error-message" id="error-message"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-card">
+                <h3>VERIFICATION PROCESS</h3>
+                <ul class="info-list">
+                    <li>
+                        <strong>Content Hash:</strong> File is hashed using SHA-256 (client-side)
+                    </li>
+                    <li>
+                        <strong>Registry Lookup:</strong> Hash queried against PoHW registry
+                    </li>
+                    <li>
+                        <strong>Signature Check:</strong> Cryptographic signature verified
+                    </li>
+                    <li>
+                        <strong>Merkle Proof:</strong> Inclusion in Merkle batch confirmed
+                    </li>
+                    <li>
+                        <strong>Blockchain Anchors:</strong> Timestamp verified on public chains
+                    </li>
+                </ul>
+                <div class="privacy-note">
+                    <strong>PRIVACY:</strong> Content never leaves your browser. Only hashes are transmitted.
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/gdnshnk/pohw-registry-node" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="crypto-utils.js"></script>
+    <script src="verification.js"></script>
+    <script src="registry-discovery.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+                            <div class="result-item">
+                                <span class="result-label">Tier</span>
+                                <span class="result-value reputation-tier" id="reputation-tier">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Trust Level</span>
+                                <span class="result-value" id="reputation-trust">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Successful Proofs</span>
+                                <span class="result-value" id="reputation-proofs">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Anomalies</span>
+                                <span class="result-value" id="reputation-anomalies">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Challenge/Dispute Section -->
+                    <div id="challenge-section" class="challenge-section hidden">
+                        <h4>DISPUTE RESOLUTION</h4>
+                        <div class="result-content">
+                            <div class="result-item">
+                                <span class="result-label">Challenges</span>
+                                <span class="result-value" id="challenge-count">—</span>
+                            </div>
+                            <div class="result-item" id="challenge-list-item" style="display: none;">
+                                <span class="result-label">Active Challenges</span>
+                                <div class="challenge-list" id="challenge-list"></div>
+                            </div>
+                            <div class="challenge-actions">
+                                <button id="submit-challenge-btn" class="challenge-btn">Submit Challenge</button>
+                                <button id="view-challenges-btn" class="challenge-btn secondary">View Challenges</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Challenge Form (hidden by default) -->
+                        <div id="challenge-form" class="challenge-form hidden">
+                            <div class="input-group">
+                                <label for="challenger-did">Your DID</label>
+                                <input type="text" id="challenger-did" class="challenge-input" placeholder="did:pohw:...">
+                            </div>
+                            <div class="input-group">
+                                <label for="challenge-reason">Reason</label>
+                                <select id="challenge-reason" class="challenge-select">
+                                    <option value="suspected_ai_generated">Suspected AI-Generated</option>
+                                    <option value="suspected_plagiarism">Suspected Plagiarism</option>
+                                    <option value="suspected_fraud">Suspected Fraud</option>
+                                    <option value="entropy_discrepancy">Entropy Discrepancy</option>
+                                    <option value="rate_limit_anomaly">Rate Limit Anomaly</option>
+                                    <option value="process_metrics_inconsistent">Process Metrics Inconsistent</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="challenge-description">Description</label>
+                                <textarea id="challenge-description" class="challenge-textarea" rows="4" placeholder="Describe why you are challenging this proof..."></textarea>
+                            </div>
+                            <div class="challenge-form-actions">
+                                <button id="submit-challenge-submit" class="challenge-btn primary">Submit Challenge</button>
+                                <button id="cancel-challenge-btn" class="challenge-btn secondary">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blockchain Anchors Section -->
+                    <div id="anchors-section" class="anchors-section hidden">
+                        <h4>BLOCKCHAIN ANCHORS</h4>
+                        <div id="anchors-list" class="anchors-list"></div>
+                    </div>
+
+                    <!-- Error Section -->
+                    <div id="error-section" class="error-section hidden">
+                        <div class="error-message" id="error-message"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-card">
+                <h3>VERIFICATION PROCESS</h3>
+                <ul class="info-list">
+                    <li>
+                        <strong>Content Hash:</strong> File is hashed using SHA-256 (client-side)
+                    </li>
+                    <li>
+                        <strong>Registry Lookup:</strong> Hash queried against PoHW registry
+                    </li>
+                    <li>
+                        <strong>Signature Check:</strong> Cryptographic signature verified
+                    </li>
+                    <li>
+                        <strong>Merkle Proof:</strong> Inclusion in Merkle batch confirmed
+                    </li>
+                    <li>
+                        <strong>Blockchain Anchors:</strong> Timestamp verified on public chains
+                    </li>
+                </ul>
+                <div class="privacy-note">
+                    <strong>PRIVACY:</strong> Content never leaves your browser. Only hashes are transmitted.
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/gdnshnk/pohw-registry-node" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="crypto-utils.js"></script>
+    <script src="verification.js"></script>
+    <script src="registry-discovery.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+                            <div class="result-item">
+                                <span class="result-label">Tier</span>
+                                <span class="result-value reputation-tier" id="reputation-tier">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Trust Level</span>
+                                <span class="result-value" id="reputation-trust">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Successful Proofs</span>
+                                <span class="result-value" id="reputation-proofs">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Anomalies</span>
+                                <span class="result-value" id="reputation-anomalies">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Challenge/Dispute Section -->
+                    <div id="challenge-section" class="challenge-section hidden">
+                        <h4>DISPUTE RESOLUTION</h4>
+                        <div class="result-content">
+                            <div class="result-item">
+                                <span class="result-label">Challenges</span>
+                                <span class="result-value" id="challenge-count">—</span>
+                            </div>
+                            <div class="result-item" id="challenge-list-item" style="display: none;">
+                                <span class="result-label">Active Challenges</span>
+                                <div class="challenge-list" id="challenge-list"></div>
+                            </div>
+                            <div class="challenge-actions">
+                                <button id="submit-challenge-btn" class="challenge-btn">Submit Challenge</button>
+                                <button id="view-challenges-btn" class="challenge-btn secondary">View Challenges</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Challenge Form (hidden by default) -->
+                        <div id="challenge-form" class="challenge-form hidden">
+                            <div class="input-group">
+                                <label for="challenger-did">Your DID</label>
+                                <input type="text" id="challenger-did" class="challenge-input" placeholder="did:pohw:...">
+                            </div>
+                            <div class="input-group">
+                                <label for="challenge-reason">Reason</label>
+                                <select id="challenge-reason" class="challenge-select">
+                                    <option value="suspected_ai_generated">Suspected AI-Generated</option>
+                                    <option value="suspected_plagiarism">Suspected Plagiarism</option>
+                                    <option value="suspected_fraud">Suspected Fraud</option>
+                                    <option value="entropy_discrepancy">Entropy Discrepancy</option>
+                                    <option value="rate_limit_anomaly">Rate Limit Anomaly</option>
+                                    <option value="process_metrics_inconsistent">Process Metrics Inconsistent</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="challenge-description">Description</label>
+                                <textarea id="challenge-description" class="challenge-textarea" rows="4" placeholder="Describe why you are challenging this proof..."></textarea>
+                            </div>
+                            <div class="challenge-form-actions">
+                                <button id="submit-challenge-submit" class="challenge-btn primary">Submit Challenge</button>
+                                <button id="cancel-challenge-btn" class="challenge-btn secondary">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blockchain Anchors Section -->
+                    <div id="anchors-section" class="anchors-section hidden">
+                        <h4>BLOCKCHAIN ANCHORS</h4>
+                        <div id="anchors-list" class="anchors-list"></div>
+                    </div>
+
+                    <!-- Error Section -->
+                    <div id="error-section" class="error-section hidden">
+                        <div class="error-message" id="error-message"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-card">
+                <h3>VERIFICATION PROCESS</h3>
+                <ul class="info-list">
+                    <li>
+                        <strong>Content Hash:</strong> File is hashed using SHA-256 (client-side)
+                    </li>
+                    <li>
+                        <strong>Registry Lookup:</strong> Hash queried against PoHW registry
+                    </li>
+                    <li>
+                        <strong>Signature Check:</strong> Cryptographic signature verified
+                    </li>
+                    <li>
+                        <strong>Merkle Proof:</strong> Inclusion in Merkle batch confirmed
+                    </li>
+                    <li>
+                        <strong>Blockchain Anchors:</strong> Timestamp verified on public chains
+                    </li>
+                </ul>
+                <div class="privacy-note">
+                    <strong>PRIVACY:</strong> Content never leaves your browser. Only hashes are transmitted.
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/gdnshnk/pohw-registry-node" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="crypto-utils.js"></script>
+    <script src="verification.js"></script>
+    <script src="registry-discovery.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
+
+                            <div class="result-item">
+                                <span class="result-label">Tier</span>
+                                <span class="result-value reputation-tier" id="reputation-tier">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Trust Level</span>
+                                <span class="result-value" id="reputation-trust">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Successful Proofs</span>
+                                <span class="result-value" id="reputation-proofs">—</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="result-label">Anomalies</span>
+                                <span class="result-value" id="reputation-anomalies">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Challenge/Dispute Section -->
+                    <div id="challenge-section" class="challenge-section hidden">
+                        <h4>DISPUTE RESOLUTION</h4>
+                        <div class="result-content">
+                            <div class="result-item">
+                                <span class="result-label">Challenges</span>
+                                <span class="result-value" id="challenge-count">—</span>
+                            </div>
+                            <div class="result-item" id="challenge-list-item" style="display: none;">
+                                <span class="result-label">Active Challenges</span>
+                                <div class="challenge-list" id="challenge-list"></div>
+                            </div>
+                            <div class="challenge-actions">
+                                <button id="submit-challenge-btn" class="challenge-btn">Submit Challenge</button>
+                                <button id="view-challenges-btn" class="challenge-btn secondary">View Challenges</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Challenge Form (hidden by default) -->
+                        <div id="challenge-form" class="challenge-form hidden">
+                            <div class="input-group">
+                                <label for="challenger-did">Your DID</label>
+                                <input type="text" id="challenger-did" class="challenge-input" placeholder="did:pohw:...">
+                            </div>
+                            <div class="input-group">
+                                <label for="challenge-reason">Reason</label>
+                                <select id="challenge-reason" class="challenge-select">
+                                    <option value="suspected_ai_generated">Suspected AI-Generated</option>
+                                    <option value="suspected_plagiarism">Suspected Plagiarism</option>
+                                    <option value="suspected_fraud">Suspected Fraud</option>
+                                    <option value="entropy_discrepancy">Entropy Discrepancy</option>
+                                    <option value="rate_limit_anomaly">Rate Limit Anomaly</option>
+                                    <option value="process_metrics_inconsistent">Process Metrics Inconsistent</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label for="challenge-description">Description</label>
+                                <textarea id="challenge-description" class="challenge-textarea" rows="4" placeholder="Describe why you are challenging this proof..."></textarea>
+                            </div>
+                            <div class="challenge-form-actions">
+                                <button id="submit-challenge-submit" class="challenge-btn primary">Submit Challenge</button>
+                                <button id="cancel-challenge-btn" class="challenge-btn secondary">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blockchain Anchors Section -->
+                    <div id="anchors-section" class="anchors-section hidden">
+                        <h4>BLOCKCHAIN ANCHORS</h4>
+                        <div id="anchors-list" class="anchors-list"></div>
+                    </div>
+
+                    <!-- Error Section -->
+                    <div id="error-section" class="error-section hidden">
+                        <div class="error-message" id="error-message"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Section -->
+            <div class="info-card">
+                <h3>VERIFICATION PROCESS</h3>
+                <ul class="info-list">
+                    <li>
+                        <strong>Content Hash:</strong> File is hashed using SHA-256 (client-side)
+                    </li>
+                    <li>
+                        <strong>Registry Lookup:</strong> Hash queried against PoHW registry
+                    </li>
+                    <li>
+                        <strong>Signature Check:</strong> Cryptographic signature verified
+                    </li>
+                    <li>
+                        <strong>Merkle Proof:</strong> Inclusion in Merkle batch confirmed
+                    </li>
+                    <li>
+                        <strong>Blockchain Anchors:</strong> Timestamp verified on public chains
+                    </li>
+                </ul>
+                <div class="privacy-note">
+                    <strong>PRIVACY:</strong> Content never leaves your browser. Only hashes are transmitted.
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Protocol: Proof of Human Work v1.0.0</p>
+            <p>
+                <a href="../">Home</a> | 
+                <a href="../spec/">Specification</a> | 
+                <a href="../docs/">Documentation</a> | 
+                <a href="https://github.com/gdnshnk/pohw-registry-node" target="_blank">GitHub</a>
+            </p>
+        </footer>
+    </div>
+
+    <script src="crypto-utils.js"></script>
+    <script src="verification.js"></script>
+    <script src="registry-discovery.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
+
