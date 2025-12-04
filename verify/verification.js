@@ -289,3 +289,475 @@ if (typeof module !== 'undefined' && module.exports) {
     module.exports = VerificationClient;
 }
 
+
+            const startTime = performance.now();
+            const response = await fetch(`${this.registryUrl}/pohw/status`);
+            const endTime = performance.now();
+            const responseTime = endTime - startTime;
+            
+            if (!response.ok) {
+                return {
+                    online: false,
+                    responseTime,
+                    error: `HTTP ${response.status}`
+                };
+            }
+            
+            const data = await response.json();
+            return {
+                online: true,
+                responseTime,
+                ...data
+            };
+        } catch (error) {
+            return {
+                online: false,
+                responseTime: null,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Get registry status
+     * @returns {Promise<Object>} Registry status
+     */
+    async getStatus() {
+        try {
+            const response = await fetch(`${this.registryUrl}/pohw/status`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching status:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get batch anchors (blockchain transactions)
+     * @param {string} batchId - Batch ID
+     * @returns {Promise<Object>} Anchor information
+     */
+    async getBatchAnchors(batchId) {
+        try {
+            const response = await fetch(`${this.registryUrl}/pohw/batch/${batchId}/anchors`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching anchors:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get PAV claim (if available)
+     * @param {string} hash - Content hash
+     * @returns {Promise<Object>} PAV claim object
+     */
+    async getPAVClaim(hash) {
+        const normalizedHash = hash.startsWith('0x') ? hash.substring(2) : hash;
+        
+        try {
+            // Use /pohw/claim/:hash endpoint for PAV claim (JSON-LD format)
+            const response = await fetch(`${this.registryUrl}/pohw/claim/${normalizedHash}`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching PAV claim:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get reputation for a DID
+     * @param {string} did - DID identifier
+     * @returns {Promise<Object>} Reputation data
+     */
+    async getReputation(did) {
+        try {
+            const encodedDid = encodeURIComponent(did);
+            const response = await fetch(`${this.registryUrl}/pohw/reputation/${encodedDid}`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching reputation:', error);
+            return null;
+        }
+    }
+}
+
+// Export for use in other scripts
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = VerificationClient;
+}
+
+
+            const startTime = performance.now();
+            const response = await fetch(`${this.registryUrl}/pohw/status`);
+            const endTime = performance.now();
+            const responseTime = endTime - startTime;
+            
+            if (!response.ok) {
+                return {
+                    online: false,
+                    responseTime,
+                    error: `HTTP ${response.status}`
+                };
+            }
+            
+            const data = await response.json();
+            return {
+                online: true,
+                responseTime,
+                ...data
+            };
+        } catch (error) {
+            return {
+                online: false,
+                responseTime: null,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Get registry status
+     * @returns {Promise<Object>} Registry status
+     */
+    async getStatus() {
+        try {
+            const response = await fetch(`${this.registryUrl}/pohw/status`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching status:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get batch anchors (blockchain transactions)
+     * @param {string} batchId - Batch ID
+     * @returns {Promise<Object>} Anchor information
+     */
+    async getBatchAnchors(batchId) {
+        try {
+            const response = await fetch(`${this.registryUrl}/pohw/batch/${batchId}/anchors`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching anchors:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get PAV claim (if available)
+     * @param {string} hash - Content hash
+     * @returns {Promise<Object>} PAV claim object
+     */
+    async getPAVClaim(hash) {
+        const normalizedHash = hash.startsWith('0x') ? hash.substring(2) : hash;
+        
+        try {
+            // Use /pohw/claim/:hash endpoint for PAV claim (JSON-LD format)
+            const response = await fetch(`${this.registryUrl}/pohw/claim/${normalizedHash}`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching PAV claim:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get reputation for a DID
+     * @param {string} did - DID identifier
+     * @returns {Promise<Object>} Reputation data
+     */
+    async getReputation(did) {
+        try {
+            const encodedDid = encodeURIComponent(did);
+            const response = await fetch(`${this.registryUrl}/pohw/reputation/${encodedDid}`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching reputation:', error);
+            return null;
+        }
+    }
+}
+
+// Export for use in other scripts
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = VerificationClient;
+}
+
+
+            const startTime = performance.now();
+            const response = await fetch(`${this.registryUrl}/pohw/status`);
+            const endTime = performance.now();
+            const responseTime = endTime - startTime;
+            
+            if (!response.ok) {
+                return {
+                    online: false,
+                    responseTime,
+                    error: `HTTP ${response.status}`
+                };
+            }
+            
+            const data = await response.json();
+            return {
+                online: true,
+                responseTime,
+                ...data
+            };
+        } catch (error) {
+            return {
+                online: false,
+                responseTime: null,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Get registry status
+     * @returns {Promise<Object>} Registry status
+     */
+    async getStatus() {
+        try {
+            const response = await fetch(`${this.registryUrl}/pohw/status`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching status:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get batch anchors (blockchain transactions)
+     * @param {string} batchId - Batch ID
+     * @returns {Promise<Object>} Anchor information
+     */
+    async getBatchAnchors(batchId) {
+        try {
+            const response = await fetch(`${this.registryUrl}/pohw/batch/${batchId}/anchors`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching anchors:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get PAV claim (if available)
+     * @param {string} hash - Content hash
+     * @returns {Promise<Object>} PAV claim object
+     */
+    async getPAVClaim(hash) {
+        const normalizedHash = hash.startsWith('0x') ? hash.substring(2) : hash;
+        
+        try {
+            // Use /pohw/claim/:hash endpoint for PAV claim (JSON-LD format)
+            const response = await fetch(`${this.registryUrl}/pohw/claim/${normalizedHash}`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching PAV claim:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get reputation for a DID
+     * @param {string} did - DID identifier
+     * @returns {Promise<Object>} Reputation data
+     */
+    async getReputation(did) {
+        try {
+            const encodedDid = encodeURIComponent(did);
+            const response = await fetch(`${this.registryUrl}/pohw/reputation/${encodedDid}`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching reputation:', error);
+            return null;
+        }
+    }
+}
+
+// Export for use in other scripts
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = VerificationClient;
+}
+
+
+            const startTime = performance.now();
+            const response = await fetch(`${this.registryUrl}/pohw/status`);
+            const endTime = performance.now();
+            const responseTime = endTime - startTime;
+            
+            if (!response.ok) {
+                return {
+                    online: false,
+                    responseTime,
+                    error: `HTTP ${response.status}`
+                };
+            }
+            
+            const data = await response.json();
+            return {
+                online: true,
+                responseTime,
+                ...data
+            };
+        } catch (error) {
+            return {
+                online: false,
+                responseTime: null,
+                error: error.message
+            };
+        }
+    }
+
+    /**
+     * Get registry status
+     * @returns {Promise<Object>} Registry status
+     */
+    async getStatus() {
+        try {
+            const response = await fetch(`${this.registryUrl}/pohw/status`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching status:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get batch anchors (blockchain transactions)
+     * @param {string} batchId - Batch ID
+     * @returns {Promise<Object>} Anchor information
+     */
+    async getBatchAnchors(batchId) {
+        try {
+            const response = await fetch(`${this.registryUrl}/pohw/batch/${batchId}/anchors`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching anchors:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get PAV claim (if available)
+     * @param {string} hash - Content hash
+     * @returns {Promise<Object>} PAV claim object
+     */
+    async getPAVClaim(hash) {
+        const normalizedHash = hash.startsWith('0x') ? hash.substring(2) : hash;
+        
+        try {
+            // Use /pohw/claim/:hash endpoint for PAV claim (JSON-LD format)
+            const response = await fetch(`${this.registryUrl}/pohw/claim/${normalizedHash}`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching PAV claim:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get reputation for a DID
+     * @param {string} did - DID identifier
+     * @returns {Promise<Object>} Reputation data
+     */
+    async getReputation(did) {
+        try {
+            const encodedDid = encodeURIComponent(did);
+            const response = await fetch(`${this.registryUrl}/pohw/reputation/${encodedDid}`);
+            
+            if (!response.ok) {
+                return null;
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('Error fetching reputation:', error);
+            return null;
+        }
+    }
+}
+
+// Export for use in other scripts
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = VerificationClient;
+}
+
